@@ -213,7 +213,7 @@ function ICLCard({ onDataChange }) {
 
       {/* BCRA Link */}
       <a
-        href="https://www.bcra.gob.ar/PublicacionesEstadisticas/index_icl.asp"
+        href="https://www.bcra.gob.ar/calculadora-icl"
         target="_blank"
         rel="noreferrer"
         className="flex items-center gap-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
