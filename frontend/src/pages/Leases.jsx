@@ -4,7 +4,7 @@ import { FileText, Plus, Search, Edit2, Trash2, Calendar, DollarSign, Percent, T
 import { Badge }              from "../components/ui/Badge";
 import { AjusteBadge, LeaseDetailModal } from "../components/leases/LeaseDetailModal";
 import { LeaseFormModal }     from "../components/leases/LeaseFormModal";
-import { IndicesPanel }       from "../components/leases/indicesPanel";
+import { IndicesPanel }       from "../components/leases/IndicesPanel";
 import { fmtDate, fmtCurrency, diffDays, getAlertLevel, isValidDate, API, apiCall } from "../utils/helpers";
 
 const TABS = ["activo", "vencido", "rescindido", "renovado", "todos"];
