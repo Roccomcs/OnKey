@@ -10,7 +10,7 @@ import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 // ─── StatCard interactivo ─────────────────────────────────────────────────────
 function StatCard({ icon: Icon, label, value, color = "blue", trend, onClick }) {
   const colors = {
-    blue:   { bg: "bg-violet-50 dark:bg-violet-900/30",       icon: "text-violet-600 dark:text-violet-400",     ring: "hover:ring-violet-300 dark:hover:ring-violet-700" },
+    blue:   { bg: "bg-blue-50 dark:bg-blue-900/30",       icon: "text-blue-600 dark:text-blue-400",     ring: "hover:ring-blue-300 dark:hover:ring-blue-700" },
     green:  { bg: "bg-emerald-50 dark:bg-emerald-900/30", icon: "text-emerald-600 dark:text-emerald-400", ring: "hover:ring-emerald-300 dark:hover:ring-emerald-700" },
     orange: { bg: "bg-orange-50 dark:bg-orange-900/30",   icon: "text-orange-600 dark:text-orange-400", ring: "hover:ring-orange-300 dark:hover:ring-orange-700" },
     slate:  { bg: "bg-slate-50 dark:bg-slate-700",        icon: "text-slate-600 dark:text-slate-300",   ring: "hover:ring-slate-300 dark:hover:ring-slate-600" },
@@ -134,11 +134,11 @@ function DashboardOcupacion({ properties, setActive }) {
   return properties.length > 0 && (
     <button
       onClick={() => setActive({ page: "properties", filter: "todos" })}
-      className="w-full text-left bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 hover:shadow-md hover:ring-2 hover:ring-violet-200 dark:hover:ring-violet-800 transition-all"
+      className="w-full text-left bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 hover:shadow-md hover:ring-2 hover:ring-blue-200 dark:hover:ring-blue-800 transition-all"
     >
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
-          <PieChart size={18} className="text-violet-600 dark:text-violet-400" />
+          <PieChart size={18} className="text-blue-600 dark:text-blue-400" />
           Tasa de Ocupación
         </h3>
         <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -147,7 +147,7 @@ function DashboardOcupacion({ properties, setActive }) {
       </div>
       <div className="h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
         <div
-          className="h-full bg-gradient-to-r from-violet-500 to-violet-600 rounded-full transition-all duration-700"
+          className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-700"
           style={{ width: `${(occupied / properties.length) * 100}%` }}
         />
       </div>
@@ -217,7 +217,7 @@ function DashboardContratosRecientes({ leases, properties, tenants, setActive })
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5">
       <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
-        <Clock size={18} className="text-violet-600 dark:text-violet-400" />
+        <Clock size={18} className="text-blue-600 dark:text-blue-400" />
         Contratos Activos Recientes
       </h3>
       {recentLeases.length === 0 ? (
@@ -235,8 +235,8 @@ function DashboardContratosRecientes({ leases, properties, tenants, setActive })
                 onClick={() => setActive({ page: "leases", filter: "activo" })}
                 className="w-full text-left flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
-                <div className="w-8 h-8 rounded-lg bg-violet-50 dark:bg-violet-900/30 flex items-center justify-center flex-shrink-0">
-                  <FileText size={14} className="text-violet-600 dark:text-violet-400" />
+                <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                  <FileText size={14} className="text-blue-600 dark:text-blue-400" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{prop?.address}</p>

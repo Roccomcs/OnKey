@@ -111,7 +111,7 @@ export default function Planes({ token }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 rounded-full border-4 border-violet-200 border-t-violet-600 animate-spin" />
+        <div className="w-8 h-8 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin" />
       </div>
     );
   }
@@ -158,14 +158,14 @@ export default function Planes({ token }) {
                 key={plan.id}
                 className={`relative rounded-2xl border-2 p-6 flex flex-col transition-shadow ${
                   esPro
-                    ? 'border-violet-500 shadow-lg shadow-violet-100 dark:shadow-violet-900/30'
+                    ? 'border-blue-500 shadow-lg shadow-blue-100 dark:shadow-blue-900/30'
                     : 'border-gray-200 dark:border-gray-700 shadow-sm'
                 } bg-white dark:bg-gray-800`}
               >
                 {/* Badge popular */}
                 {esPro && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="bg-violet-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                    <span className="bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
                       Más popular
                     </span>
                   </div>
@@ -223,7 +223,7 @@ export default function Planes({ token }) {
                     disabled={!!upgrading}
                     className={`w-full py-2 rounded-lg text-sm font-semibold text-white transition ${
                       esPro
-                        ? 'bg-violet-600 hover:bg-violet-700'
+                        ? 'bg-blue-600 hover:bg-blue-700'
                         : 'bg-gray-700 hover:bg-gray-800 dark:bg-gray-600 dark:hover:bg-gray-500'
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                   >

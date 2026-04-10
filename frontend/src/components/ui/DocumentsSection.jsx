@@ -10,7 +10,7 @@ function fmtSize(bytes) {
 function DocIcon({ mimeType }) {
   if (mimeType === "application/pdf")
     return <FileText size={16} className="text-red-500 dark:text-red-400 flex-shrink-0" />;
-  return <ImageIcon size={16} className="text-violet-500 dark:text-violet-400 flex-shrink-0" />;
+  return <ImageIcon size={16} className="text-blue-500 dark:text-blue-400 flex-shrink-0" />;
 }
 
 export function DocumentsSection({ entityType, entityId, docs, loading, uploading, error, upload, remove, getFileUrl }) {
@@ -73,8 +73,8 @@ export function DocumentsSection({ entityType, entityId, docs, loading, uploadin
         onClick={() => !uploading && inputRef.current?.click()}
         className={`relative border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-all ${
           dragOver
-            ? "border-violet-400 bg-violet-50 dark:bg-violet-900/20"
-            : "border-gray-200 dark:border-gray-600 hover:border-violet-300 dark:hover:border-violet-600 hover:bg-gray-50 dark:hover:bg-gray-700/30"
+            ? "border-blue-400 bg-blue-50 dark:bg-blue-900/20"
+            : "border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700/30"
         }`}
       >
         <input
@@ -87,14 +87,14 @@ export function DocumentsSection({ entityType, entityId, docs, loading, uploadin
         />
         {uploading ? (
           <div className="flex items-center justify-center gap-2 py-1">
-            <Loader2 size={16} className="animate-spin text-violet-500" />
-            <p className="text-sm text-violet-600 dark:text-violet-400">Subiendo…</p>
+            <Loader2 size={16} className="animate-spin text-blue-500" />
+            <p className="text-sm text-blue-600 dark:text-blue-400">Subiendo…</p>
           </div>
         ) : (
           <div className="flex items-center justify-center gap-2 py-1">
             <Upload size={16} className="text-gray-400" />
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              <span className="text-violet-600 dark:text-violet-400 font-medium">Elegí un archivo</span>
+              <span className="text-blue-600 dark:text-blue-400 font-medium">Elegí un archivo</span>
               {" "}o arrastrá aquí
             </p>
             <p className="text-xs text-gray-400 dark:text-gray-500 hidden sm:inline">· PDF, PNG, JPG · máx 10 MB</p>
@@ -135,11 +135,11 @@ export function DocumentsSection({ entityType, entityId, docs, loading, uploadin
                   href={getFileUrl(doc.id)}
                   target="_blank"
                   rel="noreferrer"
-                  className="p-1.5 rounded-lg hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors"
+                  className="p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
                   title="Ver / descargar"
                   onClick={e => e.stopPropagation()}
                 >
-                  <ExternalLink size={13} className="text-violet-500" />
+                  <ExternalLink size={13} className="text-blue-500" />
                 </a>
                 <button
                   onClick={e => { e.stopPropagation(); remove(doc.id); }}

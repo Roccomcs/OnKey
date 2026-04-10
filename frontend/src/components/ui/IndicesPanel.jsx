@@ -209,11 +209,11 @@ export function IndicesPanel({ embedded = false }) {
             key={tipo}
             className={`rounded-xl p-3 border ${
               color === "blue"
-                ? "bg-violet-50 dark:bg-violet-900/20 border-violet-100 dark:border-violet-900/40"
-                : "bg-violet-50 dark:bg-violet-900/20 border-violet-100 dark:border-violet-900/40"
+                ? "bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-900/40"
+                : "bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-900/40"
             }`}
           >
-            <p className={`text-xs font-bold ${color === "blue" ? "text-violet-600 dark:text-violet-400" : "text-violet-600 dark:text-violet-400"}`}>
+            <p className={`text-xs font-bold ${color === "blue" ? "text-blue-600 dark:text-blue-400" : "text-blue-600 dark:text-blue-400"}`}>
               {tipo}
             </p>
             {row ? (
@@ -288,7 +288,7 @@ export function IndicesPanel({ embedded = false }) {
         <button
           onClick={saveManual}
           disabled={saving || !form.periodo || !form.valor}
-          className="w-full flex items-center justify-center gap-2 py-2.5 bg-violet-600 hover:bg-violet-700 disabled:opacity-40 text-white text-sm font-medium rounded-xl transition-colors"
+          className="w-full flex items-center justify-center gap-2 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white text-sm font-medium rounded-xl transition-colors"
         >
           {saving
             ? <><Loader2 size={14} className="animate-spin" /> Guardando…</>

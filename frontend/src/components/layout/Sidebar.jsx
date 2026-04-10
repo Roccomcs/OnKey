@@ -17,7 +17,7 @@ export function Sidebar({ active, setActive, alertCount, dark, toggleDark, user,
       {/* Logo */}
       <div className="px-5 py-5 border-b border-gray-100 dark:border-gray-700">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
             <Building2 size={16} className="text-white" />
           </div>
           <div>
@@ -40,11 +40,11 @@ export function Sidebar({ active, setActive, alertCount, dark, toggleDark, user,
               onClick={() => setActive(id)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 isActive
-                  ? "bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400"
+                  ? "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
                   : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
               }`}
             >
-              <Icon size={16} className={isActive ? "text-violet-600 dark:text-violet-400" : "text-gray-400 dark:text-gray-500"} />
+              <Icon size={16} className={isActive ? "text-blue-600 dark:text-blue-400" : "text-gray-400 dark:text-gray-500"} />
               {label}
               {badge && (
                 <span className="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
@@ -73,16 +73,16 @@ export function Sidebar({ active, setActive, alertCount, dark, toggleDark, user,
         <div className="relative">
           <button
             onClick={() => setUserMenuOpen(!userMenuOpen)}
-            className="w-full flex items-center gap-3 px-3 py-3 rounded-lg bg-gradient-to-r from-violet-50 to-indigo-50 dark:from-violet-900/30 dark:to-indigo-900/30 hover:from-violet-100 hover:to-indigo-100 dark:hover:from-violet-900/50 dark:hover:to-indigo-900/50 transition-all border border-violet-200 dark:border-violet-800"
+            className="w-full flex items-center gap-3 px-3 py-3 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/50 dark:hover:to-indigo-900/50 transition-all border border-blue-200 dark:border-blue-800"
           >
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-400 to-violet-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
               {user?.nombre?.[0]?.toUpperCase() || 'A'}
             </div>
             <div className="min-w-0 flex-1 text-left">
               <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 truncate">
                 {user?.nombre || 'Usuario'}
               </p>
-              <p className="text-xs text-violet-600 dark:text-violet-400 font-medium truncate">
+              <p className="text-xs text-blue-600 dark:text-blue-400 font-medium truncate">
                 {subscription?.plan_nombre || 'Sin plan'}
               </p>
             </div>
@@ -111,7 +111,7 @@ export function Sidebar({ active, setActive, alertCount, dark, toggleDark, user,
                   setUserMenuOpen(false);
                   setActive("planes");
                 }}
-                className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors font-medium"
+                className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors font-medium"
               >
                 <Zap size={16} />
                 Mejorar Plan

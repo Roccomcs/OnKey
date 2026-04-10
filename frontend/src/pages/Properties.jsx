@@ -238,7 +238,7 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Propiedades</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{properties.length} propiedades registradas</p>
         </div>
-        <button onClick={openNew} className="flex items-center gap-2 px-4 py-2.5 bg-violet-600 text-white text-sm font-medium rounded-xl hover:bg-violet-700 transition-colors shadow-sm shadow-violet-200">
+        <button onClick={openNew} className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition-colors shadow-sm shadow-blue-200">
           <Plus size={16} /> Nueva Propiedad
         </button>
       </div>
@@ -250,14 +250,14 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar por dirección..."
-            className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:border-violet-500 focus:ring-2 focus:ring-violet-100 dark:focus:ring-violet-900 outline-none transition-all placeholder:text-gray-400"
+            className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all placeholder:text-gray-400"
           />
         </div>
         <div className="flex gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl p-1">
           {["todos", "ocupado", "vacante"].map(f => (
             <button key={f} onClick={() => setFilter(f)}
               className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all capitalize ${
-                filter === f ? "bg-violet-600 text-white" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                filter === f ? "bg-blue-600 text-white" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
               }`}>
               {f}
             </button>
@@ -284,8 +284,8 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-4 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-900/30 flex items-center justify-center flex-shrink-0">
-                    <Building2 size={16} className="text-violet-600 dark:text-violet-400" />
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                    <Building2 size={16} className="text-blue-600 dark:text-blue-400" />
                   </div>
                   <div className="min-w-0">
                     <p className="font-semibold text-gray-800 dark:text-gray-200 truncate">{p.address}</p>
@@ -376,7 +376,7 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
             <button onClick={() => setModal(false)} className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-gray-600 text-sm font-medium text-gray-600 dark:text-gray-400 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
               Cancelar
             </button>
-            <button onClick={save} disabled={saving} className="flex-1 px-4 py-2.5 bg-violet-600 text-white text-sm font-medium rounded-xl hover:bg-violet-700 disabled:opacity-50 transition-colors">
+            <button onClick={save} disabled={saving} className="flex-1 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors">
               {saving ? "Guardando…" : (editing ? "Actualizar" : "Crear Propiedad")}
             </button>
           </div>

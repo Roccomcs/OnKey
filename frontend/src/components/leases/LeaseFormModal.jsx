@@ -122,7 +122,7 @@ export function LeaseFormModal({
             Cancelar
           </button>
           <button onClick={onSave} disabled={saving}
-            className="flex-1 px-4 py-2.5 bg-violet-600 text-white text-sm font-medium rounded-xl hover:bg-violet-700 disabled:opacity-50 transition-colors">
+            className="flex-1 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors">
             {saving ? "Guardando…" : (editing ? "Actualizar" : "Crear Contrato")}
           </button>
         </div>

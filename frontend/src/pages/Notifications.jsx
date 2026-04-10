@@ -229,7 +229,7 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
             onClick={() => { setTab(key); setSearch(""); }}
             className={`flex items-center gap-1.5 px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${
               tab === key
-                ? "bg-violet-600 text-white"
+                ? "bg-blue-600 text-white"
                 : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
             }`}
           >
@@ -256,7 +256,7 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder={tab === "pendientes" ? "Buscar alertas pendientes..." : "Buscar alertas revisadas..."}
-          className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:border-violet-500 focus:ring-2 focus:ring-violet-100 dark:focus:ring-violet-900 outline-none transition-all placeholder:text-gray-400"
+          className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all placeholder:text-gray-400"
         />
       </div>
 
@@ -335,7 +335,7 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
                 <p className="font-medium text-gray-700 dark:text-gray-300 text-sm">Todas las alertas revisadas</p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                   Podés verlas en la tab{" "}
-                  <button onClick={() => setTab("revisadas")} className="text-violet-500 hover:underline font-medium">
+                  <button onClick={() => setTab("revisadas")} className="text-blue-500 hover:underline font-medium">
                     Revisadas
                   </button>
                 </p>
@@ -504,7 +504,7 @@ export function IndicesAdmin() {
         </Field>
       </div>
       <button onClick={saveManual}
-        className="w-full py-2.5 bg-violet-600 text-white text-sm font-medium rounded-xl hover:bg-violet-700 transition-colors">
+        className="w-full py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition-colors">
         Guardar valor manual
       </button>
 
