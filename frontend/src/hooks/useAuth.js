@@ -2,7 +2,8 @@ import { useState, useCallback, useEffect } from 'react';
 
 // Con el proxy de Vite configurado, usamos URL relativa.
 // Esto evita cualquier problema de CORS en desarrollo.
-const API_BASE_URL = '/api';
+import { API } from '../utils/helpers';
+const API_BASE_URL = API;
 
 export function useAuth() {
   const [user, setUser] = useState(null);
