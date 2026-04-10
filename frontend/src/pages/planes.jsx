@@ -1,5 +1,6 @@
 // frontend/src/pages/planes.jsx
 import { useState, useEffect } from 'react';
+import { API } from '../utils/helpers';
 
 const FEATURES = {
   Starter: [                           // ← era "Gratis"
@@ -48,28 +49,36 @@ export default function Planes({ token }) {
   }, []);
 
   useEffect(() => {
-    if (!token) return;
+    if (!token) {
+      setLoading(false);
+      return;
+    }
 
     async function fetchData() {
+      // Carga los planes (endpoint público)
       try {
-        const [planesRes, miPlanRes] = await Promise.all([
-          fetch('/api/subscriptions/planes'),
-          fetch('/api/subscriptions/mi-plan', {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
-
+        const planesRes = await fetch(`${API}/subscriptions/planes`);
         const planesData = await planesRes.json();
+        if (!planesRes.ok) throw new Error(planesData.error || `Error ${planesRes.status}`);
         setPlanes(Array.isArray(planesData) ? planesData : []);
+      } catch (err) {
+        console.error('[planes] Error cargando planes:', err);
+        setError(`Error al cargar los planes: ${err.message}`);
+      } finally {
+        setLoading(false);
+      }
 
+      // Carga el plan actual del usuario (independiente — si falla no rompe los planes)
+      try {
+        const miPlanRes = await fetch(`${API}/subscriptions/mi-plan`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         if (miPlanRes.ok) {
           const miPlan = await miPlanRes.json();
           setPlanActual(miPlan);
         }
       } catch (err) {
-        setError('Error al cargar los planes. Verificá tu conexión.');
-      } finally {
-        setLoading(false);
+        console.warn('[planes] No se pudo cargar el plan actual:', err.message);
       }
     }
 
@@ -80,7 +89,7 @@ export default function Planes({ token }) {
     setError('');
     setUpgrading(plan.id);
     try {
-      const res = await fetch('/api/subscriptions/upgrade', {
+      const res = await fetch(`${API}/subscriptions/upgrade`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
