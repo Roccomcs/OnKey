@@ -3,7 +3,8 @@
     "allow": [
       "Bash(git filter-repo:*)",
       "Bash(pip show:*)",
-      "Bash(pip install:*)"
+      "Bash(pip install:*)",
+      "Bash(node -e ':*)"
     ]
   }
 }

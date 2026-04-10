@@ -32,13 +32,18 @@ export function mapTenant(row) {
 
 export function mapProperty(row) {
   return {
-    id:      String(row.id),
-    address: `${row.direccion}${row.numero ? ", " + row.numero : ""}`,
-    type:    mapTipo(row.tipo),
-    price:   Number(row.precio_lista),
-    status:  row.estado === "alquilada" ? "ocupado" : "vacante",
-    ownerId: String(row.id_propietario),
-    leaseId: row.leaseId ? String(row.leaseId) : null,
+    id:           String(row.id),
+    address:      `${row.direccion}${row.numero ? ", " + row.numero : ""}`,
+    type:         mapTipo(row.tipo),
+    price:        Number(row.precio_lista),
+    moneda:       row.moneda || "ARS",
+    status:       row.estado === "alquilada" ? "ocupado" : "vacante",
+    ownerId:      String(row.id_propietario),
+    leaseId:      row.leaseId ? String(row.leaseId) : null,
+    operacion:    row.operacion || "alquiler",
+    localidad:    row.localidad || "",
+    provincia:    row.provincia || "",
+    codigoPostal: row.codigo_postal || "",
   };
 }
 
