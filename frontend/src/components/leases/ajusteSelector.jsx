@@ -216,20 +216,20 @@ export function AjusteSelector({
               onClick={() => onChange(t.id)}
               className={`relative flex flex-col items-center gap-1.5 p-4 rounded-xl border-2 transition-all ${
                 tipoAjuste === t.id
-                  ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                  ? "border-violet-500 bg-violet-50 dark:bg-violet-900/20"
                   : "border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-500"
               }`}
             >
               {tipoAjuste === t.id && (
-                <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-blue-500" />
+                <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-violet-500" />
               )}
-              <span className={`text-lg font-bold ${tipoAjuste === t.id ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400"}`}>
+              <span className={`text-lg font-bold ${tipoAjuste === t.id ? "text-violet-600 dark:text-violet-400" : "text-gray-500 dark:text-gray-400"}`}>
                 {t.icon}
               </span>
-              <p className={`text-sm font-semibold ${tipoAjuste === t.id ? "text-blue-700 dark:text-blue-300" : "text-gray-700 dark:text-gray-300"}`}>
+              <p className={`text-sm font-semibold ${tipoAjuste === t.id ? "text-violet-700 dark:text-violet-300" : "text-gray-700 dark:text-gray-300"}`}>
                 {t.label}
               </p>
-              <p className={`text-xs ${tipoAjuste === t.id ? "text-blue-500 dark:text-blue-400" : "text-gray-400 dark:text-gray-500"}`}>
+              <p className={`text-xs ${tipoAjuste === t.id ? "text-violet-500 dark:text-violet-400" : "text-gray-400 dark:text-gray-500"}`}>
                 {t.sub}
               </p>
             </button>
@@ -248,7 +248,7 @@ export function AjusteSelector({
               onClick={() => onPeriod(p.id)}
               className={`py-2 rounded-xl text-xs font-medium transition-all ${
                 period === p.id
-                  ? "bg-blue-600 text-white shadow-sm"
+                  ? "bg-violet-600 text-white shadow-sm"
                   : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600"
               }`}
             >
@@ -275,16 +275,16 @@ export function AjusteSelector({
       {tipoAjuste === "ICL" && (
         <div className="space-y-3">
           {/* Info pill azul */}
-          <div className="flex gap-2.5 p-3.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
-            <Info size={15} className="text-blue-500 flex-shrink-0 mt-0.5" />
+          <div className="flex gap-2.5 p-3.5 bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 rounded-xl">
+            <Info size={15} className="text-violet-500 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="text-xs font-semibold text-blue-700 dark:text-blue-300 mb-0.5">Ajuste por ICL</p>
-              <p className="text-xs text-blue-600 dark:text-blue-400 mb-2">{descriptions.ICL}</p>
+              <p className="text-xs font-semibold text-violet-700 dark:text-violet-300 mb-0.5">Ajuste por ICL</p>
+              <p className="text-xs text-violet-600 dark:text-violet-400 mb-2">{descriptions.ICL}</p>
               <a
                 href="https://www.bcra.gob.ar/calculadora-icl"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-600 dark:text-violet-400 hover:underline"
               >
                 <ExternalLink size={11} />
                 Consultá la variación ICL en el BCRA
@@ -336,13 +336,13 @@ export function AjusteSelector({
           {!loading && !error && (
             <>
               {/* Info pill azul con valor si hay datos */}
-              <div className="flex gap-2.5 p-3.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
-                <Info size={15} className="text-blue-500 flex-shrink-0 mt-0.5" />
+              <div className="flex gap-2.5 p-3.5 bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 rounded-xl">
+                <Info size={15} className="text-violet-500 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <p className="text-xs font-semibold text-blue-700 dark:text-blue-300 mb-0.5">Ajuste por IPC</p>
-                  <p className="text-xs text-blue-600 dark:text-blue-400">{descriptions.IPC}</p>
+                  <p className="text-xs font-semibold text-violet-700 dark:text-violet-300 mb-0.5">Ajuste por IPC</p>
+                  <p className="text-xs text-violet-600 dark:text-violet-400">{descriptions.IPC}</p>
                   {hasData && latest && (
-                    <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                    <p className="text-xs text-violet-600 dark:text-violet-400 mt-1">
                       Último valor:{" "}
                       <strong>{latest.valor?.toLocaleString("es-AR", { minimumFractionDigits: 2 })}%</strong>
                       {" "}· {fmtPeriodo(latest.periodo)}
@@ -351,7 +351,7 @@ export function AjusteSelector({
                 </div>
                 {hasData && (
                   <button type="button" onClick={reload} title="Recargar"
-                    className="p-1.5 rounded-lg text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-800/40 transition-colors self-start">
+                    className="p-1.5 rounded-lg text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-800/40 transition-colors self-start">
                     <RefreshCw size={11} />
                   </button>
                 )}

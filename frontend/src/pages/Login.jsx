@@ -97,18 +97,18 @@ export default function Login({ auth, verifiedStatus }) {
   };
 
   // ── Clases reutilizables ───────────────────────────────────────────────────
-  const inputCls = `w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition ${
+  const inputCls = `w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent outline-none transition ${
     dark ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500' : 'border border-gray-300 text-gray-900 placeholder-gray-400'
   }`;
   const labelCls = `block text-sm font-medium mb-1 ${dark ? 'text-gray-300' : 'text-gray-700'}`;
-  const linkCls  = `text-blue-500 hover:text-blue-400 font-medium cursor-pointer underline-offset-2 hover:underline`;
+  const linkCls  = `text-violet-500 hover:text-violet-400 font-medium cursor-pointer underline-offset-2 hover:underline`;
 
   return (
     <div className={`min-h-screen transition-colors duration-300 flex items-center justify-center p-4 ${
-      dark ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-blue-50 to-indigo-100'
+      dark ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-violet-50 to-indigo-100'
     }`}>
       <div className={`w-full max-w-md rounded-lg shadow-lg p-8 transition-colors duration-300 ${
-        dark ? 'bg-gray-800 shadow-2xl shadow-blue-900/20' : 'bg-white shadow-lg'
+        dark ? 'bg-gray-800 shadow-2xl shadow-violet-900/20' : 'bg-white shadow-lg'
       }`}>
         {/* Header */}
         <div className="text-center mb-8">
@@ -152,7 +152,7 @@ export default function Login({ auth, verifiedStatus }) {
             </p>
             <button
               onClick={() => switchView('login')}
-              className="mt-2 text-sm text-blue-500 hover:text-blue-400 underline underline-offset-2"
+              className="mt-2 text-sm text-violet-500 hover:text-violet-400 underline underline-offset-2"
             >
               Volver al inicio de sesión
             </button>
@@ -205,7 +205,7 @@ export default function Login({ auth, verifiedStatus }) {
               <button
                 type="submit" disabled={loading}
                 className={`w-full py-2 rounded-lg font-medium text-white transition ${
-                  loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
+                  loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-violet-600 hover:bg-violet-700 active:bg-violet-800'
                 }`}
               >
                 {loading ? 'Autenticando...' : 'Ingresar'}
@@ -315,7 +315,7 @@ export default function Login({ auth, verifiedStatus }) {
               <button
                 type="submit" disabled={loading}
                 className={`w-full py-2 rounded-lg font-medium text-white transition ${
-                  loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
+                  loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-violet-600 hover:bg-violet-700 active:bg-violet-800'
                 }`}
               >
                 {loading ? 'Registrando...' : 'Crear cuenta'}

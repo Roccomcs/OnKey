@@ -35,7 +35,7 @@ export default function App() {
   if (auth.loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin" />
+        <div className="w-10 h-10 rounded-full border-4 border-violet-200 border-t-violet-600 animate-spin" />
       </div>
     );
   }
@@ -78,7 +78,7 @@ export default function App() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="text-center">
-          <div className="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin mx-auto" />
+          <div className="w-10 h-10 rounded-full border-4 border-violet-200 border-t-violet-600 animate-spin mx-auto" />
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">Cargando datos…</p>
         </div>
       </div>

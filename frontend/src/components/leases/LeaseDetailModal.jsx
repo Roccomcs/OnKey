@@ -91,7 +91,7 @@ export function LeaseDetailModal({ lease, properties, tenants, owners, onClose, 
 
   const headerBg = alert
     ? (alert.label === "Crítico" ? "bg-red-500" : alert.label === "Urgente" ? "bg-orange-400" : "bg-amber-500")
-    : "bg-blue-600";
+    : "bg-violet-600";
 
   const otrosEstados = ["activo", "vencido", "rescindido", "renovado"].filter(s => s !== lease.status);
 
@@ -180,9 +180,9 @@ export function LeaseDetailModal({ lease, properties, tenants, owners, onClose, 
 
           {/* Próxima actualización */}
           {lease.proximaActualizacion && (
-            <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-xl">
-              <TrendingUp size={14} className="text-blue-500 flex-shrink-0" />
-              <p className="text-xs text-blue-700 dark:text-blue-300 font-medium">
+            <div className="flex items-center gap-2 p-3 bg-violet-50 dark:bg-violet-900/20 border border-violet-100 dark:border-violet-800 rounded-xl">
+              <TrendingUp size={14} className="text-violet-500 flex-shrink-0" />
+              <p className="text-xs text-violet-700 dark:text-violet-300 font-medium">
                 Próxima actualización: <strong>{fmtDate(lease.proximaActualizacion)}</strong>
               </p>
             </div>

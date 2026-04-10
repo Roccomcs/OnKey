@@ -24,7 +24,7 @@ function ContactDetailModal({ person, tab, properties, leases, onClose, onEdit, 
     ? leases.find(l => String(l.id) === String(person.leaseId) && l.status === "activo")
     : null;
 
-  const headerBg = isOwner ? "bg-blue-600" : "bg-violet-600";
+  const headerBg = isOwner ? "bg-violet-600" : "bg-violet-600";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -64,14 +64,14 @@ function ContactDetailModal({ person, tab, properties, leases, onClose, onEdit, 
             <div className="flex flex-col gap-2">
               <span className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                 <Mail size={14} className="text-gray-400 flex-shrink-0" />
-                <a href={`mailto:${person.email}`} className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <a href={`mailto:${person.email}`} className="hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
                   {person.email}
                 </a>
               </span>
               {person.phone && (
                 <span className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                   <Phone size={14} className="text-gray-400 flex-shrink-0" />
-                  <a href={`tel:${person.phone}`} className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  <a href={`tel:${person.phone}`} className="hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
                     {person.phone}
                   </a>
                 </span>
@@ -97,8 +97,8 @@ function ContactDetailModal({ person, tab, properties, leases, onClose, onEdit, 
                   <div className="space-y-2">
                     {personProps.map(prop => (
                       <div key={prop.id} className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
-                        <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
-                          <Building2 size={13} className="text-blue-600 dark:text-blue-400" />
+                        <div className="w-8 h-8 rounded-lg bg-violet-50 dark:bg-violet-900/30 flex items-center justify-center flex-shrink-0">
+                          <Building2 size={13} className="text-violet-600 dark:text-violet-400" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{prop.address}</p>
@@ -279,7 +279,7 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
           </p>
         </div>
         <button onClick={openNew}
-          className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition-colors shadow-sm shadow-blue-200">
+          className="flex items-center gap-2 px-4 py-2.5 bg-violet-600 text-white text-sm font-medium rounded-xl hover:bg-violet-700 transition-colors shadow-sm shadow-violet-200">
           <Plus size={16} /> Nuevo Contacto
         </button>
       </div>
@@ -287,11 +287,11 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
       {/* Tabs */}
       <div className="flex gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl p-1 w-fit">
         <button onClick={() => { setTab("owners"); setSearch(""); }}
-          className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${tab === "owners" ? "bg-blue-600 text-white" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"}`}>
+          className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${tab === "owners" ? "bg-violet-600 text-white" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"}`}>
           Propietarios
         </button>
         <button onClick={() => { setTab("tenants"); setSearch(""); }}
-          className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${tab === "tenants" ? "bg-blue-600 text-white" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"}`}>
+          className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${tab === "tenants" ? "bg-violet-600 text-white" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"}`}>
           Inquilinos
         </button>
       </div>
@@ -303,7 +303,7 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Buscar por nombre, email o teléfono..."
-          className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all placeholder:text-gray-400"
+          className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:border-violet-500 focus:ring-2 focus:ring-violet-100 dark:focus:ring-violet-900 outline-none transition-all placeholder:text-gray-400"
         />
       </div>
 
@@ -325,7 +325,7 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
               className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 hover:shadow-md transition-all cursor-pointer"
             >
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-400 to-violet-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                   {person.name.charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -335,7 +335,7 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
                     {person.phone && <span className="flex items-center gap-1"><Phone size={11} />{person.phone}</span>}
                   </div>
                   {tab === "owners" && personProps.length > 0 && (
-                    <p className="text-xs text-blue-600 dark:text-blue-400 mt-1.5">{personProps.length} propiedad(es)</p>
+                    <p className="text-xs text-violet-600 dark:text-violet-400 mt-1.5">{personProps.length} propiedad(es)</p>
                   )}
                   {lease && (
                     <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1.5">
@@ -417,7 +417,7 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
               Cancelar
             </button>
             <button onClick={save} disabled={saving}
-              className="flex-1 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors">
+              className="flex-1 px-4 py-2.5 bg-violet-600 text-white text-sm font-medium rounded-xl hover:bg-violet-700 disabled:opacity-50 transition-colors">
               {saving ? "Guardando…" : (editing ? "Actualizar" : "Crear Contacto")}
             </button>
           </div>

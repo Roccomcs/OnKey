@@ -54,7 +54,7 @@ export default function Register({ onGoToLogin }) {
   // ── Pantalla de éxito ──────────────────────────────────────────────────────
   if (done) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-violet-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-10 text-center">
           <CheckCircle size={56} className="text-green-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">¡Revisá tu correo!</h2>
@@ -67,7 +67,7 @@ export default function Register({ onGoToLogin }) {
           </p>
           <button
             onClick={onGoToLogin}
-            className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition"
+            className="w-full py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-medium transition"
           >
             Ir al login
           </button>
@@ -78,7 +78,7 @@ export default function Register({ onGoToLogin }) {
 
   // ── Formulario ─────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-violet-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-gray-800">Crear cuenta</h1>
@@ -97,7 +97,7 @@ export default function Register({ onGoToLogin }) {
             <label className="block text-sm font-medium text-gray-700 mb-1">Nombre de tu Inmobiliaria</label>
             <input name="tenantNombre" value={form.tenantNombre} onChange={handleChange}
               placeholder="ej: Inmobiliaria García" disabled={loading}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" />
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 outline-none transition" />
           </div>
 
           {/* Nombre + Apellido en fila */}
@@ -106,13 +106,13 @@ export default function Register({ onGoToLogin }) {
               <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
               <input name="nombre" value={form.nombre} onChange={handleChange}
                 placeholder="Juan" disabled={loading}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" />
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 outline-none transition" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
               <input name="apellido" value={form.apellido} onChange={handleChange}
                 placeholder="García" disabled={loading}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" />
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 outline-none transition" />
             </div>
           </div>
 
@@ -121,7 +121,7 @@ export default function Register({ onGoToLogin }) {
             <label className="block text-sm font-medium text-gray-700 mb-1">DNI</label>
             <input name="dni" value={form.dni} onChange={handleChange}
               placeholder="12345678" disabled={loading} inputMode="numeric"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" />
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 outline-none transition" />
           </div>
 
           {/* Email */}
@@ -129,7 +129,7 @@ export default function Register({ onGoToLogin }) {
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input name="email" type="email" value={form.email} onChange={handleChange}
               placeholder="vos@ejemplo.com" disabled={loading}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" />
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 outline-none transition" />
           </div>
 
           {/* Contraseña */}
@@ -138,7 +138,7 @@ export default function Register({ onGoToLogin }) {
             <div className="relative">
               <input name="password" type={showPwd ? 'text' : 'password'} value={form.password}
                 onChange={handleChange} placeholder="Mínimo 6 caracteres" disabled={loading}
-                className="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" />
+                className="w-full px-4 py-2 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 outline-none transition" />
               <button type="button" onClick={() => setShowPwd(p => !p)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                 {showPwd ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -151,19 +151,19 @@ export default function Register({ onGoToLogin }) {
             <label className="block text-sm font-medium text-gray-700 mb-1">Confirmar contraseña</label>
             <input name="confirmPassword" type="password" value={form.confirmPassword}
               onChange={handleChange} placeholder="Repetí la contraseña" disabled={loading}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" />
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-500 outline-none transition" />
           </div>
 
           <button type="submit" disabled={loading}
             className={`w-full py-2.5 rounded-lg font-medium text-white transition ${
-              loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+              loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-violet-600 hover:bg-violet-700'
             }`}>
             {loading ? 'Creando cuenta...' : 'Crear Cuenta Gratis'}
           </button>
         </form>
 
-        <div className="mt-4 bg-blue-50 rounded-lg p-3 text-center">
-          <p className="text-xs text-blue-700 font-medium">
+        <div className="mt-4 bg-violet-50 rounded-lg p-3 text-center">
+          <p className="text-xs text-violet-700 font-medium">
             ✓ Plan Starter incluye hasta 10 propiedades y 10 contratos
           </p>
         </div>
@@ -171,7 +171,7 @@ export default function Register({ onGoToLogin }) {
         <div className="mt-5 text-center">
           <p className="text-sm text-gray-600">
             ¿Ya tenés cuenta?{' '}
-            <button onClick={onGoToLogin} className="text-blue-600 font-medium hover:underline">
+            <button onClick={onGoToLogin} className="text-violet-600 font-medium hover:underline">
               Iniciá sesión
             </button>
           </p>
