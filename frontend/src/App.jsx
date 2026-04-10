@@ -5,7 +5,7 @@ import { Properties }    from "./pages/Properties";
 import { Contacts }      from "./pages/Contacts";
 import { Leases }        from "./pages/Leases";
 import { Notifications } from "./pages/Notifications";
-import { ErrorBox }      from "./components/ui/ErrorBox";
+import { ErrorBox }      from "./components/ui/Errorbox";
 import { useApi }        from "./hooks/useApi";
 import { useTheme }      from "./hooks/useTheme";
 import { useAlerts }     from "./hooks/useAlerts";
