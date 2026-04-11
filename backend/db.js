@@ -19,6 +19,8 @@ export const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit:    10,
   timezone: "Z",
+  // mysql2 tiene un límite de 4MB por defecto — lo subimos para soportar archivos hasta 20MB
+  maxAllowedPacket: 20 * 1024 * 1024,
 });
 
 // ─── Cache de schema para evitar queries repetidas ──────────────

@@ -83,8 +83,8 @@ router.post("/", upload.single("file"), async (req, res) => {
       created_at:  new Date(),
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Error al guardar documento" });
+    console.error('[documents POST]', err.code, err.message);
+    res.status(500).json({ error: `Error al guardar: ${err.code ?? err.message}` });
   }
 });
 
