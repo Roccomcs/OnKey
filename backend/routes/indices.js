@@ -1,7 +1,11 @@
 import { Router } from "express";
+import { fetch as undiciFetch, Agent } from "undici";
 import { pool } from "../db.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { subscriptionMiddleware } from "../middleware/subscription.js";
+
+// Agente undici con SSL desactivado solo para BCRA — no afecta fetch global
+const bcraAgent = new Agent({ connect: { rejectUnauthorized: false } });
 
 const router = Router();
 
@@ -50,20 +54,16 @@ async function fetchBCRA(tipo) {
 
   console.log(`[fetchBCRA] ${tipo}: Solicitando ${url}`);
 
-  // Bypass SSL para BCRA (certificado problemático conocido)
-  const prevTLS = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 8000);
 
   try {
-    const res = await fetch(url, {
+    const res = await undiciFetch(url, {
       headers: { Accept: "application/json", "User-Agent": "OnKey/1.0" },
       signal: controller.signal,
+      dispatcher: bcraAgent,
     });
     clearTimeout(timeout);
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = prevTLS;
 
     console.log(`[fetchBCRA] ${tipo}: Status ${res.status}`);
     if (!res.ok) {
@@ -87,7 +87,6 @@ async function fetchBCRA(tipo) {
     return filtered;
   } catch (err) {
     clearTimeout(timeout);
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = prevTLS;
     throw new Error(`BCRA falló: ${err.message}`);
   }
 }
@@ -213,6 +212,53 @@ async function fetchIndice(tipo) {
   throw new Error(`Todas las fuentes fallaron para ${tipo}:\n${errores.join("\n")}`);
 }
 
+// ─── Lógica de sync reutilizable (usada por el router Y el cron) ─
+export async function syncIndicesForTenant(tenantId, conn) {
+  const resultados = { ICL: 0, IPC: 0, errores: [], fuentes: {}, logs: [] };
+
+  for (const tipo of ["ICL", "IPC"]) {
+    let fetchResult;
+    try {
+      console.log(`[indices/sync] Iniciando fetch para ${tipo}...`);
+      fetchResult = await fetchIndice(tipo);
+      console.log(`[indices/sync] ✅ ${tipo} OK - fuente: ${fetchResult.fuente}, registros: ${fetchResult.rows.length}`);
+    } catch (e) {
+      const errMsg = `${tipo}: ${e.message}`;
+      resultados.errores.push(errMsg);
+      resultados.logs.push(`❌ ${errMsg}`);
+      console.error(`[indices/sync] Error para ${tipo}:`, e.message);
+      continue;
+    }
+
+    const { rows, fuente } = fetchResult;
+    resultados.fuentes[tipo] = fuente;
+
+    const validRows = rows
+      .map((row) => {
+        const periodo = row.fecha.slice(0, 7) + "-01";
+        const valor = row.valor;
+        if (!isFinite(valor) || isNaN(valor)) return null;
+        return [tenantId, tipo, periodo, valor];
+      })
+      .filter(Boolean);
+
+    if (validRows.length > 0) {
+      await conn.query(
+        `INSERT INTO indices_historicos (tenant_id, tipo, periodo, valor)
+         VALUES ?
+         ON DUPLICATE KEY UPDATE valor = VALUES(valor)`,
+        [validRows]
+      );
+      resultados[tipo] = validRows.length;
+    }
+
+    resultados.logs.push(`✅ ${tipo}: ${resultados[tipo]} registros insertados desde ${fuente}`);
+    console.log(`[indices/sync] ${tipo}: ${resultados[tipo]} registros insertados`);
+  }
+
+  return resultados;
+}
+
 // ─── POST /api/indices/sync ───────────────────────────────────
 router.post("/sync", async (req, res) => {
   const globalTimeout = setTimeout(() => {
@@ -220,56 +266,12 @@ router.post("/sync", async (req, res) => {
       console.warn("[indices/sync] Global timeout - respondiendo con resultado parcial");
       res.json({ ok: false, ICL: 0, IPC: 0, errores: ["Timeout: las APIs externas tardaron demasiado"], fuentes: {}, logs: [], totalEnBD: 0 });
     }
-  }, 60000); // 60s — suficiente para el batch insert
+  }, 60000);
 
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
-    const resultados = { ICL: 0, IPC: 0, errores: [], fuentes: {}, logs: [] };
-
-    for (const tipo of ["ICL", "IPC"]) {
-      let fetchResult;
-      try {
-        console.log(`[indices/sync] Iniciando fetch para ${tipo}...`);
-        fetchResult = await fetchIndice(tipo);
-        console.log(`[indices/sync] ✅ ${tipo} OK - fuente: ${fetchResult.fuente}, registros: ${fetchResult.rows.length}`);
-      } catch (e) {
-        const errMsg = `${tipo}: ${e.message}`;
-        resultados.errores.push(errMsg);
-        resultados.logs.push(`❌ ${errMsg}`);
-        console.error(`[indices/sync] Error para ${tipo}:`, e.message);
-        continue;
-      }
-
-      const { rows, fuente } = fetchResult;
-      resultados.fuentes[tipo] = fuente;
-
-      // Fix: batch insert en lugar de 1 query por fila — evita el timeout con 996 registros
-      const validRows = rows
-        .map((row) => {
-          const periodo = row.fecha.slice(0, 7) + "-01";
-          const valor = row.valor;
-          // Fix: permitir negativos válidos — solo excluir NaN e Infinity
-          if (!isFinite(valor) || isNaN(valor)) return null;
-          return [req.user.tenantId, tipo, periodo, valor];
-        })
-        .filter(Boolean);
-
-      if (validRows.length > 0) {
-        // Un solo INSERT con múltiples VALUES — mucho más rápido
-        await conn.query(
-          `INSERT INTO indices_historicos (tenant_id, tipo, periodo, valor)
-           VALUES ?
-           ON DUPLICATE KEY UPDATE valor = VALUES(valor)`,
-          [validRows]
-        );
-        resultados[tipo] = validRows.length;
-      }
-
-      resultados.logs.push(`✅ ${tipo}: ${resultados[tipo]} registros insertados desde ${fuente}`);
-      console.log(`[indices/sync] ${tipo}: ${resultados[tipo]} registros insertados`);
-    }
-
+    const resultados = await syncIndicesForTenant(req.user.tenantId, conn);
     await conn.commit();
 
     const [[countRow]] = await conn.query(

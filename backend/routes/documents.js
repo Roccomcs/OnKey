@@ -1,9 +1,19 @@
 import { Router } from "express";
+import multer      from "multer";
 import { pool }    from "../db.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { subscriptionMiddleware } from "../middleware/subscription.js";
 
 const router = Router();
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
+  fileFilter: (_, file, cb) => {
+    const allowed = ["application/pdf", "image/png", "image/jpeg"];
+    if (allowed.includes(file.mimetype)) cb(null, true);
+    else cb(new Error("Tipo no permitido. Solo PDF, PNG o JPG"));
+  },
+});
 
 // Todas las rutas requieren autenticación y suscripción activa
 router.use(authMiddleware);
@@ -50,35 +60,26 @@ router.get("/:id/file", async (req, res) => {
   }
 });
 
-// POST /api/documents
-// Body JSON: { entityType, entityId, fileName, mimeType, fileData (base64) }
-router.post("/", async (req, res) => {
-  const { entityType, entityId, fileName, mimeType, fileData } = req.body;
-  if (!entityType || !entityId || !fileName || !mimeType || !fileData)
-    return res.status(400).json({ error: "Faltan campos obligatorios" });
+// POST /api/documents  — multipart/form-data: file + entityType + entityId
+router.post("/", upload.single("file"), async (req, res) => {
+  const { entityType, entityId } = req.body;
+  if (!entityType || !entityId || !req.file)
+    return res.status(400).json({ error: "Faltan campos: entityType, entityId o archivo" });
 
-  const allowed = ["application/pdf", "image/png", "image/jpeg"];
-  if (!allowed.includes(mimeType))
-    return res.status(400).json({ error: "Tipo de archivo no permitido (PDF, PNG, JPG)" });
-
-  const buffer   = Buffer.from(fileData, "base64");
-  const maxBytes = 10 * 1024 * 1024; // 10 MB
-  if (buffer.length > maxBytes)
-    return res.status(400).json({ error: "El archivo supera los 10 MB" });
-
+  const { originalname, mimetype, buffer, size } = req.file;
   try {
     const [result] = await pool.query(
       `INSERT INTO documentos (tenant_id, entity_type, entity_id, file_name, mime_type, file_size, file_data)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [req.user.tenantId, entityType, entityId, fileName, mimeType, buffer.length, buffer]
+      [req.user.tenantId, entityType, entityId, originalname, mimetype, size, buffer]
     );
     res.status(201).json({
       id:          result.insertId,
       entity_type: entityType,
-      entity_id:   entityId,
-      file_name:   fileName,
-      mime_type:   mimeType,
-      file_size:   buffer.length,
+      entity_id:   Number(entityId),
+      file_name:   originalname,
+      mime_type:   mimetype,
+      file_size:   size,
       created_at:  new Date(),
     });
   } catch (err) {

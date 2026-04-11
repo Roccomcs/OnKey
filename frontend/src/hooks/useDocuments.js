@@ -7,13 +7,16 @@ export function useDocuments(entityType, entityId) {
   const [uploading,setUploading]= useState(false);
   const [error,    setError]    = useState(null);
 
+  const getToken = () => localStorage.getItem("authToken");
+
   const load = useCallback(async () => {
     if (!entityId) return;
     setLoading(true);
     setError(null);
     try {
       const res = await fetch(
-        `${API}/documents?entityType=${entityType}&entityId=${entityId}`
+        `${API}/documents?entityType=${entityType}&entityId=${entityId}`,
+        { headers: { Authorization: `Bearer ${getToken()}` } }
       );
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setDocs(await res.json());
@@ -30,28 +33,20 @@ export function useDocuments(entityType, entityId) {
     setUploading(true);
     setError(null);
     try {
-      // Convertir a base64
-      const base64 = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload  = () => resolve(reader.result.split(",")[1]);
-        reader.onerror = () => reject(new Error("Error al leer el archivo"));
-        reader.readAsDataURL(file);
-      });
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("entityType", entityType);
+      fd.append("entityId", String(entityId));
 
       const res = await fetch(`${API}/documents`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          entityType,
-          entityId,
-          fileName: file.name,
-          mimeType: file.type,
-          fileData: base64,
-        }),
+        headers: { Authorization: `Bearer ${getToken()}` },
+        body: fd,
       });
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Error al subir");
+        let msg = `Error ${res.status}`;
+        try { const err = await res.json(); msg = err.error || msg; } catch {}
+        throw new Error(msg);
       }
       const saved = await res.json();
       setDocs(prev => [saved, ...prev]);
@@ -66,7 +61,10 @@ export function useDocuments(entityType, entityId) {
 
   const remove = useCallback(async (docId) => {
     try {
-      await fetch(`${API}/documents/${docId}`, { method: "DELETE" });
+      await fetch(`${API}/documents/${docId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
       setDocs(prev => prev.filter(d => d.id !== docId));
     } catch (e) {
       setError(e.message);

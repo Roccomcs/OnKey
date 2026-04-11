@@ -5,6 +5,7 @@
 
 import cron from "node-cron";
 import { pool } from "./db.js";
+import { syncIndicesForTenant } from "./routes/indices.js";
 import {
   calcularMontoProyectado,
   calcularProximaActualizacion,
@@ -19,32 +20,28 @@ function warn(msg) {
 }
 
 // ─── Sincronización de índices desde APIs externas ───────────
-// Llama al endpoint /api/indices/sync para traer datos del BCRA
+// Llama directamente a la lógica de sync — sin HTTP interno
 export async function sincronizarIndices() {
-  try {
-    log("Sincronizando índices BCRA…");
-    const res = await fetch("http://localhost:3001/api/indices/sync", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-    });
-    const data = await res.json();
+  log("Sincronizando índices BCRA…");
 
-    if (!res.ok) {
-      warn(`Error en sync: ${data.error}`);
-      return;
-    }
+  const [tenants] = await pool.query(
+    "SELECT id FROM tenants WHERE activo = TRUE"
+  );
 
-    log(
-      `Índices sincronizados — ICL: ${data.ICL ?? 0} registros, IPC: ${data.IPC ?? 0} registros`
-    );
-    if (data.fuentes) {
-      log(`Fuentes: ${JSON.stringify(data.fuentes)}`);
+  for (const tenant of tenants) {
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+      const data = await syncIndicesForTenant(tenant.id, conn);
+      await conn.commit();
+      log(`Tenant #${tenant.id} — ICL: ${data.ICL ?? 0}, IPC: ${data.IPC ?? 0}`);
+      if (data.errores?.length) warn(`Tenant #${tenant.id} errores: ${data.errores.join(", ")}`);
+    } catch (e) {
+      await conn.rollback();
+      warn(`Tenant #${tenant.id} — sync falló: ${e.message}`);
+    } finally {
+      conn.release();
     }
-    if (data.errores?.length) {
-      warn(`Errores sync: ${data.errores.join(", ")}`);
-    }
-  } catch (e) {
-    warn(`No se pudieron sincronizar índices: ${e.message}`);
   }
 }
 
@@ -191,8 +188,12 @@ export async function evaluarActualizacionesContratos() {
 cron.schedule(
   "0 8 * * *",
   async () => {
-    await sincronizarIndices();
-    await evaluarActualizacionesContratos();
+    try {
+      await sincronizarIndices();
+      await evaluarActualizacionesContratos();
+    } catch (err) {
+      console.error(`[CRON] Error no manejado:`, err);
+    }
   },
   {
     scheduled: true,

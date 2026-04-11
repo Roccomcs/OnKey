@@ -24,6 +24,13 @@ const fmtPrice = (price, moneda) => {
   return fmtCurrency(num);
 };
 
+// Formatea número con puntos de miles para mostrar en el input (ej: "80000" → "80.000")
+const fmtInputPrice = (val) => {
+  if (!val && val !== 0) return "";
+  const digits = String(val).replace(/\D/g, "");
+  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
+
 // ── Hook: fotos de propiedad ──────────────────────────────────────────────────
 function usePropertyPhotos(propertyId) {
   const [photos,  setPhotos]  = useState([]);
@@ -44,7 +51,7 @@ function usePropertyPhotos(propertyId) {
   const upload = async (files) => {
     const fd = new FormData();
     Array.from(files).forEach(f => fd.append("photos", f));
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("authToken");
     const res = await fetch(`${API}/properties/${propertyId}/photos`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
@@ -63,14 +70,14 @@ function usePropertyPhotos(propertyId) {
   return { photos, loading, upload, remove, reload: load };
 }
 
-// ── Carrusel pequeño (tarjeta de lista) ──────────────────────────────────────
-function MiniCarousel({ photos }) {
+// ── Carrusel de tarjeta (imagen lateral) ─────────────────────────────────────
+function CardCarousel({ photos }) {
   const [idx, setIdx] = useState(0);
 
   if (!photos || photos.length === 0) {
     return (
-      <div className="w-20 h-20 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
-        <Building2 size={22} className="text-gray-300 dark:text-gray-500" />
+      <div className="w-56 shrink-0 bg-gray-100 dark:bg-gray-700 flex items-center justify-center rounded-l-2xl">
+        <Building2 size={32} className="text-gray-300 dark:text-gray-500" />
       </div>
     );
   }
@@ -79,31 +86,24 @@ function MiniCarousel({ photos }) {
   const next = (e) => { e.stopPropagation(); setIdx(i => (i + 1) % photos.length); };
 
   return (
-    <div className="relative w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 group">
-      <img
-        src={photos[idx].url}
-        alt="foto propiedad"
-        className="w-full h-full object-cover"
-      />
+    <div className="relative w-56 shrink-0 overflow-hidden rounded-l-2xl group">
+      <img src={photos[idx].url} alt="foto propiedad" className="w-full h-full object-cover" />
       {photos.length > 1 && (
         <>
-          <button
-            onClick={prev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-r p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            <ChevronLeft size={12} />
+          <button onClick={prev} className="absolute left-1.5 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <ChevronLeft size={14} />
           </button>
-          <button
-            onClick={next}
-            className="absolute right-0 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-l p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            <ChevronRight size={12} />
+          <button onClick={next} className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <ChevronRight size={14} />
           </button>
-          <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-0.5">
+          <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
             {photos.map((_, i) => (
-              <div key={i} className={`w-1 h-1 rounded-full ${i === idx ? "bg-white" : "bg-white/40"}`} />
+              <div key={i} className={`w-1.5 h-1.5 rounded-full ${i === idx ? "bg-white" : "bg-white/50"}`} />
             ))}
           </div>
+          <span className="absolute top-2 left-2 text-[10px] bg-black/50 text-white px-1.5 py-0.5 rounded-full">
+            {idx + 1}/{photos.length}
+          </span>
         </>
       )}
     </div>
@@ -430,7 +430,7 @@ function PropertyDetailModal({ property, owners, leases, tenants, onClose, onEdi
   );
 }
 
-// ── PropertyCard con mini-carrusel ────────────────────────────────────────────
+// ── PropertyCard horizontal ───────────────────────────────────────────────────
 function PropertyCard({ p, owners, leases, tenants, onClick, onEdit, onDelete }) {
   const { photos } = usePropertyPhotos(p.id);
   const owner       = owners.find(o => o.id === p.ownerId);
@@ -440,53 +440,62 @@ function PropertyCard({ p, owners, leases, tenants, onClick, onEdit, onDelete })
   return (
     <div
       onClick={onClick}
-      className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 hover:shadow-md transition-all cursor-pointer"
+      className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all cursor-pointer overflow-hidden flex h-44"
     >
-      <div className="flex items-start gap-4">
-        {/* Mini carrusel / foto de perfil */}
-        <MiniCarousel photos={photos} />
+      {/* Imagen lateral izquierda */}
+      <CardCarousel photos={photos} />
 
-        {/* Info */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <p className="font-semibold text-gray-800 dark:text-gray-200 truncate">{p.address}</p>
-              <div className="flex items-center gap-2 mt-0.5">
-                <p className="text-sm text-gray-500 dark:text-gray-400">{p.type}</p>
-                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                  p.operacion === "venta"
-                    ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
-                    : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
-                }`}>
-                  {p.operacion === "venta" ? "Venta" : "Alquiler"}
-                </span>
-              </div>
-              <div className="flex flex-col gap-1 mt-1.5 text-xs">
-                {owner  && <span className="text-gray-400 dark:text-gray-500"><span className="font-semibold text-gray-600 dark:text-gray-400">Propietario:</span> {owner.name}</span>}
-                {tenant && <span className="text-gray-400 dark:text-gray-500"><span className="font-semibold text-gray-600 dark:text-gray-400">Inquilino:</span> {tenant.name}</span>}
-              </div>
-            </div>
-
-            <div className="flex items-start gap-2 flex-shrink-0">
-              <div className="text-right">
-                <p className="font-bold text-gray-900 dark:text-gray-100">
-                  {fmtPrice(p.price, p.moneda)}
-                </p>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                  {p.moneda === "USD" ? "USD · " : ""}{p.operacion === "venta" ? "precio venta" : "por mes"}
-                </p>
-                <Badge status={p.status} />
-              </div>
-              <div className="flex flex-col gap-1" onClick={e => e.stopPropagation()}>
-                <button onClick={() => onEdit(p)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                  <Edit2 size={13} className="text-gray-400" />
-                </button>
-                <button onClick={() => onDelete(p.id)} className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
-                  <Trash2 size={13} className="text-red-400" />
-                </button>
-              </div>
-            </div>
+      {/* Info derecha */}
+      <div className="flex-1 min-w-0 p-4 flex flex-col justify-between">
+        {/* Fila superior: dirección + acciones */}
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className="font-semibold text-gray-800 dark:text-gray-200 leading-snug truncate">{p.address}</p>
+            {(p.localidad || p.provincia) && (
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 truncate">
+                {[p.localidad, p.provincia].filter(Boolean).join(", ")}
+              </p>
+            )}
           </div>
+          <div className="flex gap-0.5 flex-shrink-0" onClick={e => e.stopPropagation()}>
+            <button onClick={() => onEdit(p)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <Edit2 size={13} className="text-gray-400" />
+            </button>
+            <button onClick={() => onDelete(p.id)} className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+              <Trash2 size={13} className="text-red-400" />
+            </button>
+          </div>
+        </div>
+
+        {/* Tipo + operación */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500 dark:text-gray-400">{p.type}</span>
+          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+            p.operacion === "venta"
+              ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
+              : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
+          }`}>
+            {p.operacion === "venta" ? "Venta" : "Alquiler"}
+          </span>
+        </div>
+
+        {/* Propietario / Inquilino */}
+        <div className="text-xs text-gray-400 dark:text-gray-500 truncate">
+          {owner  && <span><span className="font-medium text-gray-600 dark:text-gray-400">Propietario:</span> {owner.name}</span>}
+          {tenant && <span className="ml-3"><span className="font-medium text-gray-600 dark:text-gray-400">Inquilino:</span> {tenant.name}</span>}
+        </div>
+
+        {/* Fila inferior: precio + estado */}
+        <div className="flex items-end justify-between">
+          <div>
+            <p className="font-bold text-base text-gray-900 dark:text-gray-100 leading-none">
+              {fmtPrice(p.price, p.moneda)}
+            </p>
+            <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">
+              {p.moneda === "USD" ? "USD · " : ""}{p.operacion === "venta" ? "precio venta" : "por mes"}
+            </p>
+          </div>
+          <Badge status={p.status} />
         </div>
       </div>
     </div>
@@ -547,8 +556,14 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
         method,
         body: JSON.stringify({ ...form, price: Number(form.price) }),
       });
-      setProperties(prev => editing ? prev.map(p => p.id === editing ? saved : p) : [...prev, saved]);
-      setModal(false);
+      if (editing) {
+        setProperties(prev => prev.map(p => p.id === editing ? saved : p));
+        setModal(false);
+      } else {
+        // Propiedad nueva creada: quedarse en el modal en modo edición para subir fotos
+        setProperties(prev => [...prev, saved]);
+        setEditing(saved.id);
+      }
     } catch (e) {
       alert("Error al guardar: " + e.message);
     } finally {
@@ -691,18 +706,20 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
           </div>
 
           {/* Tipo / Estado */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className={`grid gap-4 ${editing ? "grid-cols-2" : "grid-cols-1"}`}>
             <Field label="Tipo">
               <Select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}>
                 {TIPOS.map(t => <option key={t}>{t}</option>)}
               </Select>
             </Field>
-            <Field label="Estado">
-              <Select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })}>
-                <option value="vacante">Vacante</option>
-                <option value="ocupado">Ocupado</option>
-              </Select>
-            </Field>
+            {editing && (
+              <Field label="Estado">
+                <Select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })}>
+                  <option value="vacante">Vacante</option>
+                  <option value="ocupado">Ocupado</option>
+                </Select>
+              </Field>
+            )}
           </div>
 
           {/* Precio + Moneda */}
@@ -728,10 +745,13 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
                 </div>
                 <Input
                   type="text"
-                  inputMode="decimal"
-                  placeholder={form.moneda === "USD" ? "Ej: 120000" : "Ej: 320000"}
-                  value={form.price}
-                  onChange={e => setForm({ ...form, price: e.target.value.replace(/[^0-9.]/g, '') })}
+                  inputMode="numeric"
+                  placeholder={form.moneda === "USD" ? "120.000" : "320.000"}
+                  value={fmtInputPrice(form.price)}
+                  onChange={e => {
+                    const raw = e.target.value.replace(/\./g, "").replace(/\D/g, "");
+                    setForm({ ...form, price: raw });
+                  }}
                 />
               </div>
             </Field>
@@ -744,12 +764,10 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
             </Field>
           </div>
 
-          {/* Fotos — solo al editar */}
-          {editing && (
-            <div className="rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 p-4">
-              <PhotoManager propertyId={editing} />
-            </div>
-          )}
+          {/* Fotos */}
+          <div className="rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 p-4">
+            <PhotoManager propertyId={editing} />
+          </div>
 
           {/* Documentos — solo al editar */}
           {editing && (
