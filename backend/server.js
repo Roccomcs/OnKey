@@ -55,6 +55,21 @@ app.use('/api/indices',       indicesRouter);
 // ─── HEALTH CHECK ────────────────────────────────────────────
 app.get("/api/health", (_req, res) => res.json({ status: "ok", ts: new Date() }));
 
+// ─── TEMP: FIX MYSQL GRANTS (BORRAR DESPUÉS DE USAR) ─────────
+app.get("/api/_fix-grants", async (_req, res) => {
+  try {
+    const { pool } = await import('./db.js');
+    const conn = await pool.getConnection();
+    const pass = process.env.MYSQLPASSWORD || process.env.DB_PASSWORD;
+    await conn.query(`GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '${pass}' WITH GRANT OPTION`);
+    await conn.query('FLUSH PRIVILEGES');
+    conn.release();
+    res.json({ ok: true, msg: 'Grant ejecutado. Ahora borrá este endpoint.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ─── START ───────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`🚀  OnKey API corriendo en http://localhost:${PORT}`);

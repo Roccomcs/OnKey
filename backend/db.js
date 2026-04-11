@@ -1,18 +1,14 @@
-import dotenv from 'dotenv';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import dotenv from "dotenv";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import mysql from "mysql2/promise";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const envLocalPath = path.join(__dirname, '.env.local');
-const envPath = path.join(__dirname, '.env');
-dotenv.config({ path: fs.existsSync(envLocalPath) ? envLocalPath : envPath });
-
-import mysql from "mysql2/promise";
-import dotenv from "dotenv";
-dotenv.config();
+const envLocalPath = path.join(__dirname, ".env.local");
+dotenv.config({ path: fs.existsSync(envLocalPath) ? envLocalPath : path.join(__dirname, ".env") });
 
 export const pool = mysql.createPool({
   host:     process.env.DB_HOST     || "127.0.0.1",
@@ -31,7 +27,7 @@ const schemaCache = new Map();
 export async function columnExists(table, column) {
   const key = `${table}.${column}`;
   if (schemaCache.has(key)) return schemaCache.get(key);
-  
+
   const [[row]] = await pool.query(
     `SELECT COUNT(*) AS cnt FROM information_schema.columns
      WHERE table_schema = DATABASE() AND table_name = ? AND column_name = ?`,
