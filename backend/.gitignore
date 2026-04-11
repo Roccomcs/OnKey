@@ -1,2 +1,6 @@
+# Environment variables - NEVER commit credentials
 .env
+.env.local
+.env.*.local
+
 node_modules/
