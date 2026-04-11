@@ -47,7 +47,7 @@ export function Dashboard({ properties, leases, tenants, setActive, activeAlerts
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-violet-600 dark:text-violet-400">Dashboard</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
           {new Date().toLocaleDateString("es-AR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
         </p>
