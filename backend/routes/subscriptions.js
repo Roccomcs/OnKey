@@ -78,27 +78,27 @@ router.post('/upgrade', authMiddleware, async (req, res) => {
 // MP envía notificaciones cuando el estado del pago cambia
 // ─────────────────────────────────────────────
 router.post('/webhook', async (req, res) => {
-  // Responder 200 inmediatamente para que MP no reintente
+  // C5: Verificar firma ANTES de responder — rechazar con 401 si es inválida
+  const xSignature = req.headers['x-signature'];
+  const xRequestId = req.headers['x-request-id'];
+  const mpWebhookSecret = process.env.MP_WEBHOOK_SECRET;
+
+  if (xSignature && mpWebhookSecret) {
+    const [tsPart, v1Part] = xSignature.split(',');
+    const ts = tsPart?.split('=')[1];
+    const v1 = v1Part?.split('=')[1];
+    const manifest = `id:${req.body?.data?.id};request-id:${xRequestId};ts:${ts};`;
+    const expected = crypto.createHmac('sha256', mpWebhookSecret).update(manifest).digest('hex');
+    if (expected !== v1) {
+      console.warn('[webhook] ⚠️  Firma inválida — rechazando');
+      return res.status(401).json({ error: 'Firma inválida' });
+    }
+  }
+
+  // Responder 200 rápido a MP (firma ya verificada)
   res.sendStatus(200);
 
   try {
-    // C5: Verificar firma de MercadoPago
-    const xSignature = req.headers['x-signature'];
-    const xRequestId = req.headers['x-request-id'];
-    const mpWebhookSecret = process.env.MP_WEBHOOK_SECRET;
-
-    if (xSignature && mpWebhookSecret) {
-      const [tsPart, v1Part] = xSignature.split(',');
-      const ts = tsPart?.split('=')[1];
-      const v1 = v1Part?.split('=')[1];
-      const manifest = `id:${req.body?.data?.id};request-id:${xRequestId};ts:${ts};`;
-      const expected = crypto.createHmac('sha256', mpWebhookSecret).update(manifest).digest('hex');
-      if (expected !== v1) {
-        console.warn('[webhook] ⚠️  Firma inválida — rechazando');
-        return; // no procesar si la firma no coincide
-      }
-    }
-
     const { type, data } = req.body;
     console.log('[webhook] ✅ Notificación MP verificada:', { type, data });
 
@@ -108,16 +108,11 @@ router.post('/webhook', async (req, res) => {
     const preapprovalId = data?.id;
     if (!preapprovalId) return;
 
-    // Activar suscripción en nuestra BD
-    const sub = await activateSubscription(preapprovalId);
+    // C6+C7: activateSubscription devuelve { sub, montoAprobado } desde MP
+    const { sub, montoAprobado } = await activateSubscription(preapprovalId);
     console.log(`[webhook] ✅ Suscripción activada para usuario ${sub.usuario_id}`);
 
-    // C7: Registrar el pago con monto validado
-    const montoAprobado = data?.auto_recurring?.transaction_amount ?? 0;
-    if (isNaN(montoAprobado) || montoAprobado <= 0) {
-      console.warn(`[webhook] ⚠️  Monto inválido: ${montoAprobado}, usando 0`);
-    }
-    await recordPayment(sub.id, sub.usuario_id, sub.tenant_id, montoAprobado || 0, 'completado', preapprovalId);
+    await recordPayment(sub.id, sub.usuario_id, sub.tenant_id, montoAprobado ?? 0, 'completado', preapprovalId);
   } catch (err) {
     // No lanzar error (ya respondimos 200) — solo loguear
     console.error('[webhook] ❌', err.message);

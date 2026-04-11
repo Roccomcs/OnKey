@@ -189,7 +189,7 @@ export async function activateSubscription(mpPreapprovalId) {
     );
 
     await conn.commit();
-    return sub;
+    return { sub, montoAprobado: preapproval.auto_recurring?.transaction_amount ?? null };
   } catch (err) {
     await conn.rollback();
     throw err;
@@ -227,10 +227,14 @@ export async function cancelSubscription(suscripcionId, usuarioId) {
 // ─────────────────────────────────────────────
 
 export async function recordPayment(suscripcionId, usuarioId, tenantId, monto, estado = 'completado', transaccionId = null) {
+  const montoValido = typeof monto === 'number' && isFinite(monto) && monto >= 0 ? monto : 0;
+  if (montoValido !== monto) {
+    console.warn(`[recordPayment] Monto inválido recibido: ${monto} — usando 0`);
+  }
   const [result] = await pool.query(
     `INSERT INTO pagos (suscripcion_id, usuario_id, tenant_id, monto, estado, transaccion_id, fecha_pago)
      VALUES (?, ?, ?, ?, ?, ?, NOW())`,
-    [suscripcionId, usuarioId, tenantId, monto, estado, transaccionId]
+    [suscripcionId, usuarioId, tenantId, montoValido, estado, transaccionId]
   );
   return result.insertId;
 }
