@@ -2,7 +2,7 @@
 // Rutas para subir, listar y eliminar fotos de propiedades
 
 import { Router }           from "express";
-import { pool }             from "../../db.js";
+import { pool }             from "../db.js";
 import { authMiddleware }   from "../middleware/auth.js";
 import { subscriptionMiddleware } from "../middleware/subscription.js";
 import multer               from "multer";
