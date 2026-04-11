@@ -27,7 +27,7 @@ export async function authMiddleware(req, res, next) {
     // Verificar que el token no esté en la blacklist (logout)
     if (decoded.jti) {
       const [[blacklisted]] = await pool.query(
-        'SELECT id FROM token_blacklist WHERE jti = ? AND expires_at > NOW() LIMIT 1',
+        'SELECT 1 FROM token_blacklist WHERE jti = ? AND expires_at > NOW() LIMIT 1',
         [decoded.jti]
       );
       if (blacklisted) return res.status(401).json({ error: 'Token revocado' });
