@@ -1,6 +1,16 @@
+import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const envLocalPath = path.join(__dirname, '.env.local');
+const envPath = path.join(__dirname, '.env');
+dotenv.config({ path: fs.existsSync(envLocalPath) ? envLocalPath : envPath });
+
 import mysql from "mysql2/promise";
-import dotenv from "dotenv";
-dotenv.config();
 
 export const pool = mysql.createPool({
   host:     process.env.DB_HOST     || "127.0.0.1",
