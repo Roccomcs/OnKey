@@ -3,8 +3,8 @@ import { Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
 import { API } from '../utils/helpers';
 import '../App.css';
 
-export default function Login({ auth, verifiedStatus }) {
-  const [view, setView]           = useState('login'); // 'login' | 'register' | 'registered'
+export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClick, initialView = 'login' }) {
+  const [view, setView]           = useState(initialView); // 'login' | 'register' | 'registered'
   const [dark, setDark]           = useState(false);
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState('');
@@ -48,6 +48,7 @@ export default function Login({ auth, verifiedStatus }) {
     setLoading(true);
     try {
       await auth.login(null, loginForm.email, loginForm.password);
+      onLoginSuccess?.();
     } catch (err) {
       setError(err.message || 'Error al iniciar sesión');
     } finally {
@@ -110,6 +111,18 @@ export default function Login({ auth, verifiedStatus }) {
       <div className={`w-full max-w-md rounded-lg shadow-lg p-8 transition-colors duration-300 ${
         dark ? 'bg-gray-800 shadow-2xl shadow-blue-900/20' : 'bg-white shadow-lg'
       }`}>
+        {/* Botón Volver */}
+        <button
+          onClick={() => onBackClick?.()}
+          className={`text-sm mb-4 px-3 py-1 rounded-lg transition ${
+            dark 
+              ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-700' 
+              : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+          }`}
+        >
+          ✉ Volver a Inicio
+        </button>
+
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className={`text-3xl font-bold mb-2 ${dark ? 'text-white' : 'text-gray-800'}`}>OnKey</h1>

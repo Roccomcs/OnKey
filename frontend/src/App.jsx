@@ -1,4 +1,4 @@
-import { useState, createContext } from "react";
+import { useState, createContext, useMemo, useEffect } from "react";
 import { Sidebar }       from "./components/layout/Sidebar";
 import { Dashboard }     from "./pages/Dashboard";
 import { Properties }    from "./pages/Properties";
@@ -12,6 +12,7 @@ import { useAlerts }     from "./hooks/useAlerts";
 import { useAuth }       from "./hooks/useAuth";
 import Login             from "./pages/Login";
 import Planes            from "./pages/planes";
+import LandingPage       from "./pages/LandingPage";
 
 // AuthContext para acceso global a autenticación
 export const AuthContext = createContext(null);
@@ -20,9 +21,22 @@ export default function App() {
   const [active,      setActiveRaw] = useState("dashboard");
   const [propFilter,  setPropFilter] = useState("todos");
   const [leaseFilter, setLeaseFilter] = useState("activo");
+  const [currentPage, setCurrentPage] = useState("landing"); // "landing" | "login" | "app"
   const { dark, toggleDark } = useTheme();
 
   const auth = useAuth();
+
+  // Calcular verifiedStatus solo una vez para evitar re-renders infinitos
+  const verifiedStatus = useMemo(() => new URLSearchParams(window.location.search).get('verified'), []);
+
+  // Sincronizar currentPage con auth.user - evita ciclo infinito
+  useEffect(() => {
+    if (auth.user && currentPage !== "app") {
+      setCurrentPage("app");
+    } else if (!auth.user && currentPage === "app") {
+      setCurrentPage("landing");
+    }
+  }, [auth.user, currentPage]);
 
   const { data: properties, setData: setProperties, loading: lProps,   error: eProps,   reload: reloadProps }   = useApi(auth.token ? "/properties" : null, auth.token);
   const { data: owners,     setData: setOwners,     loading: lOwners,  error: eOwners,  reload: reloadOwners }  = useApi(auth.token ? "/owners"     : null, auth.token);
@@ -40,19 +54,47 @@ export default function App() {
     );
   }
 
-  if (!auth.user) {
-  // Detectar redirect del backend tras verificar email
-  const params = new URLSearchParams(window.location.search);
-  const verified = params.get('verified');
+  // Landing page pública (sin autenticación)
+  if (currentPage === "landing") {
+    return (
+      <LandingPage 
+        onLoginClick={() => setCurrentPage("login")}
+        onSignupClick={() => setCurrentPage("signup")}
+      />
+    );
+  }
 
-  return (
-    <Login
-      onLoginSuccess={() => {}}
-      auth={auth}
-      verifiedStatus={verified} // "1" = ok, "error" = falló
-    />
-  );
-}
+  // Página de login
+  if (currentPage === "login") {
+    return (
+      <Login
+        onLoginSuccess={() => setCurrentPage("app")}
+        onBackClick={() => setCurrentPage("landing")}
+        initialView="login"
+        auth={auth}
+        verifiedStatus={verifiedStatus}
+      />
+    );
+  }
+
+  // Página de signup/registro
+  if (currentPage === "signup") {
+    return (
+      <Login
+        onLoginSuccess={() => setCurrentPage("app")}
+        onBackClick={() => setCurrentPage("landing")}
+        initialView="register"
+        auth={auth}
+        verifiedStatus={verifiedStatus}
+      />
+    );
+  }
+
+  // Si el usuario se desautentica, vuelve a landing
+  if (!auth.user) {
+    setCurrentPage("landing");
+    return null;
+  }
 
   const dataLoading = lProps || lOwners || lTenants || lLeases;
   const dataError   = eProps || eOwners || eTenants || eLeases;
