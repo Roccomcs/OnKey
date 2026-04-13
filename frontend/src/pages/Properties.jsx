@@ -4,6 +4,7 @@ import {
   Building2, Edit2, Plus, Search, Trash2, User, X,
   Mail, Phone, MapPin, DollarSign, FileText, Tag,
   ChevronLeft, ChevronRight, Camera, Loader2,
+  BedDouble, Bath, Maximize2,
 } from "lucide-react";
 import { Modal }                from "../components/ui/Modal";
 import { Field, Input, Select } from "../components/ui/FormField";
@@ -260,7 +261,7 @@ function PropertyDetailModal({ property, owners, leases, tenants, onClose, onEdi
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
       <div
-        className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-5xl h-[90vh] flex border border-gray-100 dark:border-gray-700 overflow-hidden"
+        className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-5xl h-[90vh] flex border border-gray-100 dark:border-gray-600 overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
         {/* Left side: Carousel */}
@@ -398,6 +399,36 @@ function PropertyDetailModal({ property, owners, leases, tenants, onClose, onEdi
                 </p>
                 <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{property.type}</p>
               </div>
+              {/* Superficie / Habitaciones / Baños */}
+              {(property.m2 || property.habitaciones || property.banos) && (
+                <div className="col-span-2 grid grid-cols-3 gap-2">
+                  {property.m2 && (
+                    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 text-center">
+                      <p className="text-lg font-bold text-gray-800 dark:text-gray-200">{property.m2}</p>
+                      <p className="text-[10px] text-gray-400 mt-0.5">m²</p>
+                    </div>
+                  )}
+                  {property.habitaciones && (
+                    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 text-center">
+                      <p className="text-lg font-bold text-gray-800 dark:text-gray-200">{property.habitaciones}</p>
+                      <p className="text-[10px] text-gray-400 mt-0.5">hab.</p>
+                    </div>
+                  )}
+                  {property.banos && (
+                    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 text-center">
+                      <p className="text-lg font-bold text-gray-800 dark:text-gray-200">{property.banos}</p>
+                      <p className="text-[10px] text-gray-400 mt-0.5">baños</p>
+                    </div>
+                  )}
+                </div>
+              )}
+              {/* Descripción */}
+              {property.descripcion && (
+                <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 col-span-2">
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mb-1.5">Descripción</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{property.descripcion}</p>
+                </div>
+              )}
               <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 col-span-2">
                 <p className="text-xs text-gray-400 dark:text-gray-500 mb-1.5">Estado</p>
                 <Badge status={property.status} />
@@ -443,7 +474,7 @@ function PropertyCard({ p, owners, leases, tenants, onClick, onEdit, onDelete })
   return (
     <div
       onClick={onClick}
-      className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all cursor-pointer overflow-hidden flex h-44"
+      className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-600 hover:shadow-lg transition-all cursor-pointer overflow-hidden flex h-44"
     >
       {/* Imagen lateral izquierda */}
       <CardCarousel photos={photos} />
@@ -482,6 +513,27 @@ function PropertyCard({ p, owners, leases, tenants, onClick, onEdit, onDelete })
           </span>
         </div>
 
+        {/* Características: m², habitaciones, baños */}
+        {(p.m2 || p.habitaciones || p.banos) && (
+          <div className="flex items-center gap-2">
+            {p.m2 && (
+              <span className="flex items-center gap-1 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-md">
+                <Maximize2 size={10} /> {p.m2} m²
+              </span>
+            )}
+            {p.habitaciones && (
+              <span className="flex items-center gap-1 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-md">
+                <BedDouble size={10} /> {p.habitaciones}
+              </span>
+            )}
+            {p.banos && (
+              <span className="flex items-center gap-1 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-md">
+                <Bath size={10} /> {p.banos}
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Propietario / Inquilino */}
         <div className="text-xs text-gray-400 dark:text-gray-500 truncate">
           {owner  && <span><span className="font-medium text-gray-600 dark:text-gray-400">Propietario:</span> {owner.name}</span>}
@@ -517,6 +569,7 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
     address: "", type: "Departamento", price: "", status: "vacante",
     ownerId: "", operacion: "alquiler", localidad: "", provincia: "",
     codigoPostal: "", moneda: "ARS",
+    m2: "", habitaciones: "", banos: "", descripcion: "",
   });
 
   const filtered = properties.filter(p => {
@@ -529,6 +582,7 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
     address: "", type: "Departamento", price: "", status: "vacante",
     ownerId: "", operacion: "alquiler", localidad: "", provincia: "",
     codigoPostal: "", moneda: "ARS",
+    m2: "", habitaciones: "", banos: "", descripcion: "",
   });
 
   const openNew  = () => { setEditing(null); setForm(blankForm()); setModal(true); };
@@ -540,11 +594,15 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
       price:        p.price,
       status:       p.status,
       ownerId:      p.ownerId,
-      operacion:    p.operacion || "alquiler",
+      operacion:    p.operacion    || "alquiler",
       localidad:    p.localidad    || "",
       provincia:    p.provincia    || "",
       codigoPostal: p.codigoPostal || "",
       moneda:       p.moneda       || "ARS",
+      m2:           p.m2           ?? "",
+      habitaciones: p.habitaciones ?? "",
+      banos:        p.banos        ?? "",
+      descripcion:  p.descripcion  || "",
     });
     setModal(true);
   };
@@ -641,7 +699,7 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
           />
         ))}
         {filtered.length === 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 py-16 text-center">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-600 py-16 text-center">
             <Building2 size={36} className="text-gray-200 dark:text-gray-600 mx-auto mb-3" />
             <p className="font-medium text-gray-500 dark:text-gray-400">Sin propiedades</p>
             <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Agrega tu primera propiedad</p>
@@ -707,6 +765,42 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
                 onChange={e => setForm({ ...form, codigoPostal: e.target.value })} />
             </Field>
           </div>
+
+          {/* M2 / Habitaciones / Baños */}
+          <div className="grid grid-cols-3 gap-4">
+            <Field label="Superficie (m²)">
+              <Input
+                type="number" min="1" placeholder="Ej: 65"
+                value={form.m2}
+                onChange={e => setForm({ ...form, m2: e.target.value })}
+              />
+            </Field>
+            <Field label="Habitaciones">
+              <Input
+                type="number" min="0" placeholder="Ej: 2"
+                value={form.habitaciones}
+                onChange={e => setForm({ ...form, habitaciones: e.target.value })}
+              />
+            </Field>
+            <Field label="Baños">
+              <Input
+                type="number" min="0" placeholder="Ej: 1"
+                value={form.banos}
+                onChange={e => setForm({ ...form, banos: e.target.value })}
+              />
+            </Field>
+          </div>
+
+          {/* Descripción */}
+          <Field label="Descripción breve">
+            <textarea
+              rows={3}
+              placeholder="Ej: Departamento luminoso con balcón, cocina equipada, excelente estado..."
+              value={form.descripcion}
+              onChange={e => setForm({ ...form, descripcion: e.target.value })}
+              className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all placeholder:text-gray-400 resize-none"
+            />
+          </Field>
 
           {/* Tipo / Estado */}
           <div className={`grid gap-4 ${editing ? "grid-cols-2" : "grid-cols-1"}`}>

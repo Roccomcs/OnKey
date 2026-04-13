@@ -1,3 +1,60 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ─── Dark mode: paleta near-black con contraste visible entre capas ────────── */
+.dark {
+  color-scheme: dark;
+
+  /* Fondos — cada nivel tiene contraste perceptible con el anterior */
+  --color-gray-900: #0a0a0a;   /* fondo principal de la app */
+  --color-gray-800: #141414;   /* tarjetas, modales */
+  --color-gray-700: #1e1e1e;   /* inputs, paneles secundarios */
+  --color-gray-600: #282828;   /* hover states */
+
+  /* NO se sobreescriben gray-100 a gray-500: son colores de texto,
+     se mantienen los defaults claros de Tailwind para legibilidad */
+}
+
+/* ─── Transición suave al cambiar de tema ──────────────────────────────────── */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color;
+  transition-duration: 150ms;
+  transition-timing-function: ease;
+}
+
+.animate-spin, [class*="animate-"] {
+  transition: none;
+}
+
+/* ─── Scrollbar minimalista en dark mode ───────────────────────────────────── */
+.dark * {
+  scrollbar-width: thin;
+  scrollbar-color: #2a2a2a transparent;
+}
+
+.dark ::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 2px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3a;
+}
+
+/* ─── Selección de texto en dark mode ──────────────────────────────────────── */
+.dark ::selection {
+  background: #2563eb33;
+  color: #fff;
+}

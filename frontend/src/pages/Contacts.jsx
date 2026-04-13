@@ -335,17 +335,17 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
             <motion.div
               key={person.id}
               variants={fadeInUp}
-              whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(59, 130, 246, 0.2)' }}
+              whileHover={{ y: -2, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
               onClick={() => setDetailPerson(person)}
-              className="bg-gradient-to-br from-gray-800 to-gray-850 rounded-2xl border border-gray-700/50 p-5 hover:border-blue-600/30 transition-all cursor-pointer"
+              className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-600 p-5 hover:border-blue-300 dark:hover:border-blue-500/40 hover:shadow-sm transition-all cursor-pointer"
             >
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                   {person.name.charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-800 dark:text-gray-200">{person.name}</p>
-                  <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-gray-400 dark:text-gray-500">
+                  <p className="font-semibold text-gray-900 dark:text-gray-100">{person.name}</p>
+                  <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-gray-500 dark:text-gray-400">
                     <span className="flex items-center gap-1"><Mail size={11} />{person.email}</span>
                     {person.phone && <span className="flex items-center gap-1"><Phone size={11} />{person.phone}</span>}
                   </div>

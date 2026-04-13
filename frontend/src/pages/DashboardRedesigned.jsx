@@ -32,24 +32,24 @@ function StatCard({ icon: Icon, label, value, color = "blue", trend, onClick }) 
     <motion.button
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}
+      whileHover={{ y: -4, boxShadow: '0 12px 30px rgba(0,0,0,0.08)' }}
       transition={{ duration: 0.3 }}
       viewport={{ once: true }}
       onClick={onClick}
-      className={`w-full text-left bg-gradient-to-br from-gray-800 to-gray-850 rounded-lg border border-gray-700/50 p-5 transition-all ${onClick ? "cursor-pointer" : "cursor-default"} hover:border-blue-600/30`}
+      className={`w-full text-left bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-600 p-5 transition-all ${onClick ? "cursor-pointer" : "cursor-default"} hover:border-blue-400/50 dark:hover:border-blue-500/40 hover:shadow-md dark:hover:shadow-black/40`}
     >
       <div className="flex items-start justify-between">
-        <motion.div 
+        <motion.div
           className={`p-3 rounded-lg bg-gradient-to-br ${c.bg}`}
           whileHover={{ scale: 1.1 }}
         >
           <Icon size={20} className="text-white" />
         </motion.div>
         {trend !== undefined && (
-          <motion.span 
+          <motion.span
             initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
-            className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${trend >= 0 ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}`}
+            className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${trend >= 0 ? "bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400" : "bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400"}`}
           >
             {trend >= 0 ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
             {Math.abs(trend)}%
@@ -57,8 +57,8 @@ function StatCard({ icon: Icon, label, value, color = "blue", trend, onClick }) 
         )}
       </div>
       <div className="mt-4">
-        <p className="text-3xl font-bold text-gray-100">{value}</p>
-        <p className="text-xs text-gray-400 mt-1">{label}</p>
+        <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{label}</p>
       </div>
     </motion.button>
   );
@@ -78,10 +78,10 @@ function OcupacionBar({ properties, setActive }) {
       transition={{ duration: 0.3 }}
       viewport={{ once: true }}
       onClick={() => setActive({ page: "properties", filter: "todos" })}
-      className="w-full text-left bg-gradient-to-br from-gray-800 to-gray-850 rounded-lg border border-gray-700/50 p-6 hover:border-blue-600/30 transition-all"
+      className="w-full text-left bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-600 p-6 hover:border-blue-400/50 dark:hover:border-blue-500/40 hover:shadow-md dark:hover:shadow-black/40 transition-all"
     >
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-gray-200 flex items-center gap-2">
+        <h3 className="font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
           <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.5 }}>
             <PieChart size={18} className="text-blue-400" />
           </motion.div>
@@ -95,7 +95,7 @@ function OcupacionBar({ properties, setActive }) {
           {percentage}%
         </motion.span>
       </div>
-      <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
+      <div className="h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
@@ -163,8 +163,8 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive }) 
         className="flex items-center justify-between gap-4"
       >
         <div>
-          <h1 className="text-4xl font-bold text-gray-100 tracking-tight">Dashboard</h1>
-          <p className="text-gray-400 mt-2">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">Dashboard</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">
             {new Date().toLocaleDateString("es-AR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
           </p>
         </div>
@@ -280,10 +280,10 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive }) 
                   className={`w-3 h-3 rounded-full flex-shrink-0 ${alert.level.dot}`}
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-100">
+                  <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
                     {alert.nominatario || "Contrato"}
                   </p>
-                  <p className="text-xs text-gray-400">Propiedad #{alert.propiedad_id}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Propiedad #{alert.propiedad_id}</p>
                 </div>
                 <div className="text-right flex-shrink-0">
                   <p className={`text-sm font-bold ${alert.level.color}`}>
@@ -338,20 +338,20 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive }) 
                     variants={fadeInUp}
                     whileHover={{ backgroundColor: 'rgba(55, 65, 81, 0.5)' }}
                     onClick={() => setActive({ page: "leases", filter: "activo" })}
-                    className="w-full text-left flex items-center gap-3 p-4 rounded-lg hover:bg-gray-700/30 transition-colors"
+                    className="w-full text-left flex items-center gap-3 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
                   >
-                    <motion.div 
+                    <motion.div
                       whileHover={{ scale: 1.1 }}
-                      className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0"
+                      className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center flex-shrink-0"
                     >
-                      <FileText size={14} className="text-blue-400" />
+                      <FileText size={14} className="text-blue-600 dark:text-blue-400" />
                     </motion.div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-100">Propiedad #{lease.propiedad_id}</p>
-                      <p className="text-xs text-gray-400">{lease.nominatario}</p>
+                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">Propiedad #{lease.propiedad_id}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{lease.nominatario}</p>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <p className="text-sm font-bold text-gray-200">{fmtCurrency(lease.renta_mensual)}</p>
+                      <p className="text-sm font-bold text-gray-900 dark:text-gray-200">{fmtCurrency(lease.renta_mensual)}</p>
                       {alert ? (
                         <p className={`text-xs font-medium ${alert.color}`}>
                           {days <= 0 ? "Vencido" : fmtDuration(days)}

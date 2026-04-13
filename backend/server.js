@@ -32,8 +32,25 @@ import indicesRouter        from "./routes/indices.js";
 import authRouter           from "./routes/auth.js";
 import subscriptionsRouter  from "./routes/subscriptions.js";
 
-import "./db.js";
+import { pool, columnExists } from "./db.js";
 import "./cron.js";
+
+// ─── MIGRACIONES AUTOMÁTICAS ─────────────────────────────────
+async function runMigrations() {
+  const cols = [
+    { name: "m2",           sql: "ALTER TABLE propiedades ADD COLUMN m2 INT NULL" },
+    { name: "habitaciones", sql: "ALTER TABLE propiedades ADD COLUMN habitaciones TINYINT NULL" },
+    { name: "banos",        sql: "ALTER TABLE propiedades ADD COLUMN banos TINYINT NULL" },
+    { name: "descripcion",  sql: "ALTER TABLE propiedades ADD COLUMN descripcion TEXT NULL" },
+  ];
+  for (const { name, sql } of cols) {
+    if (!(await columnExists("propiedades", name))) {
+      await pool.query(sql);
+      console.log(`  ✅ Columna '${name}' agregada`);
+    }
+  }
+  console.log("✅ Migraciones aplicadas");
+}
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
@@ -56,6 +73,8 @@ app.use('/api/indices',       indicesRouter);
 app.get("/api/health", (_req, res) => res.json({ status: "ok", ts: new Date() }));
 
 // ─── START ───────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`🚀  OnKey API corriendo en http://localhost:${PORT}`);
+runMigrations().then(() => {
+  app.listen(PORT, () => {
+    console.log(`🚀  OnKey API corriendo en http://localhost:${PORT}`);
+  });
 });

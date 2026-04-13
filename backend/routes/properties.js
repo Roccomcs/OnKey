@@ -32,7 +32,8 @@ router.post("/", checkLimits('propiedades'), async (req, res) => {
   const {
     address, type, price, status, ownerId,
     operacion, localidad, provincia, codigoPostal,
-    moneda,                               // ← NUEVO: 'ARS' | 'USD'
+    moneda,
+    m2, habitaciones, banos, descripcion,
   } = req.body;
 
   if (!address || !price || !ownerId)
@@ -43,18 +44,20 @@ router.post("/", checkLimits('propiedades'), async (req, res) => {
   const numero  = parts.slice(1).join(",").trim() || null;
   const estado  = status === "ocupado" ? "alquilada" : "disponible";
   const op      = operacion === "venta" ? "venta" : "alquiler";
-  const monedaV = moneda === "USD" ? "USD" : "ARS";          // ← validar
+  const monedaV = moneda === "USD" ? "USD" : "ARS";
 
   try {
     const [result] = await pool.query(
       `INSERT INTO propiedades
          (tenant_id, id_propietario, direccion, numero, tipo, estado,
-          precio_lista, moneda, operacion, localidad, provincia, codigo_postal, activo)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+          precio_lista, moneda, operacion, localidad, provincia, codigo_postal,
+          m2, habitaciones, banos, descripcion, activo)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
       [
         req.user.tenantId, ownerId, dir, numero, mapTipoDB(type), estado,
         price, monedaV, op,
         localidad || null, provincia || null, codigoPostal || null,
+        m2 || null, habitaciones || null, banos || null, descripcion || null,
       ]
     );
     const [[row]] = await pool.query(
@@ -74,7 +77,8 @@ router.put("/:id", async (req, res) => {
   const {
     address, type, price, status, ownerId,
     operacion, localidad, provincia, codigoPostal,
-    moneda,                               // ← NUEVO
+    moneda,
+    m2, habitaciones, banos, descripcion,
   } = req.body;
 
   const parts   = (address || "").split(",");
@@ -82,19 +86,21 @@ router.put("/:id", async (req, res) => {
   const numero  = parts.slice(1).join(",").trim() || null;
   const estado  = status === "ocupado" ? "alquilada" : "disponible";
   const op      = operacion === "venta" ? "venta" : "alquiler";
-  const monedaV = moneda === "USD" ? "USD" : "ARS";          // ← validar
+  const monedaV = moneda === "USD" ? "USD" : "ARS";
 
   try {
     await pool.query(
       `UPDATE propiedades
        SET direccion = ?, numero = ?, tipo = ?, estado = ?, precio_lista = ?,
            moneda = ?, id_propietario = ?, operacion = ?,
-           localidad = ?, provincia = ?, codigo_postal = ?
+           localidad = ?, provincia = ?, codigo_postal = ?,
+           m2 = ?, habitaciones = ?, banos = ?, descripcion = ?
        WHERE id = ? AND tenant_id = ?`,
       [
         dir, numero, mapTipoDB(type), estado, price,
         monedaV, ownerId, op,
         localidad || null, provincia || null, codigoPostal || null,
+        m2 || null, habitaciones || null, banos || null, descripcion || null,
         id, req.user.tenantId,
       ]
     );

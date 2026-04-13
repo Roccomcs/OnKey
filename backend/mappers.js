@@ -44,6 +44,10 @@ export function mapProperty(row) {
     localidad:    row.localidad || "",
     provincia:    row.provincia || "",
     codigoPostal: row.codigo_postal || "",
+    m2:           row.m2 != null ? Number(row.m2) : null,
+    habitaciones: row.habitaciones != null ? Number(row.habitaciones) : null,
+    banos:        row.banos != null ? Number(row.banos) : null,
+    descripcion:  row.descripcion || "",
   };
 }
 
