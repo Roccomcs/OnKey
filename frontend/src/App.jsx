@@ -1,6 +1,6 @@
 import { useState, createContext, useMemo, useEffect } from "react";
 import { Sidebar }       from "./components/layout/Sidebar";
-import { Dashboard }     from "./pages/Dashboard";
+import { DashboardRedesigned as Dashboard }     from "./pages/DashboardRedesigned";
 import { Properties }    from "./pages/Properties";
 import { Contacts }      from "./pages/Contacts";
 import { Leases }        from "./pages/Leases";
