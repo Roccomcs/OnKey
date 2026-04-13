@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { motion } from "motion/react";
 import {
   Edit2, Mail, Phone, Plus, Search, Trash2, Users,
-  X, FileText, Building2, Calendar, User,
+  X, FileText, Building2, Calendar, User, CheckCircle,
 } from "lucide-react";
 import { Modal }                from "../components/ui/Modal";
 import { Field, Input, Select } from "../components/ui/FormField";
@@ -269,23 +270,35 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
     }
   };
 
+  const staggerContainer = {
+    animate: {
+      transition: {
+        staggerChildren: 0.08,
+      },
+    },
+  };
+
+  const fadeInUp = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <motion.div className="space-y-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+      <motion.div className="flex items-center justify-between" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3 }}>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Contactos</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <h1 className="text-4xl font-bold text-gray-100 tracking-tight">Contactos</h1>
+          <p className="text-gray-400 mt-2">
             {owners.length} propietarios · {tenants.length} inquilinos
           </p>
         </div>
-        <button onClick={openNew}
-          className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition-colors shadow-sm shadow-blue-200">
+        <motion.button onClick={openNew} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-medium rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg shadow-blue-600/20">
           <Plus size={16} /> Nuevo Contacto
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl p-1 w-fit">
+      <motion.div className="flex gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl p-1 w-fit" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3, delay: 0.1 }}>
         <button onClick={() => { setTab("owners"); setSearch(""); }}
           className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${tab === "owners" ? "bg-blue-600 text-white" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"}`}>
           Propietarios
@@ -294,7 +307,7 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
           className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${tab === "tenants" ? "bg-blue-600 text-white" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"}`}>
           Inquilinos
         </button>
-      </div>
+      </motion.div>
 
       {/* Buscador */}
       <div className="relative">
@@ -314,15 +327,17 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
       )}
 
       {/* Lista */}
-      <div className="grid gap-3">
-        {list.map(person => {
+      <motion.div className="grid gap-3" variants={staggerContainer} initial="initial" animate="animate">
+        {list.map((person, idx) => {
           const personProps = tab === "owners" ? properties.filter(p => p.ownerId === person.id) : [];
           const lease       = tab === "tenants" ? leases.find(l => String(l.id) === String(person.leaseId)) : null;
           return (
-            <div
+            <motion.div
               key={person.id}
+              variants={fadeInUp}
+              whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(59, 130, 246, 0.2)' }}
               onClick={() => setDetailPerson(person)}
-              className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 hover:shadow-md transition-all cursor-pointer"
+              className="bg-gradient-to-br from-gray-800 to-gray-850 rounded-2xl border border-gray-700/50 p-5 hover:border-blue-600/30 transition-all cursor-pointer"
             >
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
@@ -352,18 +367,18 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
                   </button>
                 </div>
               </div>
-            </div>
+            </motion.div>
           );
         })}
         {list.length === 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 py-16 text-center">
-            <Users size={36} className="text-gray-200 dark:text-gray-600 mx-auto mb-3" />
-            <p className="font-medium text-gray-500 dark:text-gray-400">
-              {search ? "Sin resultados para tu búsqueda" : "Sin contactos"}
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.3 }} className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl border border-green-200 dark:border-green-800/50 py-16 text-center">
+            <CheckCircle size={36} className="text-green-400 mx-auto mb-3" />
+            <p className="font-medium text-green-700 dark:text-green-400">
+              {search ? "Sin resultados para tu búsqueda" : "Sin contactos registrados"}
             </p>
-          </div>
+          </motion.div>
         )}
-      </div>
+      </motion.div>
 
       {/* Modal de detalle */}
       {detailPerson && (
@@ -423,6 +438,6 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
           </div>
         </div>
       </Modal>
-    </div>
+    </motion.div>
   );
 }

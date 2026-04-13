@@ -12,7 +12,7 @@ import { useAlerts }     from "./hooks/useAlerts";
 import { useAuth }       from "./hooks/useAuth";
 import Login             from "./pages/Login";
 import Planes            from "./pages/planes";
-import LandingPage       from "./pages/LandingPage";
+import LandingPageModern from "./pages/LandingPageModern";
 
 // AuthContext para acceso global a autenticación
 export const AuthContext = createContext(null);
@@ -57,9 +57,11 @@ export default function App() {
   // Landing page pública (sin autenticación)
   if (currentPage === "landing") {
     return (
-      <LandingPage 
+      <LandingPageModern 
         onLoginClick={() => setCurrentPage("login")}
         onSignupClick={() => setCurrentPage("signup")}
+        dark={dark}
+        toggleDark={toggleDark}
       />
     );
   }

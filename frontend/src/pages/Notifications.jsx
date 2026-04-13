@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "motion/react";
 import { AlertTriangle, Calendar, CheckCircle, DollarSign, Search, X, Phone, Mail, MapPin, Percent, RotateCcw, FileText } from "lucide-react";
 import { fmtDate, fmtCurrency, fmtDuration, diffDays, getAlertLevel, apiCall } from "../utils/helpers";
 
@@ -212,14 +213,30 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
   const handleClose = () => setOpenAlert(null);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Notificaciones</h1>
+    <motion.div
+      className="space-y-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-4xl font-bold text-gray-100 tracking-tight">Notificaciones</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Sistema de alertas de vencimiento de contratos</p>
-      </div>
+      </motion.div>
 
       {/* ── Tabs ── */}
-      <div className="flex gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl p-1 w-fit">
+      <motion.div
+        className="flex gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl p-1 w-fit"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
         {[
           { key: "pendientes", label: "Pendientes", count: pendientes.length, red: true  },
           { key: "revisadas",  label: "Revisadas",  count: revisadas.length,  red: false },
@@ -247,10 +264,16 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
             )}
           </button>
         ))}
-      </div>
+      </motion.div>
 
       {/* Buscador */}
-      <div className="relative">
+      <motion.div
+        className="relative"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.15 }}
+      >
         <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
         <input
           value={search}
@@ -258,13 +281,19 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
           placeholder={tab === "pendientes" ? "Buscar alertas pendientes..." : "Buscar alertas revisadas..."}
           className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all placeholder:text-gray-400"
         />
-      </div>
+      </motion.div>
 
       {/* ════════ TAB: PENDIENTES ════════ */}
       {tab === "pendientes" && (
         <>
           {/* Leyenda */}
-          <div className="grid grid-cols-3 gap-3">
+          <motion.div
+            className="grid grid-cols-3 gap-3"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             {[
               { label: "15 días o menos", color: "bg-red-500",    desc: "Crítico" },
               { label: "16 a 30 días",    color: "bg-orange-400", desc: "Urgente" },
@@ -278,28 +307,60 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
                 </div>
               </div>
             ))}
-          </div>
+          </motion.div>
 
           {/* Sin alertas en absoluto */}
           {allAlerts.length === 0 && ok.length === 0 && (
-            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 py-16 text-center">
+            <motion.div
+              className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 py-16 text-center"
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
               <CheckCircle size={36} className="text-emerald-400 mx-auto mb-3" />
               <p className="font-medium text-gray-700 dark:text-gray-300">Sin alertas activas</p>
               <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Todos los contratos están en regla</p>
-            </div>
+            </motion.div>
           )}
 
           {/* Lista de alertas pendientes */}
           {filteredPendientes.length > 0 ? (
-            <div className="space-y-3">
-              <p className="text-xs text-gray-400 dark:text-gray-500">Tocá una alerta para ver los detalles</p>
+            <motion.div
+              className="space-y-3"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: { staggerChildren: 0.08 },
+                },
+              }}
+            >
+              <motion.p
+                className="text-xs text-gray-400 dark:text-gray-500"
+                variants={{
+                  hidden: { opacity: 0 },
+                  visible: { opacity: 1 },
+                }}
+              >
+                Tocá una alerta para ver los detalles
+              </motion.p>
               {filteredPendientes.map(a => {
                 const s = getCardStyles(a.level);
                 return (
-                  <button
+                  <motion.button
                     key={a.id}
                     onClick={() => handleOpen(a)}
-                    className={`w-full text-left rounded-2xl ${s.card} bg-white dark:bg-gray-800 p-5 transition-all hover:shadow-md hover:scale-[1.005] active:scale-[0.99]`}
+                    className={`w-full text-left rounded-2xl ${s.card} bg-white dark:bg-gray-800 p-5 transition-all hover:shadow-md active:scale-[0.99]`}
+                    variants={{
+                      hidden: { opacity: 0, y: 20 },
+                      visible: { opacity: 1, y: 0 },
+                    }}
+                    whileHover={{ y: -4, boxShadow: "0 8px 12px rgba(59, 130, 246, 0.1)" }}
+                    whileTap={{ scale: 0.98 }}
                   >
                     <div className="flex items-center gap-4">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${s.icon}`}>
@@ -323,14 +384,20 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
                         )}
                       </div>
                     </div>
-                  </button>
+                  </motion.button>
                 );
               })}
-            </div>
+            </motion.div>
           ) : (
             /* Sin pendientes pero hay revisadas o contratos */
             allAlerts.length > 0 && !search && (
-              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 py-10 text-center">
+              <motion.div
+                className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 py-10 text-center"
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
                 <CheckCircle size={30} className="text-emerald-400 mx-auto mb-2" />
                 <p className="font-medium text-gray-700 dark:text-gray-300 text-sm">Todas las alertas revisadas</p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
@@ -339,20 +406,48 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
                     Revisadas
                   </button>
                 </p>
-              </div>
+              </motion.div>
             )
           )}
 
           {/* Contratos al día */}
           {filteredOk.length > 0 && (
-            <div className="space-y-3 pt-2">
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Contratos al día ({filteredOk.length})</p>
+            <motion.div
+              className="space-y-3 pt-2"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: { staggerChildren: 0.08 },
+                },
+              }}
+            >
+              <motion.p
+                className="text-sm font-medium text-gray-500 dark:text-gray-400"
+                variants={{
+                  hidden: { opacity: 0 },
+                  visible: { opacity: 1 },
+                }}
+              >
+                Contratos al día ({filteredOk.length})
+              </motion.p>
               {filteredOk.map(l => {
                 const prop   = properties.find(p => p.id === l.propertyId);
                 const tenant = tenants.find(t => t.id === l.tenantId);
                 const days   = diffDays(l.endDate);
                 return (
-                  <div key={l.id} className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 hover:shadow-md transition-all">
+                  <motion.div
+                    key={l.id}
+                    className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 transition-all"
+                    variants={{
+                      hidden: { opacity: 0, x: -20 },
+                      visible: { opacity: 1, x: 0 },
+                    }}
+                    whileHover={{ y: -2, boxShadow: "0 4px 12px rgba(34, 197, 94, 0.1)" }}
+                  >
                     <div className="flex items-start gap-4">
                       <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0">
                         <CheckCircle size={16} className="text-emerald-600 dark:text-emerald-400" />
@@ -370,10 +465,10 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
                         <p className="text-xs text-gray-400 dark:text-gray-500">restantes</p>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 );
               })}
-            </div>
+            </motion.div>
           )}
         </>
       )}
@@ -382,7 +477,13 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
       {tab === "revisadas" && (
         <>
           {filteredRevisadas.length === 0 ? (
-            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 py-12 text-center">
+            <motion.div
+              className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 py-12 text-center"
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
               <CheckCircle size={36} className="text-gray-200 dark:text-gray-600 mx-auto mb-3" />
               <p className="font-medium text-gray-500 dark:text-gray-400">
                 {search ? "Sin resultados para tu búsqueda" : "No hay alertas revisadas"}
@@ -392,18 +493,41 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
                   Las alertas que revisés aparecerán acá
                 </p>
               )}
-            </div>
+            </motion.div>
           ) : (
-            <div className="space-y-3">
-              <p className="text-xs text-gray-400 dark:text-gray-500">
+            <motion.div
+              className="space-y-3"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: { staggerChildren: 0.08 },
+                },
+              }}
+            >
+              <motion.p
+                className="text-xs text-gray-400 dark:text-gray-500"
+                variants={{
+                  hidden: { opacity: 0 },
+                  visible: { opacity: 1 },
+                }}
+              >
                 Hacé click en ↺ para marcar una alerta como no vista
-              </p>
+              </motion.p>
               {filteredRevisadas.map(a => {
                 const s = getCardStyles(a.level);
                 return (
-                  <div
+                  <motion.div
                     key={a.id}
-                    className="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700/60 px-5 py-4 opacity-60 hover:opacity-90 transition-opacity"
+                    className="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700/60 px-5 py-4"
+                    variants={{
+                      hidden: { opacity: 0, x: -20 },
+                      visible: { opacity: 0.6 },
+                    }}
+                    whileHover={{ opacity: 0.9, x: 4 }}
                   >
                     <div className={`w-2 h-2 rounded-full flex-shrink-0 ${s.dot}`} />
                     <div className="flex-1 min-w-0">
@@ -422,10 +546,10 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
                         <RotateCcw size={14} className="text-gray-400 dark:text-gray-500" />
                       </button>
                     </div>
-                  </div>
+                  </motion.div>
                 );
               })}
-            </div>
+            </motion.div>
           )}
         </>
       )}
@@ -436,7 +560,7 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
         onClose={handleClose}
         onGoToContract={() => setActive({ page: "leases", filter: "activo" })}
       />
-    </div>
+    </motion.div>
   );
 }
 // IndicesAdmin.jsx — panel minimalista de carga manual

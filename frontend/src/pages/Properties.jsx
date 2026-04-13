@@ -116,9 +116,9 @@ function BigCarousel({ photos }) {
 
   if (!photos || photos.length === 0) {
     return (
-      <div className="w-full h-52 rounded-xl bg-gray-100 dark:bg-gray-700 flex flex-col items-center justify-center gap-2">
-        <Camera size={28} className="text-gray-300 dark:text-gray-500" />
-        <p className="text-xs text-gray-400">Sin fotos</p>
+      <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-gray-900">
+        <Camera size={48} className="text-gray-700" />
+        <p className="text-sm text-gray-500">Sin fotos</p>
       </div>
     );
   }
@@ -127,22 +127,22 @@ function BigCarousel({ photos }) {
   const next = () => setIdx(i => (i + 1) % photos.length);
 
   return (
-    <div className="relative w-full h-52 rounded-xl overflow-hidden bg-black">
-      <img src={photos[idx].url} alt="foto" className="w-full h-full object-cover" />
+    <div className="relative w-full h-full overflow-hidden bg-black flex items-center justify-center">
+      <img src={photos[idx].url} alt="foto" className="w-full h-full object-contain" />
       {photos.length > 1 && (
         <>
-          <button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition-colors">
-            <ChevronLeft size={16} />
+          <button onClick={prev} className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white rounded-full p-2.5 transition-colors z-10">
+            <ChevronLeft size={24} />
           </button>
-          <button onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition-colors">
-            <ChevronRight size={16} />
+          <button onClick={next} className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white rounded-full p-2.5 transition-colors z-10">
+            <ChevronRight size={24} />
           </button>
-          <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
+          <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2 px-6">
             {photos.map((_, i) => (
-              <button key={i} onClick={() => setIdx(i)} className={`w-1.5 h-1.5 rounded-full transition-colors ${i === idx ? "bg-white" : "bg-white/40"}`} />
+              <button key={i} onClick={() => setIdx(i)} className={`w-2.5 h-2.5 rounded-full transition-colors ${i === idx ? "bg-white" : "bg-white/40"}`} />
             ))}
           </div>
-          <span className="absolute top-2 right-2 text-xs bg-black/50 text-white px-2 py-0.5 rounded-full">
+          <span className="absolute top-4 right-4 text-sm bg-black/70 text-white px-3 py-1.5 rounded-full font-medium">
             {idx + 1} / {photos.length}
           </span>
         </>
@@ -260,16 +260,18 @@ function PropertyDetailModal({ property, owners, leases, tenants, onClose, onEdi
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
       <div
-        className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto border border-gray-100 dark:border-gray-700"
+        className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-5xl h-[90vh] flex border border-gray-100 dark:border-gray-700 overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
-        {/* Carrusel de fotos */}
-        <div className="rounded-t-2xl overflow-hidden">
+        {/* Left side: Carousel */}
+        <div className="w-1/2 bg-black overflow-hidden rounded-l-2xl flex flex-col">
           <BigCarousel photos={photos} />
         </div>
 
-        {/* Header info */}
-        <div className={`${headerBg} px-6 py-4`}>
+        {/* Right side: Details */}
+        <div className="flex-1 flex flex-col overflow-y-auto">
+          {/* Header info */}
+          <div className={`${headerBg} px-6 py-4 flex-shrink-0`}>
           <div className="flex items-start justify-between">
             <div className="min-w-0 pr-3">
               <div className="flex items-center gap-2 mb-1">
@@ -296,133 +298,134 @@ function PropertyDetailModal({ property, owners, leases, tenants, onClose, onEdi
               {property.status === "ocupado" ? "Ocupada" : "Vacante"}
             </span>
           </div>
-        </div>
-
-        {/* Cuerpo */}
-        <div className="p-6 space-y-5">
-          {/* Ubicación */}
-          <div className="space-y-1">
-            <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
-              <MapPin size={11} /> Ubicación
-            </p>
-            <p className="font-semibold text-gray-800 dark:text-gray-100">{property.address}</p>
-            {(property.localidad || property.provincia) && (
-              <p className="text-xs text-gray-400 dark:text-gray-500">
-                {[property.localidad, property.provincia, property.codigoPostal].filter(Boolean).join(", ")}
-              </p>
-            )}
-            <p className="text-xs text-gray-400 dark:text-gray-500">{property.type}</p>
           </div>
 
-          <div className="h-px bg-gray-100 dark:bg-gray-800" />
+          {/* Cuerpo */}
+          <div className="p-6 space-y-5 flex-1 overflow-y-auto">
+            {/* Ubicación */}
+            <div className="space-y-1">
+              <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
+                <MapPin size={11} /> Ubicación
+              </p>
+              <p className="font-semibold text-gray-800 dark:text-gray-100">{property.address}</p>
+              {(property.localidad || property.provincia) && (
+                <p className="text-xs text-gray-400 dark:text-gray-500">
+                  {[property.localidad, property.provincia, property.codigoPostal].filter(Boolean).join(", ")}
+                </p>
+              )}
+              <p className="text-xs text-gray-400 dark:text-gray-500">{property.type}</p>
+            </div>
 
-          {/* Propietario */}
-          <div className="space-y-2">
-            <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
-              <User size={11} /> Propietario
-            </p>
-            {owner ? (
+            <div className="h-px bg-gray-100 dark:bg-gray-800" />
+
+            {/* Propietario */}
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
+                <User size={11} /> Propietario
+              </p>
+              {owner ? (
+                <>
+                  <p className="font-semibold text-gray-800 dark:text-gray-100">{owner.name}</p>
+                  <div className="flex flex-col gap-1">
+                    {owner.email && (
+                      <span className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                        <Mail size={11} className="text-gray-400 flex-shrink-0" />{owner.email}
+                      </span>
+                    )}
+                    {owner.phone && (
+                      <span className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                        <Phone size={11} className="text-gray-400 flex-shrink-0" />{owner.phone}
+                      </span>
+                    )}
+                    {owner.document && (
+                      <span className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                        <FileText size={11} className="text-gray-400 flex-shrink-0" />{owner.document}
+                      </span>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm text-gray-400 dark:text-gray-500">Sin propietario asignado</p>
+              )}
+            </div>
+
+            {/* Inquilino actual */}
+            {leaseTenant && (
               <>
-                <p className="font-semibold text-gray-800 dark:text-gray-100">{owner.name}</p>
-                <div className="flex flex-col gap-1">
-                  {owner.email && (
-                    <span className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                      <Mail size={11} className="text-gray-400 flex-shrink-0" />{owner.email}
-                    </span>
-                  )}
-                  {owner.phone && (
-                    <span className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                      <Phone size={11} className="text-gray-400 flex-shrink-0" />{owner.phone}
-                    </span>
-                  )}
-                  {owner.document && (
-                    <span className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                      <FileText size={11} className="text-gray-400 flex-shrink-0" />{owner.document}
-                    </span>
-                  )}
+                <div className="h-px bg-gray-100 dark:bg-gray-800" />
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
+                    <FileText size={11} /> Inquilino actual
+                  </p>
+                  <p className="font-semibold text-gray-800 dark:text-gray-100">{leaseTenant.name}</p>
+                  <div className="flex flex-col gap-1">
+                    {leaseTenant.email && (
+                      <span className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                        <Mail size={11} className="text-gray-400 flex-shrink-0" />{leaseTenant.email}
+                      </span>
+                    )}
+                    {leaseTenant.phone && (
+                      <span className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                        <Phone size={11} className="text-gray-400 flex-shrink-0" />{leaseTenant.phone}
+                      </span>
+                    )}
+                    {leaseTenant.document && (
+                      <span className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                        <FileText size={11} className="text-gray-400 flex-shrink-0" />{leaseTenant.document}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </>
-            ) : (
-              <p className="text-sm text-gray-400 dark:text-gray-500">Sin propietario asignado</p>
             )}
-          </div>
 
-          {/* Inquilino actual */}
-          {leaseTenant && (
-            <>
-              <div className="h-px bg-gray-100 dark:bg-gray-800" />
-              <div className="space-y-2">
-                <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
-                  <FileText size={11} /> Inquilino actual
+            <div className="h-px bg-gray-100 dark:bg-gray-800" />
+
+            {/* Info grid */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
+                <p className="text-xs text-gray-400 dark:text-gray-500 mb-1 flex items-center gap-1">
+                  <DollarSign size={10} /> Precio lista
                 </p>
-                <p className="font-semibold text-gray-800 dark:text-gray-100">{leaseTenant.name}</p>
-                <div className="flex flex-col gap-1">
-                  {leaseTenant.email && (
-                    <span className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                      <Mail size={11} className="text-gray-400 flex-shrink-0" />{leaseTenant.email}
-                    </span>
-                  )}
-                  {leaseTenant.phone && (
-                    <span className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                      <Phone size={11} className="text-gray-400 flex-shrink-0" />{leaseTenant.phone}
-                    </span>
-                  )}
-                  {leaseTenant.document && (
-                    <span className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                      <FileText size={11} className="text-gray-400 flex-shrink-0" />{leaseTenant.document}
-                    </span>
-                  )}
-                </div>
+                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                  {fmtPrice(property.price, property.moneda)}
+                </p>
+                <p className="text-[10px] text-gray-400 mt-0.5">{property.moneda || "ARS"}</p>
               </div>
-            </>
-          )}
-
-          <div className="h-px bg-gray-100 dark:bg-gray-800" />
-
-          {/* Info grid */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
-              <p className="text-xs text-gray-400 dark:text-gray-500 mb-1 flex items-center gap-1">
-                <DollarSign size={10} /> Precio lista
-              </p>
-              <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
-                {fmtPrice(property.price, property.moneda)}
-              </p>
-              <p className="text-[10px] text-gray-400 mt-0.5">{property.moneda || "ARS"}</p>
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
+                <p className="text-xs text-gray-400 dark:text-gray-500 mb-1 flex items-center gap-1">
+                  <Tag size={10} /> Tipo
+                </p>
+                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{property.type}</p>
+              </div>
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 col-span-2">
+                <p className="text-xs text-gray-400 dark:text-gray-500 mb-1.5">Estado</p>
+                <Badge status={property.status} />
+              </div>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
-              <p className="text-xs text-gray-400 dark:text-gray-500 mb-1 flex items-center gap-1">
-                <Tag size={10} /> Tipo
-              </p>
-              <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{property.type}</p>
-            </div>
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 col-span-2">
-              <p className="text-xs text-gray-400 dark:text-gray-500 mb-1.5">Estado</p>
-              <Badge status={property.status} />
-            </div>
-          </div>
 
-          <div className="h-px bg-gray-100 dark:bg-gray-800" />
+            <div className="h-px bg-gray-100 dark:bg-gray-800" />
 
-          {/* Documentos */}
-          <DocumentsSection entityType="property" entityId={property.id} {...docState} />
+            {/* Documentos */}
+            <DocumentsSection entityType="property" entityId={property.id} {...docState} />
 
-          <div className="h-px bg-gray-100 dark:bg-gray-800" />
+            <div className="h-px bg-gray-100 dark:bg-gray-800" />
 
-          {/* Acciones */}
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={() => { onClose(); onEdit(property); }}
-              className="flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-medium rounded-xl border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            >
-              <Edit2 size={14} /> Editar
-            </button>
-            <button
-              onClick={() => { onClose(); onDelete(property.id); }}
-              className="flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-medium rounded-xl border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+            {/* Acciones */}
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => { onClose(); onEdit(property); }}
+                className="flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-medium rounded-xl border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                <Edit2 size={14} /> Editar
+              </button>
+              <button
+                onClick={() => { onClose(); onDelete(property.id); }}
+                className="flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-medium rounded-xl border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
             >
               <Trash2 size={14} /> Eliminar
             </button>
+          </div>
           </div>
         </div>
       </div>
