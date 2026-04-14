@@ -36,7 +36,7 @@ function StatCard({ icon: Icon, label, value, color = "blue", trend, onClick }) 
       transition={{ duration: 0.3 }}
       viewport={{ once: true }}
       onClick={onClick}
-      className={`w-full text-left bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-600 p-5 transition-all ${onClick ? "cursor-pointer" : "cursor-default"} hover:border-blue-400/50 dark:hover:border-blue-500/40 hover:shadow-md dark:hover:shadow-black/40`}
+      className={`w-full text-left bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-[#404040] p-5 transition-all ${onClick ? "cursor-pointer" : "cursor-default"} hover:border-blue-400/50 dark:hover:border-blue-500/40 hover:shadow-md dark:hover:shadow-black/40`}
     >
       <div className="flex items-start justify-between">
         <motion.div
@@ -78,7 +78,7 @@ function OcupacionBar({ properties, setActive }) {
       transition={{ duration: 0.3 }}
       viewport={{ once: true }}
       onClick={() => setActive({ page: "properties", filter: "todos" })}
-      className="w-full text-left bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-600 p-6 hover:border-blue-400/50 dark:hover:border-blue-500/40 hover:shadow-md dark:hover:shadow-black/40 transition-all"
+      className="w-full text-left bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-[#404040] p-6 hover:border-blue-400/50 dark:hover:border-blue-500/40 hover:shadow-md dark:hover:shadow-black/40 transition-all"
     >
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
@@ -95,7 +95,7 @@ function OcupacionBar({ properties, setActive }) {
           {percentage}%
         </motion.span>
       </div>
-      <div className="h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+      <div className="h-3 bg-gray-100 dark:bg-[#2d2d2d] rounded-full overflow-hidden">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
@@ -338,7 +338,7 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive }) 
                     variants={fadeInUp}
                     whileHover={{ backgroundColor: 'rgba(55, 65, 81, 0.5)' }}
                     onClick={() => setActive({ page: "leases", filter: "activo" })}
-                    className="w-full text-left flex items-center gap-3 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
+                    className="w-full text-left flex items-center gap-3 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-[#333333]00/30 transition-colors"
                   >
                     <motion.div
                       whileHover={{ scale: 1.1 }}

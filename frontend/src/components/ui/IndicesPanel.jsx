@@ -33,7 +33,7 @@ function IndicesTable({ tipo, rows, onDelete }) {
     <div className="overflow-x-auto">
       <table className="w-full text-xs">
         <thead>
-          <tr className="border-b border-gray-100 dark:border-gray-700">
+          <tr className="border-b border-gray-100 dark:border-[#404040]">
             <th className="text-left py-2 px-2 text-gray-400 dark:text-gray-500 font-medium">Período</th>
             <th className="text-right py-2 px-2 text-gray-400 dark:text-gray-500 font-medium">Valor</th>
             <th className="w-8" />
@@ -188,7 +188,7 @@ export function IndicesPanel({ embedded = false }) {
 
   const wrapClass = embedded
     ? "space-y-4"
-    : "bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 space-y-4";
+    : "bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] p-5 space-y-4";
 
   return (
     <div className={wrapClass}>
@@ -251,7 +251,7 @@ export function IndicesPanel({ embedded = false }) {
 
       {/* ── Divisor ── */}
       <div className="relative">
-        <div className="h-px bg-gray-100 dark:bg-gray-700" />
+        <div className="h-px bg-gray-100 dark:bg-[#333333]" />
         <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 px-3 text-xs text-gray-400 dark:text-gray-500">
           o cargá manualmente
         </span>
@@ -314,14 +314,14 @@ export function IndicesPanel({ embedded = false }) {
 
       {/* ── Historial ── */}
       <div className="space-y-2">
-        <div className="flex gap-1 bg-gray-100 dark:bg-gray-700/50 rounded-lg p-0.5 w-fit">
+        <div className="flex gap-1 bg-gray-100 dark:bg-[#1e1e1e] rounded-lg p-0.5 w-fit">
           {["ICL", "IPC"].map(t => (
             <button
               key={t}
               onClick={() => setActiveTab(t)}
               className={`px-4 py-1 text-xs font-semibold rounded-md transition-all ${
                 activeTab === t
-                  ? "bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow-sm"
+                  ? "bg-white dark:bg-[#262626] text-gray-800 dark:text-gray-200 shadow-sm"
                   : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
               }`}
             >

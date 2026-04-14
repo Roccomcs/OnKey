@@ -159,7 +159,7 @@ export default function Planes({ token }) {
                 className={`relative rounded-2xl border-2 p-6 flex flex-col transition-shadow ${
                   esPro
                     ? 'border-blue-500 shadow-lg shadow-blue-100 dark:shadow-blue-900/30'
-                    : 'border-gray-200 dark:border-gray-700 shadow-sm'
+                    : 'border-gray-200 dark:border-[#404040] shadow-sm'
                 } bg-white dark:bg-gray-800`}
               >
                 {/* Badge popular */}
@@ -214,7 +214,7 @@ export default function Planes({ token }) {
                     ✓ Plan actual
                   </div>
                 ) : plan.precio_mensual === 0 ? (
-                  <div className="w-full py-2 text-center bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 rounded-lg text-sm border border-gray-200 dark:border-gray-600">
+                  <div className="w-full py-2 text-center bg-gray-50 dark:bg-[#1e1e1e] text-gray-400 dark:text-gray-500 rounded-lg text-sm border border-gray-200 dark:border-[#404040]">
                     Plan de inicio
                   </div>
                 ) : (
@@ -224,7 +224,7 @@ export default function Planes({ token }) {
                     className={`w-full py-2 rounded-lg text-sm font-semibold text-white transition ${
                       esPro
                         ? 'bg-blue-600 hover:bg-blue-700'
-                        : 'bg-gray-700 hover:bg-gray-800 dark:bg-gray-600 dark:hover:bg-gray-500'
+                        : 'bg-gray-700 hover:bg-gray-800 dark:bg-[#333333] dark:hover:bg-[#333333]00'
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     {upgrading === plan.id ? 'Redirigiendo…' : `Actualizar a ${plan.nombre}`}

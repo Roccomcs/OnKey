@@ -19,7 +19,7 @@ function StatCard({ icon: Icon, label, value, color = "blue", trend, onClick }) 
   return (
     <button
       onClick={onClick}
-      className={`w-full text-left bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 transition-all duration-200 hover:shadow-md hover:ring-2 ${c.ring} ${onClick ? "cursor-pointer" : "cursor-default"}`}
+      className={`w-full text-left bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] p-5 transition-all duration-200 hover:shadow-md hover:ring-2 ${c.ring} ${onClick ? "cursor-pointer" : "cursor-default"}`}
     >
       <div className="flex items-start justify-between">
         <div className={`p-2.5 rounded-xl ${c.bg}`}>
@@ -134,7 +134,7 @@ function DashboardOcupacion({ properties, setActive }) {
   return properties.length > 0 && (
     <button
       onClick={() => setActive({ page: "properties", filter: "todos" })}
-      className="w-full text-left bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 hover:shadow-md hover:ring-2 hover:ring-blue-200 dark:hover:ring-blue-800 transition-all"
+      className="w-full text-left bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] p-5 hover:shadow-md hover:ring-2 hover:ring-blue-200 dark:hover:ring-blue-800 transition-all"
     >
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
@@ -145,7 +145,7 @@ function DashboardOcupacion({ properties, setActive }) {
           {Math.round(occupied / properties.length * 100)}%
         </span>
       </div>
-      <div className="h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+      <div className="h-3 bg-gray-100 dark:bg-[#2d2d2d] rounded-full overflow-hidden">
         <div
           className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-700"
           style={{ width: `${(occupied / properties.length) * 100}%` }}
@@ -175,7 +175,7 @@ function DashboardAlertas({ leases, properties, tenants, activeAlerts, setActive
     .sort((a, b) => a.days - b.days);
   if (dashAlerts.length === 0) return null;
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] p-5">
       <div className="flex items-center gap-2 mb-4">
         <Bell size={18} className="text-amber-500" />
         <h3 className="font-semibold text-gray-800 dark:text-gray-200">Alertas de Vencimiento</h3>
@@ -215,7 +215,7 @@ function DashboardContratosRecientes({ leases, properties, tenants, setActive })
     .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
     .slice(0, 4);
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] p-5">
       <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
         <Clock size={18} className="text-blue-600 dark:text-blue-400" />
         Contratos Activos Recientes
@@ -233,7 +233,7 @@ function DashboardContratosRecientes({ leases, properties, tenants, setActive })
               <button
                 key={l.id}
                 onClick={() => setActive({ page: "leases", filter: "activo" })}
-                className="w-full text-left flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                className="w-full text-left flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-[#333333]00 transition-colors"
               >
                 <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
                   <FileText size={14} className="text-blue-600 dark:text-blue-400" />

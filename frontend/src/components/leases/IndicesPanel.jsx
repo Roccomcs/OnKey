@@ -12,7 +12,7 @@ function SmallInput({ label, ...props }) {
       {label && <p className="text-[10px] text-gray-400 dark:text-gray-500 mb-1 font-medium uppercase tracking-wide">{label}</p>}
       <input
         {...props}
-        className="w-full px-2.5 py-1.5 text-xs border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 transition-all"
+        className="w-full px-2.5 py-1.5 text-xs border border-gray-200 dark:border-[#404040] rounded-lg bg-white dark:bg-[#2d2d2d] text-gray-900 dark:text-gray-100 outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 transition-all"
       />
     </div>
   );
@@ -25,7 +25,7 @@ function PeriodSelect({ value, onChange, accentColor = "teal" }) {
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full px-2.5 py-1.5 text-xs border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 outline-none focus:ring-1 focus:ring-${accentColor}-500 focus:border-${accentColor}-500 transition-all`}
+        className={`w-full px-2.5 py-1.5 text-xs border border-gray-200 dark:border-[#404040] rounded-lg bg-white dark:bg-[#2d2d2d] text-gray-900 dark:text-gray-100 outline-none focus:ring-1 focus:ring-${accentColor}-500 focus:border-${accentColor}-500 transition-all`}
       >
         <option value="trimestral">Trimestral</option>
         <option value="cuatrimestral">Cuatrimestral</option>
@@ -303,11 +303,11 @@ export function IndicesPanel() {
   const [refreshKey, setRefreshKey] = useState(0);
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+    <div className="bg-white dark:bg-[#262626] rounded-2xl border border-gray-100 dark:border-[#404040] overflow-hidden">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center justify-between px-5 py-4 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+        className="w-full flex items-center justify-between px-5 py-4 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#333333]00/50 transition-colors"
       >
         <span className="flex items-center gap-2">
           <TrendingUp size={15} className="text-teal-500" />
@@ -320,7 +320,7 @@ export function IndicesPanel() {
       </button>
 
       {open && (
-        <div className="px-5 pb-5 border-t border-gray-100 dark:border-gray-700 pt-4 space-y-4">
+        <div className="px-5 pb-5 border-t border-gray-100 dark:border-[#404040] pt-4 space-y-4">
           <p className="text-xs text-gray-500 dark:text-gray-400">
             El <strong>IPC</strong> se sincroniza automáticamente todos los días a las 08:00 hs.
             El <strong>ICL</strong> se ingresa manualmente consultando la calculadora oficial del BCRA.

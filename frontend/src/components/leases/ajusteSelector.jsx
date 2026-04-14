@@ -130,9 +130,9 @@ function SinDatosFallback({ tipo, onSuccess }) {
           </p>
           <div className="flex gap-2">
             <input type="month" value={mes} onChange={(e) => setMes(e.target.value)}
-              className="flex-1 px-2.5 py-1.5 text-xs border border-amber-300 dark:border-amber-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 outline-none focus:border-amber-500" />
+              className="flex-1 px-2.5 py-1.5 text-xs border border-amber-300 dark:border-[#6b5608] rounded-lg bg-white dark:bg-[#2d2d2d] text-gray-900 dark:text-gray-100 outline-none focus:border-amber-500" />
             <input type="text" inputMode="decimal" placeholder="Ej: 1234.56" value={val} onChange={(e) => setVal(e.target.value.replace(/[^0-9.]/g, ''))}
-              className="flex-1 px-2.5 py-1.5 text-xs border border-amber-300 dark:border-amber-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 outline-none focus:border-amber-500" />
+              className="flex-1 px-2.5 py-1.5 text-xs border border-amber-300 dark:border-[#6b5608] rounded-lg bg-white dark:bg-[#2d2d2d] text-gray-900 dark:text-gray-100 outline-none focus:border-amber-500" />
             <button type="button" onClick={saveManual} disabled={saving || !mes || !val}
               className="px-3 py-1.5 text-xs bg-amber-600 text-white rounded-lg hover:bg-amber-700 disabled:opacity-50 transition-colors">
               {saving ? "…" : "Guardar"}
@@ -217,7 +217,7 @@ export function AjusteSelector({
               className={`relative flex flex-col items-center gap-1.5 p-4 rounded-xl border-2 transition-all ${
                 tipoAjuste === t.id
                   ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                  : "border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-500"
+                  : "border-gray-200 dark:border-[#404040] bg-white dark:bg-[#2d2d2d] hover:border-gray-300 dark:hover:border-[#404040]"
               }`}
             >
               {tipoAjuste === t.id && (
@@ -249,7 +249,7 @@ export function AjusteSelector({
               className={`py-2 rounded-xl text-xs font-medium transition-all ${
                 period === p.id
                   ? "bg-blue-600 text-white shadow-sm"
-                  : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  : "bg-gray-100 dark:bg-[#2d2d2d] text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#333333]"
               }`}
             >
               {p.label}
@@ -396,11 +396,11 @@ export function AjusteSelector({
 
       {/* ── FIJO: calculadora ── */}
       {canShowCalc && tipoAjuste === "FIJO" && (
-        <div className="border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden">
+        <div className="border border-gray-100 dark:border-[#404040] rounded-xl overflow-hidden">
           <button
             type="button"
             onClick={() => setShowCalc((v) => !v)}
-            className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-700/40 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/60 transition-colors"
+            className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-[#1e1e1e] text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#262626] transition-colors"
           >
             <span className="flex items-center gap-2">
               <Calculator size={13} className="text-gray-400" />

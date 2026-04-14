@@ -1,5 +1,6 @@
 // frontend/src/pages/Properties.jsx
 import { useState, useEffect, useRef } from "react";
+import { motion } from "motion/react";
 import {
   Building2, Edit2, Plus, Search, Trash2, User, X,
   Mail, Phone, MapPin, DollarSign, FileText, Tag,
@@ -77,7 +78,7 @@ function CardCarousel({ photos }) {
 
   if (!photos || photos.length === 0) {
     return (
-      <div className="w-56 shrink-0 bg-gray-100 dark:bg-gray-700 flex items-center justify-center rounded-l-2xl">
+      <div className="w-56 shrink-0 bg-gray-100 dark:bg-[#2d2d2d] flex items-center justify-center rounded-l-2xl">
         <Building2 size={32} className="text-gray-300 dark:text-gray-500" />
       </div>
     );
@@ -205,7 +206,7 @@ function PhotoManager({ propertyId }) {
       {!loading && photos.length === 0 && (
         <button
           onClick={() => inputRef.current?.click()}
-          className="w-full border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-xl py-6 flex flex-col items-center gap-2 hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors"
+          className="w-full border-2 border-dashed border-gray-200 dark:border-[#404040] rounded-xl py-6 flex flex-col items-center gap-2 hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-colors"
         >
           <Camera size={22} className="text-gray-300 dark:text-gray-500" />
           <span className="text-xs text-gray-400">Hacé click para subir fotos</span>
@@ -215,7 +216,7 @@ function PhotoManager({ propertyId }) {
       {photos.length > 0 && (
         <div className="grid grid-cols-3 gap-2">
           {photos.map((photo, i) => (
-            <div key={photo.id} className="relative group rounded-lg overflow-hidden aspect-square bg-gray-100 dark:bg-gray-700">
+            <div key={photo.id} className="relative group rounded-lg overflow-hidden aspect-square bg-gray-100 dark:bg-[#2d2d2d]">
               <img src={photo.url} alt={photo.fileName} className="w-full h-full object-cover" />
               {i === 0 && (
                 <span className="absolute top-1 left-1 text-[9px] bg-blue-600 text-white px-1.5 py-0.5 rounded font-medium">
@@ -261,7 +262,7 @@ function PropertyDetailModal({ property, owners, leases, tenants, onClose, onEdi
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
       <div
-        className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-5xl h-[90vh] flex border border-gray-100 dark:border-gray-600 overflow-hidden"
+        className="relative bg-white dark:bg-[#262626] rounded-2xl shadow-2xl w-full max-w-5xl h-[90vh] flex border border-gray-100 dark:border-[#404040] overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
         {/* Left side: Carousel */}
@@ -317,7 +318,7 @@ function PropertyDetailModal({ property, owners, leases, tenants, onClose, onEdi
               <p className="text-xs text-gray-400 dark:text-gray-500">{property.type}</p>
             </div>
 
-            <div className="h-px bg-gray-100 dark:bg-gray-800" />
+            <div className="h-px bg-gray-100 dark:bg-[#333333]" />
 
             {/* Propietario */}
             <div className="space-y-2">
@@ -353,7 +354,7 @@ function PropertyDetailModal({ property, owners, leases, tenants, onClose, onEdi
             {/* Inquilino actual */}
             {leaseTenant && (
               <>
-                <div className="h-px bg-gray-100 dark:bg-gray-800" />
+                <div className="h-px bg-gray-100 dark:bg-[#333333]" />
                 <div className="space-y-2">
                   <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
                     <FileText size={11} /> Inquilino actual
@@ -380,11 +381,11 @@ function PropertyDetailModal({ property, owners, leases, tenants, onClose, onEdi
               </>
             )}
 
-            <div className="h-px bg-gray-100 dark:bg-gray-800" />
+            <div className="h-px bg-gray-100 dark:bg-[#333333]" />
 
             {/* Info grid */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
+              <div className="bg-gray-50 dark:bg-[#1e1e1e] rounded-xl p-3">
                 <p className="text-xs text-gray-400 dark:text-gray-500 mb-1 flex items-center gap-1">
                   <DollarSign size={10} /> Precio lista
                 </p>
@@ -393,7 +394,7 @@ function PropertyDetailModal({ property, owners, leases, tenants, onClose, onEdi
                 </p>
                 <p className="text-[10px] text-gray-400 mt-0.5">{property.moneda || "ARS"}</p>
               </div>
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
+              <div className="bg-gray-50 dark:bg-[#1e1e1e] rounded-xl p-3">
                 <p className="text-xs text-gray-400 dark:text-gray-500 mb-1 flex items-center gap-1">
                   <Tag size={10} /> Tipo
                 </p>
@@ -403,19 +404,19 @@ function PropertyDetailModal({ property, owners, leases, tenants, onClose, onEdi
               {(property.m2 || property.habitaciones || property.banos) && (
                 <div className="col-span-2 grid grid-cols-3 gap-2">
                   {property.m2 && (
-                    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 text-center">
+                    <div className="bg-gray-50 dark:bg-[#1e1e1e] rounded-xl p-3 text-center">
                       <p className="text-lg font-bold text-gray-800 dark:text-gray-200">{property.m2}</p>
                       <p className="text-[10px] text-gray-400 mt-0.5">m²</p>
                     </div>
                   )}
                   {property.habitaciones && (
-                    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 text-center">
+                    <div className="bg-gray-50 dark:bg-[#1e1e1e] rounded-xl p-3 text-center">
                       <p className="text-lg font-bold text-gray-800 dark:text-gray-200">{property.habitaciones}</p>
                       <p className="text-[10px] text-gray-400 mt-0.5">hab.</p>
                     </div>
                   )}
                   {property.banos && (
-                    <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 text-center">
+                    <div className="bg-gray-50 dark:bg-[#1e1e1e] rounded-xl p-3 text-center">
                       <p className="text-lg font-bold text-gray-800 dark:text-gray-200">{property.banos}</p>
                       <p className="text-[10px] text-gray-400 mt-0.5">baños</p>
                     </div>
@@ -424,29 +425,29 @@ function PropertyDetailModal({ property, owners, leases, tenants, onClose, onEdi
               )}
               {/* Descripción */}
               {property.descripcion && (
-                <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 col-span-2">
+                <div className="bg-gray-50 dark:bg-[#1e1e1e] rounded-xl p-3 col-span-2">
                   <p className="text-xs text-gray-400 dark:text-gray-500 mb-1.5">Descripción</p>
                   <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{property.descripcion}</p>
                 </div>
               )}
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 col-span-2">
+              <div className="bg-gray-50 dark:bg-[#1e1e1e] rounded-xl p-3 col-span-2">
                 <p className="text-xs text-gray-400 dark:text-gray-500 mb-1.5">Estado</p>
                 <Badge status={property.status} />
               </div>
             </div>
 
-            <div className="h-px bg-gray-100 dark:bg-gray-800" />
+            <div className="h-px bg-gray-100 dark:bg-[#333333]" />
 
             {/* Documentos */}
             <DocumentsSection entityType="property" entityId={property.id} {...docState} />
 
-            <div className="h-px bg-gray-100 dark:bg-gray-800" />
+            <div className="h-px bg-gray-100 dark:bg-[#333333]" />
 
             {/* Acciones */}
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => { onClose(); onEdit(property); }}
-                className="flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-medium rounded-xl border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                className="flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-medium rounded-xl border border-gray-200 dark:border-[#404040] text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#333333]00 transition-colors"
               >
                 <Edit2 size={14} /> Editar
               </button>
@@ -472,9 +473,13 @@ function PropertyCard({ p, owners, leases, tenants, onClick, onEdit, onDelete })
   const tenant      = activeLease ? tenants?.find(t => t.id === activeLease.tenantId) : null;
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -2, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
+      transition={{ duration: 0.3 }}
       onClick={onClick}
-      className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-600 hover:shadow-lg transition-all cursor-pointer overflow-hidden flex h-44"
+      className="bg-white dark:bg-[#262626] rounded-2xl border border-gray-100 dark:border-[#404040] hover:border-blue-300 dark:hover:border-blue-500/40 hover:shadow-sm transition-all cursor-pointer overflow-hidden flex h-44"
     >
       {/* Imagen lateral izquierda */}
       <CardCarousel photos={photos} />
@@ -492,7 +497,7 @@ function PropertyCard({ p, owners, leases, tenants, onClick, onEdit, onDelete })
             )}
           </div>
           <div className="flex gap-0.5 flex-shrink-0" onClick={e => e.stopPropagation()}>
-            <button onClick={() => onEdit(p)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <button onClick={() => onEdit(p)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#333333]00 transition-colors">
               <Edit2 size={13} className="text-gray-400" />
             </button>
             <button onClick={() => onDelete(p.id)} className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
@@ -517,17 +522,17 @@ function PropertyCard({ p, owners, leases, tenants, onClick, onEdit, onDelete })
         {(p.m2 || p.habitaciones || p.banos) && (
           <div className="flex items-center gap-2">
             {p.m2 && (
-              <span className="flex items-center gap-1 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-md">
+              <span className="flex items-center gap-1 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-[#2d2d2d] px-2 py-0.5 rounded-md">
                 <Maximize2 size={10} /> {p.m2} m²
               </span>
             )}
             {p.habitaciones && (
-              <span className="flex items-center gap-1 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-md">
+              <span className="flex items-center gap-1 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-[#2d2d2d] px-2 py-0.5 rounded-md">
                 <BedDouble size={10} /> {p.habitaciones}
               </span>
             )}
             {p.banos && (
-              <span className="flex items-center gap-1 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-md">
+              <span className="flex items-center gap-1 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-[#2d2d2d] px-2 py-0.5 rounded-md">
                 <Bath size={10} /> {p.banos}
               </span>
             )}
@@ -553,7 +558,7 @@ function PropertyCard({ p, owners, leases, tenants, onClick, onEdit, onDelete })
           <Badge status={p.status} />
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -643,30 +648,35 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
   };
 
   return (
-    <div className="space-y-6">
+    <motion.div className="space-y-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
       {/* Encabezado */}
-      <div className="flex items-center justify-between">
+      <motion.div className="flex items-center justify-between" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3 }}>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Propiedades</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{properties.length} propiedades registradas</p>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">Propiedades</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">{properties.length} propiedades registradas</p>
         </div>
-        <button onClick={openNew} className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition-colors shadow-sm shadow-blue-200">
+        <motion.button 
+          onClick={openNew}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-medium rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg shadow-blue-600/20"
+        >
           <Plus size={16} /> Nueva Propiedad
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
 
       {/* Búsqueda y filtros */}
-      <div className="flex gap-3">
+      <motion.div className="flex gap-3" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3, delay: 0.1 }}>
         <div className="relative flex-1">
           <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar por dirección..."
-            className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all placeholder:text-gray-400"
+            className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 dark:border-[#404040] rounded-xl bg-white dark:bg-[#2d2d2d] text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all placeholder:text-gray-400"
           />
         </div>
-        <div className="flex gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl p-1">
+        <div className="flex gap-1 bg-white dark:bg-[#262626] border border-gray-200 dark:border-[#404040] rounded-xl p-1">
           {["todos", "ocupado", "vacante"].map(f => (
             <button key={f} onClick={() => setFilter(f)}
               className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all capitalize ${
@@ -676,7 +686,7 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
             </button>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {filtered.length > 0 && (
         <p className="text-xs text-gray-400 dark:text-gray-500 -mt-2">
@@ -685,7 +695,18 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
       )}
 
       {/* Lista de propiedades */}
-      <div className="grid gap-3">
+      <motion.div
+        className="grid gap-3"
+        initial="initial"
+        animate="animate"
+        variants={{
+          animate: {
+            transition: {
+              staggerChildren: 0.08,
+            },
+          },
+        }}
+      >
         {filtered.map(p => (
           <PropertyCard
             key={p.id}
@@ -699,13 +720,17 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
           />
         ))}
         {filtered.length === 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-600 py-16 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white dark:bg-[#262626] rounded-2xl border border-gray-100 dark:border-[#404040] py-16 text-center"
+          >
             <Building2 size={36} className="text-gray-200 dark:text-gray-600 mx-auto mb-3" />
             <p className="font-medium text-gray-500 dark:text-gray-400">Sin propiedades</p>
             <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Agrega tu primera propiedad</p>
-          </div>
+          </motion.div>
         )}
-      </div>
+      </motion.div>
 
       {/* Modal de detalle */}
       {detailProperty && (
@@ -735,7 +760,7 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
                   className={`flex-1 py-2 text-sm font-medium rounded-xl border transition-colors capitalize ${
                     form.operacion === op
                       ? "bg-blue-600 text-white border-blue-600"
-                      : "border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      : "border-gray-200 dark:border-[#404040] text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#333333]00"
                   }`}
                 >
                   {op === "alquiler" ? "Alquiler" : "Venta"}
@@ -798,7 +823,7 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
               placeholder="Ej: Departamento luminoso con balcón, cocina equipada, excelente estado..."
               value={form.descripcion}
               onChange={e => setForm({ ...form, descripcion: e.target.value })}
-              className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all placeholder:text-gray-400 resize-none"
+              className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-[#404040] rounded-xl bg-white dark:bg-[#2d2d2d] text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all placeholder:text-gray-400 resize-none"
             />
           </Field>
 
@@ -824,7 +849,7 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
             <Field label="Precio lista">
               <div className="flex gap-2">
                 {/* Toggle ARS / USD */}
-                <div className="flex rounded-xl overflow-hidden border border-gray-200 dark:border-gray-600 flex-shrink-0">
+                <div className="flex rounded-xl overflow-hidden border border-gray-200 dark:border-[#404040] flex-shrink-0">
                   {["ARS", "USD"].map(m => (
                     <button
                       key={m}
@@ -833,7 +858,7 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
                       className={`px-3 py-2 text-xs font-semibold transition-colors ${
                         form.moneda === m
                           ? "bg-blue-600 text-white"
-                          : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                          : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#333333]00"
                       }`}
                     >
                       {m}
@@ -862,13 +887,13 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
           </div>
 
           {/* Fotos */}
-          <div className="rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 p-4">
+          <div className="rounded-xl border border-gray-200 dark:border-[#404040] bg-gray-50 dark:bg-[#1e1e1e] p-4">
             <PhotoManager propertyId={editing} />
           </div>
 
           {/* Documentos — solo al editar */}
           {editing && (
-            <div className="rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 p-4">
+            <div className="rounded-xl border border-gray-200 dark:border-[#404040] bg-gray-50 dark:bg-[#1e1e1e] p-4">
               <PropertyDocuments propertyId={editing} />
             </div>
           )}
@@ -876,7 +901,7 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
           {/* Botones */}
           <div className="flex gap-3 pt-2">
             <button onClick={() => setModal(false)}
-              className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-gray-600 text-sm font-medium text-gray-600 dark:text-gray-400 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+              className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-[#404040] text-sm font-medium text-gray-600 dark:text-gray-400 rounded-xl hover:bg-gray-50 dark:hover:bg-[#333333]00 transition-colors">
               Cancelar
             </button>
             <button onClick={save} disabled={saving}
@@ -886,6 +911,6 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
           </div>
         </div>
       </Modal>
-    </div>
+    </motion.div>
   );
 }

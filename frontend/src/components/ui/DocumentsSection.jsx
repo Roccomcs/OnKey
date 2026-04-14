@@ -59,7 +59,7 @@ export function DocumentsSection({ entityType, entityId, docs, loading, uploadin
           Documentos adjuntos
         </p>
         {docs.length > 0 && (
-          <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded-full">
+          <span className="text-xs bg-gray-100 dark:bg-[#2d2d2d] text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded-full">
             {docs.length}
           </span>
         )}
@@ -74,7 +74,7 @@ export function DocumentsSection({ entityType, entityId, docs, loading, uploadin
         className={`relative border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-all ${
           dragOver
             ? "border-blue-400 bg-blue-50 dark:bg-blue-900/20"
-            : "border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700/30"
+            : "border-gray-200 dark:border-[#404040] hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-[#333333]00/30"
         }`}
       >
         <input
@@ -121,7 +121,7 @@ export function DocumentsSection({ entityType, entityId, docs, loading, uploadin
           {docs.map(doc => (
             <div
               key={doc.id}
-              className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-100 dark:border-gray-700"
+              className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-[#333333]"
             >
               <DocIcon mimeType={doc.mime_type} />
               <div className="flex-1 min-w-0">

@@ -141,7 +141,7 @@ export function AjusteCalculadora({ tipoAjuste, periodicidad, rentaBase, ipcRows
   return (
     <div className="space-y-3 pt-1">
       {/* Chart */}
-      <div className="bg-gray-50 dark:bg-gray-800/60 rounded-xl p-3 text-gray-500 dark:text-gray-400">
+      <div className="bg-gray-50 dark:bg-[#1e1e1e] rounded-xl p-3 text-gray-500 dark:text-gray-400">
         <BarChart rows={rows} color={color} />
       </div>
 
@@ -154,10 +154,10 @@ export function AjusteCalculadora({ tipoAjuste, periodicidad, rentaBase, ipcRows
       )}
 
       {/* Table */}
-      <div className="overflow-x-auto rounded-xl border border-gray-100 dark:border-gray-700">
+      <div className="overflow-x-auto rounded-xl border border-gray-100 dark:border-[#404040]">
         <table className="w-full text-xs">
           <thead>
-            <tr className="bg-gray-50 dark:bg-gray-700/50">
+            <tr className="bg-gray-50 dark:bg-[#1e1e1e]">
               <th className="text-left px-3 py-2 font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide text-[10px]">Período</th>
               <th className="text-left px-3 py-2 font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide text-[10px]">Fecha</th>
               <th className="text-right px-3 py-2 font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide text-[10px]">Ajuste</th>
@@ -168,8 +168,8 @@ export function AjusteCalculadora({ tipoAjuste, periodicidad, rentaBase, ipcRows
             {rows.map((r) => (
               <tr
                 key={r.num}
-                className={`border-t border-gray-100 dark:border-gray-700/60 ${
-                  r.num === 0 ? "bg-gray-50/50 dark:bg-gray-700/20" : ""
+                className={`border-t border-gray-100 dark:border-[#404040]/60 ${
+                  r.num === 0 ? "bg-gray-50/50 dark:bg-[#1a1a1a]" : ""
                 }`}
               >
                 <td className="px-3 py-2 font-medium text-gray-700 dark:text-gray-300">{r.label}</td>

@@ -108,7 +108,7 @@ export function LeaseFormModal({
               onChange={e => setForm({ ...form, rent: e.target.value.replace(/[^0-9.]/g, '') })}
             />
             {propiedadSeleccionada?.price && (
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded pointer-events-none">
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-[#2d2d2d] px-1.5 py-0.5 rounded pointer-events-none">
                 lista: {propiedadSeleccionada.price} {monedaProp}
               </span>
             )}
@@ -121,7 +121,7 @@ export function LeaseFormModal({
         </Field>
 
         {!esVenta && (
-          <div className="border border-gray-200 dark:border-gray-600 rounded-xl p-4 bg-gray-50/50 dark:bg-gray-700/30">
+          <div className="border border-gray-200 dark:border-[#404040] rounded-xl p-4 bg-gray-50/50 dark:bg-[#1e1e1e]">
             <AjusteSelector
               tipoAjuste={form.tipoAjuste}
               onChange={v  => setForm({ ...form, tipoAjuste: v })}
@@ -148,7 +148,7 @@ export function LeaseFormModal({
         )}
 
         {editing && (
-          <div className="rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 p-4">
+          <div className="rounded-xl border border-gray-200 dark:border-[#404040] bg-gray-50 dark:bg-[#1e1e1e] p-4">
             <LeaseDocuments leaseId={editing} />
           </div>
         )}
@@ -162,7 +162,7 @@ export function LeaseFormModal({
 
         <div className="flex gap-3 pt-2">
           <button onClick={onClose}
-            className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-gray-600 text-sm font-medium text-gray-600 dark:text-gray-400 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+            className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-[#404040] text-sm font-medium text-gray-600 dark:text-gray-400 rounded-xl hover:bg-gray-50 dark:hover:bg-[#333333]00 transition-colors">
             Cancelar
           </button>
           <button onClick={onSave} disabled={saving}

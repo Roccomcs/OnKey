@@ -46,7 +46,7 @@ const LandingPageModern = ({ onLoginClick, onSignupClick, dark, toggleDark }) =>
       <motion.nav
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="fixed top-0 w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-700/50 dark:border-gray-700/50 z-50"
+        className="fixed top-0 w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg border-b border-gray-200/50 dark:border-[#404040]/50 dark:border-[#404040]/50 z-50"
       >
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
           <motion.div className="font-semibold text-xl text-gray-900 dark:text-gray-100 dark:text-gray-100 flex items-center gap-2">
@@ -105,7 +105,7 @@ const LandingPageModern = ({ onLoginClick, onSignupClick, dark, toggleDark }) =>
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white dark:bg-gray-900 dark:bg-gray-800 border-t border-gray-200/50 dark:border-gray-700/50 dark:border-gray-700/50 px-4 py-4"
+            className="md:hidden bg-white dark:bg-gray-900 dark:bg-gray-800 border-t border-gray-200/50 dark:border-[#404040]/50 dark:border-[#404040]/50 px-4 py-4"
           >
             <div className="flex flex-col gap-3">
               <a href="#funcionalidades" className="text-sm text-gray-900 dark:text-gray-100 px-3 py-2">
@@ -120,7 +120,7 @@ const LandingPageModern = ({ onLoginClick, onSignupClick, dark, toggleDark }) =>
               <div className="flex gap-2 mt-4">
                 <button
                   onClick={() => onLoginClick?.()}
-                  className="flex-1 px-3 py-2 text-sm font-medium text-gray-900 dark:text-gray-100 border border-gray-200/50 dark:border-gray-700/50 rounded-lg"
+                  className="flex-1 px-3 py-2 text-sm font-medium text-gray-900 dark:text-gray-100 border border-gray-200/50 dark:border-[#404040]/50 rounded-lg"
                 >
                   Iniciar sesión
                 </button>
@@ -202,7 +202,7 @@ const LandingPageModern = ({ onLoginClick, onSignupClick, dark, toggleDark }) =>
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => onLoginClick?.()}
-              className="px-6 py-3 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-200/50 dark:border-gray-700/50 rounded-lg font-semibold hover:bg-gray-50 dark:bg-gray-800 transition-all duration-200"
+              className="px-6 py-3 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-200/50 dark:border-[#404040]/50 rounded-lg font-semibold hover:bg-gray-50 dark:bg-gray-800 transition-all duration-200"
             >
               Ver demo
             </motion.button>
@@ -232,7 +232,7 @@ const LandingPageModern = ({ onLoginClick, onSignupClick, dark, toggleDark }) =>
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="bg-gradient-to-b from-gray-100 to-transparent rounded-2xl border border-gray-200/50 dark:border-gray-700/50 p-8 md:p-12 aspect-video flex items-center justify-center shadow-sm"
+            className="bg-gradient-to-b from-gray-100 to-transparent rounded-2xl border border-gray-200/50 dark:border-[#404040]/50 p-8 md:p-12 aspect-video flex items-center justify-center shadow-sm"
           >
             <div className="text-center">
               <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 2.5, repeat: Infinity }}>
@@ -292,7 +292,7 @@ const LandingPageModern = ({ onLoginClick, onSignupClick, dark, toggleDark }) =>
               <motion.div
                 key={idx}
                 variants={fadeInUp}
-                className="p-6 md:p-8 rounded-xl border border-gray-200/50 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:shadow-sm transition-all duration-200"
+                className="p-6 md:p-8 rounded-xl border border-gray-200/50 dark:border-[#404040]/50 bg-white dark:bg-gray-900 hover:shadow-sm transition-all duration-200"
               >
                 <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-4">
                   <problem.icon className="text-red-600" size={24} />
@@ -413,7 +413,7 @@ const LandingPageModern = ({ onLoginClick, onSignupClick, dark, toggleDark }) =>
                 key={idx}
                 variants={fadeInUp}
                 whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                className="p-6 md:p-8 rounded-xl border border-gray-200/50 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:shadow-md transition-all duration-200"
+                className="p-6 md:p-8 rounded-xl border border-gray-200/50 dark:border-[#404040]/50 bg-white dark:bg-gray-900 hover:shadow-md transition-all duration-200"
               >
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                   <feature.icon className="text-blue-600" size={24} />
@@ -511,7 +511,7 @@ const LandingPageModern = ({ onLoginClick, onSignupClick, dark, toggleDark }) =>
               <motion.div
                 key={idx}
                 variants={fadeInUp}
-                className="p-6 rounded-lg border border-gray-200/50 dark:border-gray-700/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:bg-gray-800 transition-all duration-200"
+                className="p-6 rounded-lg border border-gray-200/50 dark:border-[#404040]/50 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:bg-gray-800 transition-all duration-200"
               >
                 <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
                   <ArrowUpRight size={16} className="text-blue-600" />

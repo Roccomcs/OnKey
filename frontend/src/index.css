@@ -4,18 +4,26 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* ─── Dark mode: paleta near-black con contraste visible entre capas ────────── */
+/* ─── Dark mode: paleta inspirada en ChatGPT con gradación negro → gris ────────── */
 .dark {
   color-scheme: dark;
 
-  /* Fondos — cada nivel tiene contraste perceptible con el anterior */
-  --color-gray-900: #0a0a0a;   /* fondo principal de la app */
-  --color-gray-800: #141414;   /* tarjetas, modales */
-  --color-gray-700: #1e1e1e;   /* inputs, paneles secundarios */
-  --color-gray-600: #282828;   /* hover states */
-
-  /* NO se sobreescriben gray-100 a gray-500: son colores de texto,
-     se mantienen los defaults claros de Tailwind para legibilidad */
+  /* Fondos — progresión clara de negro a gris (estilo ChatGPT) */
+  --bg-sidebar: #0f0f0f;        /* sidebar izquierda - negro puro */
+  --bg-main: #1a1a1a;           /* área principal - gris oscuro */
+  --bg-card: #262626;           /* tarjetas, modales - gris medio */
+  --bg-input: #2d2d2d;          /* inputs, paneles secundarios */
+  --bg-hover: #3a3a3a;          /* hover states - gris más claro */
+  
+  /* Bordes con más visibilidad */
+  --border-dark: #404040;       /* bordes principales */
+  --border-subtle: #333333;     /* bordes sutiles */
+  
+  /* Para compatibilidad con código existente */
+  --color-gray-900: var(--bg-sidebar);
+  --color-gray-800: var(--bg-card);
+  --color-gray-700: var(--bg-input);
+  --color-gray-600: var(--bg-hover);
 }
 
 /* ─── Transición suave al cambiar de tema ──────────────────────────────────── */

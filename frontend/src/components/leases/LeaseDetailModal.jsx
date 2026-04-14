@@ -14,7 +14,7 @@ export function AjusteBadge({ tipo }) {
   const map = {
     ICL:  "bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400",
     IPC:  "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400",
-    FIJO: "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300",
+    FIJO: "bg-gray-100 dark:bg-[#2d2d2d] text-gray-600 dark:text-gray-300",
   };
   return (
     <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${map[tipo] || map.FIJO}`}>
@@ -48,11 +48,11 @@ function ProyeccionAjuste({ lease }) {
   if (!canShow) return null;
 
   return (
-    <div className="rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+    <div className="rounded-xl border border-gray-100 dark:border-[#404040] overflow-hidden">
       <button
         type="button"
         onClick={() => setOpen(v => !v)}
-        className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-700/40 hover:bg-gray-100 dark:hover:bg-gray-700/60 transition-colors"
+        className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-[#1e1e1e] hover:bg-gray-100 dark:hover:bg-[#262626] transition-colors"
       >
         <span className="flex items-center gap-2 text-xs font-semibold text-gray-600 dark:text-gray-300">
           <BarChart2 size={13} style={{ color }} />
@@ -99,7 +99,7 @@ export function LeaseDetailModal({ lease, properties, tenants, owners, onClose, 
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
       <div
-        className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto border border-gray-100 dark:border-gray-700"
+        className="relative bg-white dark:bg-[#262626] rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto border border-gray-100 dark:border-[#404040]"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -128,13 +128,13 @@ export function LeaseDetailModal({ lease, properties, tenants, owners, onClose, 
         <div className="p-6 space-y-5">
           {/* Partes */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
+            <div className="bg-gray-50 dark:bg-[#1e1e1e] rounded-xl p-3">
               <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">Inquilino</p>
               <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{tenant?.name}</p>
               {tenant?.email && <p className="text-xs text-gray-400 mt-0.5">{tenant.email}</p>}
               {tenant?.phone && <p className="text-xs text-gray-400">{tenant.phone}</p>}
             </div>
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
+            <div className="bg-gray-50 dark:bg-[#1e1e1e] rounded-xl p-3">
               <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">Propietario</p>
               <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{owner?.name ?? "—"}</p>
               {owner?.email && <p className="text-xs text-gray-400 mt-0.5">{owner.email}</p>}
@@ -143,19 +143,19 @@ export function LeaseDetailModal({ lease, properties, tenants, owners, onClose, 
 
           {/* Fechas y montos */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
+            <div className="bg-gray-50 dark:bg-[#1e1e1e] rounded-xl p-3">
               <p className="text-xs text-gray-400 dark:text-gray-500 mb-1 flex items-center gap-1"><Calendar size={10} /> Inicio</p>
               <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{fmtDate(lease.startDate)}</p>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
+            <div className="bg-gray-50 dark:bg-[#1e1e1e] rounded-xl p-3">
               <p className="text-xs text-gray-400 dark:text-gray-500 mb-1 flex items-center gap-1"><Calendar size={10} /> Vencimiento</p>
               <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{fmtDate(lease.endDate)}</p>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
+            <div className="bg-gray-50 dark:bg-[#1e1e1e] rounded-xl p-3">
               <p className="text-xs text-gray-400 dark:text-gray-500 mb-1 flex items-center gap-1"><DollarSign size={10} /> Renta base</p>
               <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{fmtCurrency(lease.rent)}/mes</p>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
+            <div className="bg-gray-50 dark:bg-[#1e1e1e] rounded-xl p-3">
               <p className="text-xs text-gray-400 dark:text-gray-500 mb-1 flex items-center gap-1"><TrendingUp size={10} /> Ajuste</p>
               <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
                 {lease.tipoAjuste === "FIJO" || !lease.tipoAjuste
@@ -190,16 +190,16 @@ export function LeaseDetailModal({ lease, properties, tenants, owners, onClose, 
 
           <ProyeccionAjuste lease={lease} />
 
-          <div className="h-px bg-gray-100 dark:bg-gray-800" />
+          <div className="h-px bg-gray-100 dark:bg-[#333333]" />
 
           <DocumentsSection entityType="lease" entityId={lease.id} {...docState} />
 
-          <div className="h-px bg-gray-100 dark:bg-gray-800" />
+          <div className="h-px bg-gray-100 dark:bg-[#333333]" />
 
           {/* Acciones */}
           <div className="grid grid-cols-2 gap-2">
             <button onClick={() => { onClose(); onEdit(lease); }}
-              className="flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-medium rounded-xl border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+              className="flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-medium rounded-xl border border-gray-200 dark:border-[#404040] text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#333333]00 transition-colors">
               <Edit2 size={14} /> Editar
             </button>
             <button onClick={() => { onClose(); onDelete(lease.id); }}
@@ -215,7 +215,7 @@ export function LeaseDetailModal({ lease, properties, tenants, owners, onClose, 
               <div className="flex flex-wrap gap-2">
                 {otrosEstados.map(s => (
                   <button key={s} onClick={() => onStatusChange(lease.id, s)}
-                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors capitalize">
+                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-[#404040] text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#333333]00 transition-colors capitalize">
                     <ChevronRight size={11} /> {s}
                   </button>
                 ))}

@@ -1,5 +1,6 @@
 import { useState, createContext, useMemo, useEffect } from "react";
 import { Sidebar }       from "./components/layout/Sidebar";
+import { UserMenu }      from "./components/layout/UserMenu";
 import { DashboardRedesigned as Dashboard }     from "./pages/DashboardRedesigned";
 import { Properties }    from "./pages/Properties";
 import { Contacts }      from "./pages/Contacts";
@@ -48,7 +49,7 @@ export default function App() {
 
   if (auth.loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-[#1a1a1a]">
         <div className="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin" />
       </div>
     );
@@ -120,7 +121,7 @@ export default function App() {
 
   if (dataLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-[#1a1a1a]">
         <div className="text-center">
           <div className="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin mx-auto" />
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">Cargando datos…</p>
@@ -131,7 +132,7 @@ export default function App() {
 
   if (dataError) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900 p-8">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-[#1a1a1a] p-8">
         <div className="max-w-sm w-full space-y-4">
           <ErrorBox
             message={dataError}
@@ -139,7 +140,7 @@ export default function App() {
           />
           <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
             Verificá que el servidor esté corriendo en{" "}
-            <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">
+            <code className="bg-gray-100 dark:bg-[#262626] px-1 rounded">
               {import.meta.env.VITE_API_URL || "http://localhost:3001"}
             </code>
           </p>
@@ -150,7 +151,7 @@ export default function App() {
 
   return (
     <AuthContext.Provider value={auth}>
-      <div className="flex min-h-screen bg-gray-50/80 dark:bg-gray-900 font-sans">
+      <div className="flex min-h-screen bg-gray-50/80 dark:bg-[#1a1a1a] font-sans">
         <Sidebar
           active={active}
           setActive={handleSetActive}
@@ -162,14 +163,30 @@ export default function App() {
           onLogout={handleLogout}
           subscription={subscription}
         />
-        <main className="flex-1 overflow-auto">
-          <div className="max-w-5xl mx-auto px-6 py-8">
-            {active === "dashboard"     && <Dashboard     {...shared} setActive={handleSetActive} activeAlerts={activeAlerts} />}
-            {active === "properties"    && <Properties    {...shared} initialFilter={propFilter} />}
-            {active === "contacts"      && <Contacts      {...shared} />}
-            {active === "leases"        && <Leases        {...shared} initialTab={leaseFilter} />}
-            {active === "notifications" && <Notifications {...shared} activeAlerts={activeAlerts} dismiss={dismiss} setActive={handleSetActive} />}
-            {active === "planes"        && <Planes token={auth.token} />}
+        <main className="flex-1 flex flex-col overflow-auto">
+          {/* Header con UserMenu */}
+          <div className="sticky top-0 z-40 bg-white dark:bg-[#1a1a1a] backdrop-blur-sm bg-white/80 dark:bg-[#1a1a1a]/80">
+            <div className="px-6 py-1 flex justify-end">
+              <UserMenu
+                user={auth.user}
+                dark={dark}
+                toggleDark={toggleDark}
+                onLogout={handleLogout}
+                onSelectPlanes={() => handleSetActive("planes")}
+              />
+            </div>
+          </div>
+          
+          {/* Contenido */}
+          <div className="flex-1 overflow-auto">
+            <div className="max-w-5xl mx-auto px-6 py-3">
+              {active === "dashboard"     && <Dashboard     {...shared} setActive={handleSetActive} activeAlerts={activeAlerts} />}
+              {active === "properties"    && <Properties    {...shared} initialFilter={propFilter} />}
+              {active === "contacts"      && <Contacts      {...shared} />}
+              {active === "leases"        && <Leases        {...shared} initialTab={leaseFilter} />}
+              {active === "notifications" && <Notifications {...shared} activeAlerts={activeAlerts} dismiss={dismiss} setActive={handleSetActive} />}
+              {active === "planes"        && <Planes token={auth.token} />}
+            </div>
           </div>
         </main>
       </div>

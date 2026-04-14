@@ -33,7 +33,7 @@ function AlertDetailModal({ alert, onClose, onGoToContract }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
       <div
-        className={`relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md ring-1 ${c.ring} overflow-hidden`}
+        className={`relative bg-white dark:bg-[#262626] rounded-2xl shadow-2xl w-full max-w-md ring-1 ${c.ring} overflow-hidden`}
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -72,7 +72,7 @@ function AlertDetailModal({ alert, onClose, onGoToContract }) {
             {prop?.type && <p className="text-xs text-gray-400 dark:text-gray-500">{prop.type}</p>}
           </div>
 
-          <div className="h-px bg-gray-100 dark:bg-gray-800" />
+          <div className="h-px bg-gray-100 dark:bg-[#333333]" />
 
           <div className="space-y-2">
             <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">Inquilino</p>
@@ -91,7 +91,7 @@ function AlertDetailModal({ alert, onClose, onGoToContract }) {
             </div>
           </div>
 
-          <div className="h-px bg-gray-100 dark:bg-gray-800" />
+          <div className="h-px bg-gray-100 dark:bg-[#333333]" />
 
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
@@ -129,21 +129,21 @@ function AlertDetailModal({ alert, onClose, onGoToContract }) {
 function getCardStyles(level) {
   const map = {
     Crítico: {
-      card:  "border border-gray-200/80 dark:border-gray-700/60 dark:shadow-[inset_3px_0_0_0_rgba(239,68,68,0.55)]",
+      card:  "border border-gray-200/80 dark:border-[#404040]/60 dark:shadow-[inset_3px_0_0_0_rgba(239,68,68,0.55)]",
       icon:  "bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/40",
       dot:   "bg-red-500",
       badge: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800/50",
       days:  "text-red-600 dark:text-red-400",
     },
     Urgente: {
-      card:  "border border-gray-200/80 dark:border-gray-700/60 dark:shadow-[inset_3px_0_0_0_rgba(249,115,22,0.55)]",
+      card:  "border border-gray-200/80 dark:border-[#404040]/60 dark:shadow-[inset_3px_0_0_0_rgba(249,115,22,0.55)]",
       icon:  "bg-orange-50 dark:bg-orange-900/20 border border-orange-100 dark:border-orange-900/40",
       dot:   "bg-orange-400",
       badge: "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-800/50",
       days:  "text-orange-600 dark:text-orange-400",
     },
     Próximo: {
-      card:  "border border-gray-200/80 dark:border-gray-700/60 dark:shadow-[inset_3px_0_0_0_rgba(251,191,36,0.45)]",
+      card:  "border border-gray-200/80 dark:border-[#404040]/60 dark:shadow-[inset_3px_0_0_0_rgba(251,191,36,0.45)]",
       icon:  "bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/40",
       dot:   "bg-amber-400",
       badge: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50",
@@ -231,7 +231,7 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
 
       {/* ── Tabs ── */}
       <motion.div
-        className="flex gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl p-1 w-fit"
+        className="flex gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-[#404040] rounded-xl p-1 w-fit"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -257,7 +257,7 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
                   ? "bg-white/20 text-white"
                   : red
                     ? "bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400"
-                    : "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+                    : "bg-gray-100 dark:bg-[#2d2d2d] text-gray-500 dark:text-gray-400"
               }`}>
                 {count}
               </span>
@@ -279,7 +279,7 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder={tab === "pendientes" ? "Buscar alertas pendientes..." : "Buscar alertas revisadas..."}
-          className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all placeholder:text-gray-400"
+          className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 dark:border-[#404040] rounded-xl bg-white dark:bg-[#2d2d2d] text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all placeholder:text-gray-400"
         />
       </motion.div>
 
@@ -299,7 +299,7 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
               { label: "16 a 30 días",    color: "bg-orange-400", desc: "Urgente" },
               { label: "31 a 90 días",    color: "bg-amber-400",  desc: "Próximo" },
             ].map(({ label, color, desc }) => (
-              <div key={label} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 flex items-start gap-3">
+              <div key={label} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-[#404040] p-4 flex items-start gap-3">
                 <div className={`w-3 h-3 rounded-full mt-0.5 flex-shrink-0 ${color}`} />
                 <div>
                   <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{desc}</p>
@@ -312,7 +312,7 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
           {/* Sin alertas en absoluto */}
           {allAlerts.length === 0 && ok.length === 0 && (
             <motion.div
-              className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 py-16 text-center"
+              className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] py-16 text-center"
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
@@ -392,7 +392,7 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
             /* Sin pendientes pero hay revisadas o contratos */
             allAlerts.length > 0 && !search && (
               <motion.div
-                className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 py-10 text-center"
+                className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] py-10 text-center"
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
@@ -441,7 +441,7 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
                 return (
                   <motion.div
                     key={l.id}
-                    className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 transition-all"
+                    className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] p-5 transition-all"
                     variants={{
                       hidden: { opacity: 0, x: -20 },
                       visible: { opacity: 1, x: 0 },
@@ -478,7 +478,7 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
         <>
           {filteredRevisadas.length === 0 ? (
             <motion.div
-              className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 py-12 text-center"
+              className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] py-12 text-center"
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
@@ -522,7 +522,7 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
                 return (
                   <motion.div
                     key={a.id}
-                    className="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700/60 px-5 py-4"
+                    className="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040]/60 px-5 py-4"
                     variants={{
                       hidden: { opacity: 0, x: -20 },
                       visible: { opacity: 0.6 },
@@ -541,7 +541,7 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
                       <button
                         onClick={() => handleUndismiss(a)}
                         title="Marcar como no vista"
-                        className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#333333]00 transition-colors"
                       >
                         <RotateCcw size={14} className="text-gray-400 dark:text-gray-500" />
                       </button>
@@ -602,7 +602,7 @@ export function IndicesAdmin() {
   };
 
   return (
-    <div className="space-y-4 p-5 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
+    <div className="space-y-4 p-5 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040]">
       <h3 className="font-semibold text-gray-800 dark:text-gray-200">Gestión de Índices</h3>
 
       {/* Sync automático */}

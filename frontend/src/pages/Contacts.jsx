@@ -31,7 +31,7 @@ function ContactDetailModal({ person, tab, properties, leases, onClose, onEdit, 
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
       <div
-        className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto border border-gray-100 dark:border-gray-700"
+        className="relative bg-white dark:bg-[#262626] rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto border border-gray-100 dark:border-[#404040]"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -89,7 +89,7 @@ function ContactDetailModal({ person, tab, properties, leases, onClose, onEdit, 
           {/* Propiedades del propietario */}
           {isOwner && (
             <>
-              <div className="h-px bg-gray-100 dark:bg-gray-800" />
+              <div className="h-px bg-gray-100 dark:bg-[#333333]" />
               <div className="space-y-2">
                 <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
                   <Building2 size={11} /> Propiedades ({personProps.length})
@@ -108,7 +108,7 @@ function ContactDetailModal({ person, tab, properties, leases, onClose, onEdit, 
                         <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${
                           prop.status === "ocupado"
                             ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400"
-                            : "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+                            : "bg-gray-100 dark:bg-[#2d2d2d] text-gray-500 dark:text-gray-400"
                         }`}>
                           {prop.status === "ocupado" ? "Ocupada" : "Vacante"}
                         </span>
@@ -125,7 +125,7 @@ function ContactDetailModal({ person, tab, properties, leases, onClose, onEdit, 
           {/* Contrato activo del inquilino */}
           {!isOwner && (
             <>
-              <div className="h-px bg-gray-100 dark:bg-gray-800" />
+              <div className="h-px bg-gray-100 dark:bg-[#333333]" />
               <div className="space-y-2">
                 <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
                   <FileText size={11} /> Contrato activo
@@ -157,13 +157,13 @@ function ContactDetailModal({ person, tab, properties, leases, onClose, onEdit, 
             </>
           )}
 
-          <div className="h-px bg-gray-100 dark:bg-gray-800" />
+          <div className="h-px bg-gray-100 dark:bg-[#333333]" />
 
           {/* Acciones */}
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => { onClose(); onEdit(person); }}
-              className="flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-medium rounded-xl border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-medium rounded-xl border border-gray-200 dark:border-[#404040] text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#333333]00 transition-colors"
             >
               <Edit2 size={14} /> Editar
             </button>
@@ -298,7 +298,7 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
       </motion.div>
 
       {/* Tabs */}
-      <motion.div className="flex gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl p-1 w-fit" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3, delay: 0.1 }}>
+      <motion.div className="flex gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-[#404040] rounded-xl p-1 w-fit" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3, delay: 0.1 }}>
         <button onClick={() => { setTab("owners"); setSearch(""); }}
           className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${tab === "owners" ? "bg-blue-600 text-white" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"}`}>
           Propietarios
@@ -316,7 +316,7 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Buscar por nombre, email o teléfono..."
-          className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all placeholder:text-gray-400"
+          className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 dark:border-[#404040] rounded-xl bg-white dark:bg-[#2d2d2d] text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all placeholder:text-gray-400"
         />
       </div>
 
@@ -337,7 +337,7 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
               variants={fadeInUp}
               whileHover={{ y: -2, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
               onClick={() => setDetailPerson(person)}
-              className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-600 p-5 hover:border-blue-300 dark:hover:border-blue-500/40 hover:shadow-sm transition-all cursor-pointer"
+              className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] p-5 hover:border-blue-300 dark:hover:border-blue-500/40 hover:shadow-sm transition-all cursor-pointer"
             >
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
@@ -359,7 +359,7 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
                   )}
                 </div>
                 <div className="flex flex-col gap-1 flex-shrink-0" onClick={e => e.stopPropagation()}>
-                  <button onClick={() => openEdit(person)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                  <button onClick={() => openEdit(person)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#333333]00 transition-colors">
                     <Edit2 size={13} className="text-gray-400" />
                   </button>
                   <button onClick={() => del(person.id)} className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
@@ -428,7 +428,7 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
           )}
           <div className="flex gap-3 pt-2">
             <button onClick={() => { setModal(false); setEditing(null); }}
-              className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-gray-600 text-sm font-medium text-gray-600 dark:text-gray-400 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+              className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-[#404040] text-sm font-medium text-gray-600 dark:text-gray-400 rounded-xl hover:bg-gray-50 dark:hover:bg-[#333333]00 transition-colors">
               Cancelar
             </button>
             <button onClick={save} disabled={saving}
