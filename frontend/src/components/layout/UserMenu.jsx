@@ -104,19 +104,23 @@ export function UserMenu({ user, dark, toggleDark, onLogout, onSelectPlanes }) {
               {menuItems.map((item, idx) => {
                 const Icon = item.icon;
                 return (
-                  <motion.button
-                    key={idx}
-                    onClick={item.onClick}
-                    whileHover={{ x: 4 }}
-                    transition={{ duration: 0.2 }}
-                    className="w-full flex items-center justify-between px-4 py-3 text-base text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#2d2d2d] transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Icon size={18} className="text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400" />
-                      <span>{item.label}</span>
-                    </div>
-                    <ChevronRight size={16} className="text-gray-300 dark:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </motion.button>
+                  <div key={idx}>
+                    <motion.button
+                      onClick={item.onClick}
+                      whileHover={{ x: 4 }}
+                      transition={{ duration: 0.2 }}
+                      className="w-full flex items-center justify-between px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#2d2d2d] transition-colors group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Icon size={16} className="text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400" />
+                        <span>{item.label}</span>
+                      </div>
+                      <ChevronRight size={14} className="text-gray-300 dark:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </motion.button>
+                    {idx < menuItems.length - 1 && (
+                      <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-[#404040] to-transparent" />
+                    )}
+                  </div>
                 );
               })}
             </div>
@@ -129,19 +133,23 @@ export function UserMenu({ user, dark, toggleDark, onLogout, onSelectPlanes }) {
               {themeItems.map((item, idx) => {
                 const Icon = item.icon;
                 return (
-                  <motion.button
-                    key={idx}
-                    onClick={item.onClick}
-                    whileHover={{ x: 4 }}
-                    transition={{ duration: 0.2 }}
-                    className="w-full flex items-center justify-between px-4 py-3 text-base text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#2d2d2d] transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Icon size={18} className="text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400" />
-                      <span>{item.label}</span>
-                    </div>
-                    <ChevronRight size={16} className="text-gray-300 dark:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </motion.button>
+                  <div key={idx}>
+                    <motion.button
+                      onClick={item.onClick}
+                      whileHover={{ x: 4 }}
+                      transition={{ duration: 0.2 }}
+                      className="w-full flex items-center justify-between px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#2d2d2d] transition-colors group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Icon size={16} className="text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400" />
+                        <span>{item.label}</span>
+                      </div>
+                      <ChevronRight size={14} className="text-gray-300 dark:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </motion.button>
+                    {idx < themeItems.length - 1 && (
+                      <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-[#404040] to-transparent" />
+                    )}
+                  </div>
                 );
               })}
             </div>
@@ -154,19 +162,23 @@ export function UserMenu({ user, dark, toggleDark, onLogout, onSelectPlanes }) {
               {supportItems.map((item, idx) => {
                 const Icon = item.icon;
                 return (
-                  <motion.button
-                    key={idx}
-                    onClick={item.onClick}
-                    whileHover={{ x: 4 }}
-                    transition={{ duration: 0.2 }}
-                    className="w-full flex items-center justify-between px-4 py-3 text-base text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#2d2d2d] transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Icon size={18} className="text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400" />
-                      <span>{item.label}</span>
-                    </div>
-                    <ChevronRight size={16} className="text-gray-300 dark:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </motion.button>
+                  <div key={idx}>
+                    <motion.button
+                      onClick={item.onClick}
+                      whileHover={{ x: 4 }}
+                      transition={{ duration: 0.2 }}
+                      className="w-full flex items-center justify-between px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#2d2d2d] transition-colors group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Icon size={16} className="text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400" />
+                        <span>{item.label}</span>
+                      </div>
+                      <ChevronRight size={14} className="text-gray-300 dark:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </motion.button>
+                    {idx < supportItems.length - 1 && (
+                      <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-[#404040] to-transparent" />
+                    )}
+                  </div>
                 );
               })}
             </div>
@@ -180,13 +192,13 @@ export function UserMenu({ user, dark, toggleDark, onLogout, onSelectPlanes }) {
                 onClick={() => { onLogout(); setOpen(false); }}
                 whileHover={{ x: 4 }}
                 transition={{ duration: 0.2 }}
-                className="w-full flex items-center justify-between px-4 py-3 text-base text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors group"
+                className="w-full flex items-center justify-between px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors group"
               >
                 <div className="flex items-center gap-3">
-                  <LogOut size={18} className="text-red-400 dark:text-red-500 group-hover:text-red-600 dark:group-hover:text-red-400" />
+                  <LogOut size={16} className="text-red-400 dark:text-red-500 group-hover:text-red-600 dark:group-hover:text-red-400" />
                   <span>Cerrar sesión</span>
                 </div>
-                <ChevronRight size={16} className="text-red-300 dark:text-red-800 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ChevronRight size={14} className="text-red-300 dark:text-red-800 opacity-0 group-hover:opacity-100 transition-opacity" />
               </motion.button>
             </div>
           </motion.div>
