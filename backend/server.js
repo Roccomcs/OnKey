@@ -37,6 +37,46 @@ import "./cron.js";
 
 // ─── MIGRACIONES AUTOMÁTICAS ─────────────────────────────────
 async function runMigrations() {
+  // Crear tabla planes si no existe
+  const createPlanesTable = `
+    CREATE TABLE IF NOT EXISTS planes (
+      id               INT UNSIGNED    NOT NULL AUTO_INCREMENT,
+      nombre           VARCHAR(100)    NOT NULL,
+      activo           TINYINT(1)      NOT NULL DEFAULT 1,
+      precio_mensual   DECIMAL(10,2)   NOT NULL DEFAULT 0.00,
+      max_propiedades  INT UNSIGNED             DEFAULT NULL,
+      max_contratos    INT UNSIGNED             DEFAULT NULL,
+      max_contactos    INT UNSIGNED             DEFAULT NULL,
+      max_usuarios     INT UNSIGNED             DEFAULT NULL,
+      mp_plan_id       VARCHAR(255)             DEFAULT NULL,
+      PRIMARY KEY (id),
+      UNIQUE KEY uq_planes_nombre (nombre)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `;
+
+  // Crear tabla suscripciones si no existe
+  const createSuscripcionesTable = `
+    CREATE TABLE IF NOT EXISTS suscripciones (
+      id                       INT UNSIGNED   NOT NULL AUTO_INCREMENT,
+      usuario_id               INT UNSIGNED   NOT NULL,
+      tenant_id                INT UNSIGNED   NOT NULL,
+      plan_id                  INT UNSIGNED   NOT NULL,
+      fecha_inicio             DATE           NOT NULL,
+      fecha_fin                DATE           NOT NULL,
+      fecha_renovacion_proximo DATE                    DEFAULT NULL,
+      ciclo_facturacion        ENUM('mensual','anual') NOT NULL DEFAULT 'mensual',
+      estado                   ENUM('activo','pendiente','cancelado')
+                               NOT NULL DEFAULT 'activo',
+      renovacion_automatica    TINYINT(1)     NOT NULL DEFAULT 0,
+      mp_preapproval_id        VARCHAR(255)            DEFAULT NULL,
+      created_at               DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at               DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      PRIMARY KEY (id),
+      KEY idx_subs_usuario (usuario_id),
+      KEY idx_subs_tenant  (tenant_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `;
+
   // Crear tabla property_photos si no existe
   const createPropertyPhotosTable = `
     CREATE TABLE IF NOT EXISTS property_photos (
@@ -55,6 +95,48 @@ async function runMigrations() {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
   `;
 
+  // Crear tabla documentos si no existe
+  const createDocumentosTable = `
+    CREATE TABLE IF NOT EXISTS documentos (
+      id           INT UNSIGNED   NOT NULL AUTO_INCREMENT,
+      tenant_id    INT UNSIGNED   NOT NULL,
+      entity_type  VARCHAR(30)    NOT NULL,
+      entity_id    INT UNSIGNED   NOT NULL,
+      file_name    VARCHAR(255)   NOT NULL,
+      mime_type    VARCHAR(100)   NOT NULL,
+      file_size    INT UNSIGNED   NOT NULL DEFAULT 0,
+      file_data    LONGBLOB       NOT NULL,
+      created_at   DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (id),
+      KEY idx_docs_tenant  (tenant_id),
+      KEY idx_docs_entity  (entity_type, entity_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `;
+
+  // Crear plan Starter si no existe (required para new users)
+  const ensureStarterPlan = `
+    INSERT IGNORE INTO planes (nombre, activo, precio_mensual, max_propiedades, max_contratos, max_contactos, max_usuarios)
+    VALUES ('Starter', 1, 0, 5, 5, 10, 1)
+  `;
+
+  try {
+    await pool.query(createPlanesTable);
+    console.log("  ✅ Tabla 'planes' creada/verificada");
+  } catch (err) {
+    if (err.code !== 'ER_TABLE_EXISTS_ERROR') {
+      console.error("  ❌ Error al crear tabla planes:", err.message);
+    }
+  }
+
+  try {
+    await pool.query(createSuscripcionesTable);
+    console.log("  ✅ Tabla 'suscripciones' creada/verificada");
+  } catch (err) {
+    if (err.code !== 'ER_TABLE_EXISTS_ERROR') {
+      console.error("  ❌ Error al crear tabla suscripciones:", err.message);
+    }
+  }
+
   try {
     await pool.query(createPropertyPhotosTable);
     console.log("  ✅ Tabla 'property_photos' creada/verificada");
@@ -62,6 +144,22 @@ async function runMigrations() {
     if (err.code !== 'ER_TABLE_EXISTS_ERROR') {
       console.error("  ❌ Error al crear tabla property_photos:", err.message);
     }
+  }
+
+  try {
+    await pool.query(createDocumentosTable);
+    console.log("  ✅ Tabla 'documentos' creada/verificada");
+  } catch (err) {
+    if (err.code !== 'ER_TABLE_EXISTS_ERROR') {
+      console.error("  ❌ Error al crear tabla documentos:", err.message);
+    }
+  }
+
+  try {
+    await pool.query(ensureStarterPlan);
+    console.log("  ✅ Plan Starter verificado/creado");
+  } catch (err) {
+    console.error("  ⚠️  Error al verificar plan Starter:", err.message);
   }
 
   // Agregar columnas a propiedades si no existen
