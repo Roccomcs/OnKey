@@ -95,6 +95,9 @@ export const apiCall = async (endpoint, options = {}) => {
 
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
+    console.log(`[apiCall] ${options.method || 'GET'} ${endpoint} - Token presente (${token.substring(0, 20)}...)`);
+  } else {
+    console.warn(`[apiCall] ${options.method || 'GET'} ${endpoint} - ⚠️  SIN TOKEN en localStorage`);
   }
 
   const response = await fetch(`${API}${endpoint}`, {
