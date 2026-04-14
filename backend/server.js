@@ -37,6 +37,34 @@ import "./cron.js";
 
 // ─── MIGRACIONES AUTOMÁTICAS ─────────────────────────────────
 async function runMigrations() {
+  // Crear tabla property_photos si no existe
+  const createPropertyPhotosTable = `
+    CREATE TABLE IF NOT EXISTS property_photos (
+      id            INT UNSIGNED   NOT NULL AUTO_INCREMENT,
+      tenant_id     INT UNSIGNED   NOT NULL,
+      propiedad_id  INT            NOT NULL,
+      file_name     VARCHAR(255)   NOT NULL,
+      mime_type     VARCHAR(100)   NOT NULL DEFAULT 'image/jpeg',
+      file_size     INT UNSIGNED   NOT NULL DEFAULT 0,
+      file_data     LONGBLOB       NOT NULL,
+      orden         INT UNSIGNED   NOT NULL DEFAULT 0,
+      created_at    DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (id),
+      KEY idx_photos_propiedad (propiedad_id),
+      KEY idx_photos_tenant    (tenant_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `;
+
+  try {
+    await pool.query(createPropertyPhotosTable);
+    console.log("  ✅ Tabla 'property_photos' creada/verificada");
+  } catch (err) {
+    if (err.code !== 'ER_TABLE_EXISTS_ERROR') {
+      console.error("  ❌ Error al crear tabla property_photos:", err.message);
+    }
+  }
+
+  // Agregar columnas a propiedades si no existen
   const cols = [
     { name: "m2",           sql: "ALTER TABLE propiedades ADD COLUMN m2 INT NULL" },
     { name: "habitaciones", sql: "ALTER TABLE propiedades ADD COLUMN habitaciones TINYINT NULL" },
