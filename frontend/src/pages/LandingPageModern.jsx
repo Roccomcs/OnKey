@@ -141,7 +141,7 @@ const LandingPageModern = ({ onLoginClick, onSignupClick, dark, toggleDark }) =>
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
-        className="pt-32 pb-20 px-4 md:px-6 bg-gradient-to-b from-slate-50 via-white to-blue-50/30 relative overflow-hidden"
+        className="pt-32 pb-20 px-4 md:px-6 bg-gradient-to-b from-slate-50 via-white to-blue-50/30 dark:from-[#0a0e1a] dark:via-[#0f0f0f] dark:to-[#0f0f0f] relative overflow-hidden"
       >
         <div className="absolute top-20 right-0 w-72 h-72 bg-blue-200/30 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
         <div className="absolute -bottom-8 left-20 w-72 h-72 bg-purple-200/30 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
@@ -228,17 +228,105 @@ const LandingPageModern = ({ onLoginClick, onSignupClick, dark, toggleDark }) =>
             </div>
           </motion.div>
 
+          {/* Mini-dashboard preview */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="bg-gradient-to-b from-gray-100 to-transparent rounded-2xl border border-gray-200/50 dark:border-[#404040]/50 p-8 md:p-12 aspect-video flex items-center justify-center shadow-sm"
+            className="rounded-2xl border border-gray-200/70 dark:border-[#2d2d2d] overflow-hidden shadow-2xl dark:shadow-black/60"
           >
-            <div className="text-center">
-              <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 2.5, repeat: Infinity }}>
-                <LineChart size={56} className="mx-auto mb-4 text-blue-600 opacity-40" />
-              </motion.div>
-              <p className="text-gray-600 dark:text-gray-400 font-medium">Dashboard intuitivo y poderoso</p>
+            {/* Browser chrome */}
+            <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-[#1a1a1a] border-b border-gray-200/70 dark:border-[#2d2d2d]">
+              <div className="flex gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-red-400/80" />
+                <div className="w-2.5 h-2.5 rounded-full bg-yellow-400/80" />
+                <div className="w-2.5 h-2.5 rounded-full bg-green-400/80" />
+              </div>
+              <div className="flex-1 h-5 mx-3 bg-white dark:bg-[#262626] rounded-md border border-gray-200/50 dark:border-[#333] flex items-center justify-center">
+                <span className="text-[10px] text-gray-400">onkey.app/dashboard</span>
+              </div>
+            </div>
+
+            {/* App UI */}
+            <div className="flex bg-white dark:bg-[#141414]" style={{ height: '360px' }}>
+              {/* Sidebar */}
+              <div className="w-[130px] flex-shrink-0 bg-gray-50 dark:bg-[#0f0f0f] border-r border-gray-200/50 dark:border-[#2d2d2d] p-3 flex flex-col gap-1">
+                <div className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider px-2 mb-2">OnKey</div>
+                {[
+                  { label: 'Dashboard', active: true },
+                  { label: 'Propiedades' },
+                  { label: 'Contratos' },
+                  { label: 'Contactos' },
+                  { label: 'Alertas' },
+                ].map(item => (
+                  <div
+                    key={item.label}
+                    className={`text-[10px] px-2.5 py-1.5 rounded-md font-medium ${
+                      item.active
+                        ? 'bg-blue-600 text-white'
+                        : 'text-gray-500 dark:text-gray-500'
+                    }`}
+                  >
+                    {item.label}
+                  </div>
+                ))}
+              </div>
+
+              {/* Main content */}
+              <div className="flex-1 p-4 overflow-hidden">
+                {/* Header */}
+                <div className="mb-3">
+                  <div className="text-sm font-bold text-gray-900 dark:text-gray-100">Dashboard</div>
+                  <div className="text-[10px] text-gray-400">lunes, 14 de abril de 2026</div>
+                </div>
+
+                {/* Stats grid */}
+                <div className="grid grid-cols-4 gap-2 mb-3">
+                  {[
+                    { label: 'PROPIEDADES', value: '12', color: 'from-blue-600 to-blue-700' },
+                    { label: 'OCUPADAS', value: '9', color: 'from-emerald-500 to-emerald-600' },
+                    { label: 'VACANTES', value: '3', color: 'from-orange-500 to-orange-600' },
+                    { label: 'RENTA MES.', value: '$142K', color: 'from-slate-600 to-slate-700' },
+                  ].map(card => (
+                    <div key={card.label} className="bg-white dark:bg-[#1e1e1e] rounded-lg border border-gray-100 dark:border-[#333] p-2.5">
+                      <div className={`w-5 h-5 rounded-md bg-gradient-to-br ${card.color} mb-2`} />
+                      <div className="text-sm font-bold text-gray-900 dark:text-gray-100">{card.value}</div>
+                      <div className="text-[8px] text-gray-400 dark:text-gray-500 uppercase tracking-wide font-medium mt-0.5">{card.label}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Occupation bar */}
+                <div className="bg-white dark:bg-[#1e1e1e] rounded-lg border border-gray-100 dark:border-[#333] p-2.5 mb-3">
+                  <div className="flex justify-between mb-1.5">
+                    <span className="text-[10px] font-semibold text-gray-700 dark:text-gray-300">Tasa de Ocupación</span>
+                    <span className="text-[11px] font-bold text-emerald-500">75%</span>
+                  </div>
+                  <div className="h-1.5 bg-gray-100 dark:bg-[#2d2d2d] rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-blue-500 via-green-500 to-emerald-500 rounded-full" style={{ width: '75%' }} />
+                  </div>
+                  <div className="flex justify-between mt-1">
+                    <span className="text-[9px] text-emerald-500 font-medium">9 ocupadas</span>
+                    <span className="text-[9px] text-orange-400 font-medium">3 vacantes</span>
+                  </div>
+                </div>
+
+                {/* Alerts */}
+                <div>
+                  <div className="text-[9px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5">Alertas de Vencimiento</div>
+                  <div className="space-y-1.5">
+                    {[
+                      { name: 'García, Roberto', days: '8 días', bg: 'bg-red-50 dark:bg-red-900/20', border: 'border-red-200 dark:border-red-800/50', color: 'text-red-600 dark:text-red-400' },
+                      { name: 'López, María', days: '23 días', bg: 'bg-amber-50 dark:bg-amber-900/20', border: 'border-amber-200 dark:border-amber-800/50', color: 'text-amber-600 dark:text-amber-400' },
+                    ].map(alert => (
+                      <div key={alert.name} className={`flex items-center justify-between px-2.5 py-1.5 rounded-md border ${alert.bg} ${alert.border}`}>
+                        <span className={`text-[10px] font-medium ${alert.color}`}>{alert.name}</span>
+                        <span className={`text-[10px] font-bold ${alert.color}`}>{alert.days}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </motion.div>
         </div>
@@ -254,7 +342,7 @@ const LandingPageModern = ({ onLoginClick, onSignupClick, dark, toggleDark }) =>
             {...fadeInUp}
             className="text-center mb-16"
           >
-            <span className="inline-block text-xs font-semibold text-blue-600 mb-3 px-3 py-1 bg-blue-50 rounded-full">
+            <span className="inline-block text-xs font-semibold text-blue-600 dark:text-blue-400 mb-3 px-3 py-1 bg-blue-50 dark:bg-blue-500/15 rounded-full border border-transparent dark:border-blue-500/20">
               PROBLEMAS REALES
             </span>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 tracking-tight">
@@ -309,14 +397,14 @@ const LandingPageModern = ({ onLoginClick, onSignupClick, dark, toggleDark }) =>
       <motion.section
         id="soluciones"
         {...fadeInUp}
-        className="py-20 md:py-28 px-4 md:px-6 bg-slate-50/50 relative"
+        className="py-20 md:py-28 px-4 md:px-6 bg-slate-50/50 dark:bg-[#141414] relative"
       >
         <div className="max-w-6xl mx-auto">
           <motion.div
             {...fadeInUp}
             className="text-center mb-16"
           >
-            <span className="inline-block text-xs font-semibold text-blue-600 mb-3 px-3 py-1 bg-blue-50 rounded-full">
+            <span className="inline-block text-xs font-semibold text-blue-600 dark:text-blue-400 mb-3 px-3 py-1 bg-blue-50 dark:bg-blue-500/15 rounded-full border border-transparent dark:border-blue-500/20">
               SOLUCIONES
             </span>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 tracking-tight">
@@ -386,7 +474,7 @@ const LandingPageModern = ({ onLoginClick, onSignupClick, dark, toggleDark }) =>
             {...fadeInUp}
             className="text-center mb-16"
           >
-            <span className="inline-block text-xs font-semibold text-blue-600 mb-3 px-3 py-1 bg-blue-50 rounded-full">
+            <span className="inline-block text-xs font-semibold text-blue-600 dark:text-blue-400 mb-3 px-3 py-1 bg-blue-50 dark:bg-blue-500/15 rounded-full border border-transparent dark:border-blue-500/20">
               FUNCIONALIDADES
             </span>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
@@ -477,7 +565,7 @@ const LandingPageModern = ({ onLoginClick, onSignupClick, dark, toggleDark }) =>
             {...fadeInUp}
             className="text-center mb-16"
           >
-            <span className="inline-block text-xs font-semibold text-blue-600 mb-3 px-3 py-1 bg-blue-50 rounded-full">
+            <span className="inline-block text-xs font-semibold text-blue-600 dark:text-blue-400 mb-3 px-3 py-1 bg-blue-50 dark:bg-blue-500/15 rounded-full border border-transparent dark:border-blue-500/20">
               PREGUNTAS FRECUENTES
             </span>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100">Respuestas a tus dudas</h2>

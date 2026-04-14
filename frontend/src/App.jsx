@@ -179,7 +179,7 @@ export default function App() {
           
           {/* Contenido */}
           <div className="flex-1 overflow-auto">
-            <div className="max-w-5xl mx-auto px-6 py-3">
+            <div className="px-8 py-3">
               {active === "dashboard"     && <Dashboard     {...shared} setActive={handleSetActive} activeAlerts={activeAlerts} />}
               {active === "properties"    && <Properties    {...shared} initialFilter={propFilter} />}
               {active === "contacts"      && <Contacts      {...shared} />}

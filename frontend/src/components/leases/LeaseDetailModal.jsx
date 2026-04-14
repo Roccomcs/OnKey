@@ -199,7 +199,7 @@ export function LeaseDetailModal({ lease, properties, tenants, owners, onClose, 
           {/* Acciones */}
           <div className="grid grid-cols-2 gap-2">
             <button onClick={() => { onClose(); onEdit(lease); }}
-              className="flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-medium rounded-xl border border-gray-200 dark:border-[#404040] text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#333333]00 transition-colors">
+              className="flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-medium rounded-xl border border-gray-200 dark:border-[#404040] text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#2d2d2d] transition-colors">
               <Edit2 size={14} /> Editar
             </button>
             <button onClick={() => { onClose(); onDelete(lease.id); }}
@@ -215,7 +215,7 @@ export function LeaseDetailModal({ lease, properties, tenants, owners, onClose, 
               <div className="flex flex-wrap gap-2">
                 {otrosEstados.map(s => (
                   <button key={s} onClick={() => onStatusChange(lease.id, s)}
-                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-[#404040] text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#333333]00 transition-colors capitalize">
+                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-[#404040] text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2d2d2d] transition-colors capitalize">
                     <ChevronRight size={11} /> {s}
                   </button>
                 ))}

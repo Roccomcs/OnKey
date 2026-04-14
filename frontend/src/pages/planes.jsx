@@ -224,7 +224,7 @@ export default function Planes({ token }) {
                     className={`w-full py-2 rounded-lg text-sm font-semibold text-white transition ${
                       esPro
                         ? 'bg-blue-600 hover:bg-blue-700'
-                        : 'bg-gray-700 hover:bg-gray-800 dark:bg-[#333333] dark:hover:bg-[#333333]00'
+                        : 'bg-gray-700 hover:bg-gray-800 dark:bg-[#333333] dark:hover:bg-[#2d2d2d]'
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     {upgrading === plan.id ? 'Redirigiendo…' : `Actualizar a ${plan.nombre}`}

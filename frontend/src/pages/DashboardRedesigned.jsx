@@ -1,110 +1,78 @@
 // frontend/src/pages/DashboardRedesigned.jsx
 // Dashboard mejorado - Funcional, interactivo y hermoso
 
-import { AlertCircle, AlertTriangle, Plus, Search, TrendingUp, AlertOctagon, Bell, Building2, CheckCircle, DollarSign, FileText, Key, Users, PieChart, Clock, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { Plus, Building2, CheckCircle, DollarSign, FileText, Key, Users, PieChart, ArrowUpRight, ArrowDownRight, ScrollText } from 'lucide-react';
 import { motion } from 'motion/react';
 import {
   BtnPrimary,
   Card,
-  CardProperty,
-  SearchInput,
-  AlertCard,
-  EmptyState,
-  MetricCard,
   SectionHeader,
-  Table,
-  Badge,
   Separator,
 } from '../components/ui/redesigned';
 import { fmtCurrency, fmtDate, diffDays, fmtDuration, getAlertLevel } from '../utils/helpers';
 
-// ─── StatCard Interactivo ─────────────────────────────────────────────────────
-function StatCard({ icon: Icon, label, value, color = "blue", trend, onClick }) {
+// ─── StatCard limpio estilo mockup ────────────────────────────────────────────
+function StatCard({ icon: Icon, label, value, color = "blue", onClick }) {
   const colors = {
-    blue:   { bg: "from-blue-600 to-blue-700", icon: "text-blue-600 dark:text-blue-400", light: "bg-blue-50 dark:bg-blue-900/30" },
-    green:  { bg: "from-emerald-600 to-emerald-700", icon: "text-emerald-600 dark:text-emerald-400", light: "bg-emerald-50 dark:bg-emerald-900/30" },
-    orange: { bg: "from-orange-600 to-orange-700", icon: "text-orange-600 dark:text-orange-400", light: "bg-orange-50 dark:bg-orange-900/30" },
-    slate:  { bg: "from-slate-600 to-slate-700", icon: "text-slate-600 dark:text-slate-300", light: "bg-slate-50 dark:bg-slate-700" },
+    blue:   "from-blue-600 to-blue-700",
+    green:  "from-emerald-500 to-emerald-600",
+    orange: "from-orange-500 to-orange-600",
+    slate:  "from-slate-600 to-slate-700",
   };
-  const c = colors[color] || colors.blue;
 
   return (
     <motion.button
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4, boxShadow: '0 12px 30px rgba(0,0,0,0.08)' }}
-      transition={{ duration: 0.3 }}
+      whileHover={{ y: -3, boxShadow: '0 12px 28px rgba(0,0,0,0.09)' }}
+      transition={{ duration: 0.25 }}
       viewport={{ once: true }}
       onClick={onClick}
-      className={`w-full text-left bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-[#404040] p-5 transition-all ${onClick ? "cursor-pointer" : "cursor-default"} hover:border-blue-400/50 dark:hover:border-blue-500/40 hover:shadow-md dark:hover:shadow-black/40`}
+      className={`w-full text-left bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-[#333] p-5 transition-all ${onClick ? "cursor-pointer" : "cursor-default"} hover:border-blue-200 dark:hover:border-blue-500/30 hover:shadow-md dark:hover:shadow-black/40`}
     >
-      <div className="flex items-start justify-between">
-        <motion.div
-          className={`p-3 rounded-lg bg-gradient-to-br ${c.bg}`}
-          whileHover={{ scale: 1.1 }}
-        >
-          <Icon size={20} className="text-white" />
-        </motion.div>
-        {trend !== undefined && (
-          <motion.span
-            initial={{ opacity: 0, x: 10 }}
-            animate={{ opacity: 1, x: 0 }}
-            className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${trend >= 0 ? "bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400" : "bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400"}`}
-          >
-            {trend >= 0 ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-            {Math.abs(trend)}%
-          </motion.span>
-        )}
+      <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${colors[color] || colors.blue} flex items-center justify-center mb-4`}>
+        <Icon size={18} className="text-white" />
       </div>
-      <div className="mt-4">
-        <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{label}</p>
-      </div>
+      <p className="text-3xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">{value}</p>
+      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1.5 uppercase tracking-wide font-medium">{label}</p>
     </motion.button>
   );
 }
 
 // ─── Ocupación Progress Bar ────────────────────────────────────────────────────
 function OcupacionBar({ properties, setActive }) {
-  const occupied = properties.filter(p => p.status === "ocupado").length;
-  const vacant = properties.filter(p => p.status === "desocupado").length;
+  const occupied   = properties.filter(p => p.status === "ocupado").length;
+  const vacant     = properties.filter(p => p.status !== "ocupado").length;
   const percentage = properties.length > 0 ? Math.round((occupied / properties.length) * 100) : 0;
 
   return properties.length > 0 && (
     <motion.button
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.3 }}
+      whileHover={{ y: -2 }}
+      transition={{ duration: 0.25 }}
       viewport={{ once: true }}
       onClick={() => setActive({ page: "properties", filter: "todos" })}
-      className="w-full text-left bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-[#404040] p-6 hover:border-blue-400/50 dark:hover:border-blue-500/40 hover:shadow-md dark:hover:shadow-black/40 transition-all"
+      className="w-full text-left bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-[#333] p-5 hover:border-blue-200 dark:hover:border-blue-500/30 hover:shadow-md dark:hover:shadow-black/40 transition-all"
     >
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-          <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.5 }}>
-            <PieChart size={18} className="text-blue-400" />
-          </motion.div>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
           Tasa de Ocupación
         </h3>
-        <motion.span 
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-400"
-        >
+        <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-blue-500">
           {percentage}%
-        </motion.span>
+        </span>
       </div>
-      <div className="h-3 bg-gray-100 dark:bg-[#2d2d2d] rounded-full overflow-hidden">
+      <div className="h-2 bg-gray-100 dark:bg-[#2d2d2d] rounded-full overflow-hidden">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
           transition={{ duration: 1, ease: 'easeOut' }}
-          className="h-full bg-gradient-to-r from-blue-500 via-green-500 to-emerald-600 rounded-full"
+          className="h-full bg-gradient-to-r from-blue-500 via-green-500 to-emerald-500 rounded-full"
         />
       </div>
-      <div className="flex justify-between mt-3 text-xs text-gray-400">
-        <span className="text-green-400 font-medium">{occupied} ocupadas</span>
+      <div className="flex justify-between mt-2 text-xs">
+        <span className="text-emerald-500 font-medium">{occupied} ocupadas</span>
         <span className="text-orange-400 font-medium">{vacant} {vacant === 1 ? 'vacante' : 'vacantes'}</span>
       </div>
     </motion.button>
@@ -116,6 +84,7 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive }) 
   const occupied = properties.filter(p => p.status === "ocupado").length;
   const vacant = properties.filter(p => p.status === "desocupado").length;
   const totalRent = leases.filter(l => l.status === "activo").reduce((s, l) => s + (l.renta_mensual || 0), 0);
+  const activeLeases = leases.filter(l => l.status === "activo").length;
 
   // Alertas de vencimiento
   const dashAlerts = leases
@@ -184,7 +153,7 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive }) 
         variants={staggerContainer}
         initial="initial"
         animate="animate"
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4"
       >
         <motion.div variants={fadeInUp}>
           <StatCard
@@ -237,6 +206,16 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive }) 
             onClick={() => setActive("contacts")}
           />
         </motion.div>
+
+        <motion.div variants={fadeInUp}>
+          <StatCard
+            icon={ScrollText}
+            label="Contratos"
+            value={activeLeases}
+            color="slate"
+            onClick={() => setActive({ page: "leases", filter: "activo" })}
+          />
+        </motion.div>
       </motion.div>
 
       <Separator />
@@ -259,9 +238,9 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive }) 
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <SectionHeader title="⚠ Alertas de Vencimiento" />
-          <motion.div 
-            className="space-y-3"
+          <SectionHeader title="Alertas de Vencimiento" />
+          <motion.div
+            className="space-y-2"
             variants={staggerContainer}
             initial="initial"
             animate="animate"
@@ -270,27 +249,16 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive }) 
               <motion.button
                 key={alert.id}
                 variants={fadeInUp}
-                whileHover={{ x: 4 }}
+                whileHover={{ x: 3 }}
                 onClick={() => setActive({ page: "leases", filter: "activo" })}
-                className={`w-full text-left flex items-center gap-4 p-4 rounded-lg border transition-all ${alert.level.bg} ${alert.level.border} hover:shadow-lg`}
+                className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-lg border transition-all ${alert.level.bg} ${alert.level.border}`}
               >
-                <motion.div 
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className={`w-3 h-3 rounded-full flex-shrink-0 ${alert.level.dot}`}
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
-                    {alert.nominatario || "Contrato"}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Propiedad #{alert.propiedad_id}</p>
-                </div>
-                <div className="text-right flex-shrink-0">
-                  <p className={`text-sm font-bold ${alert.level.color}`}>
-                    {alert.days <= 0 ? "Venció" : fmtDuration(alert.days)}
-                  </p>
-                  <p className={`text-xs ${alert.level.color}`}>{alert.level.label}</p>
-                </div>
+                <p className={`text-sm font-medium ${alert.level.color}`}>
+                  {alert.nominatario || "Contrato"}
+                </p>
+                <p className={`text-sm font-bold ${alert.level.color} flex-shrink-0`}>
+                  {alert.days <= 0 ? "Venció" : fmtDuration(alert.days)}
+                </p>
               </motion.button>
             ))}
           </motion.div>
@@ -336,28 +304,22 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive }) 
                   <motion.button
                     key={lease.id}
                     variants={fadeInUp}
-                    whileHover={{ backgroundColor: 'rgba(55, 65, 81, 0.5)' }}
+                    whileHover={{ x: 2 }}
                     onClick={() => setActive({ page: "leases", filter: "activo" })}
-                    className="w-full text-left flex items-center gap-3 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-[#333333]00/30 transition-colors"
+                    className="w-full text-left flex items-center justify-between px-4 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-[#2d2d2d] transition-colors border border-transparent hover:border-gray-100 dark:hover:border-[#333]"
                   >
-                    <motion.div
-                      whileHover={{ scale: 1.1 }}
-                      className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center flex-shrink-0"
-                    >
-                      <FileText size={14} className="text-blue-600 dark:text-blue-400" />
-                    </motion.div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">Propiedad #{lease.propiedad_id}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{lease.nominatario}</p>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">{lease.nominatario || `Propiedad #${lease.propiedad_id}`}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">Propiedad #{lease.propiedad_id}</p>
                     </div>
-                    <div className="text-right flex-shrink-0">
+                    <div className="text-right flex-shrink-0 ml-4">
                       <p className="text-sm font-bold text-gray-900 dark:text-gray-200">{fmtCurrency(lease.renta_mensual)}</p>
                       {alert ? (
                         <p className={`text-xs font-medium ${alert.color}`}>
                           {days <= 0 ? "Vencido" : fmtDuration(days)}
                         </p>
                       ) : (
-                        <p className="text-xs text-gray-500">Hasta {fmtDate(lease.fecha_fin)}</p>
+                        <p className="text-xs text-gray-400">Hasta {fmtDate(lease.fecha_fin)}</p>
                       )}
                     </div>
                   </motion.button>

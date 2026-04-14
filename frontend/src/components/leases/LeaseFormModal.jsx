@@ -162,7 +162,7 @@ export function LeaseFormModal({
 
         <div className="flex gap-3 pt-2">
           <button onClick={onClose}
-            className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-[#404040] text-sm font-medium text-gray-600 dark:text-gray-400 rounded-xl hover:bg-gray-50 dark:hover:bg-[#333333]00 transition-colors">
+            className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-[#404040] text-sm font-medium text-gray-600 dark:text-gray-400 rounded-xl hover:bg-gray-50 dark:hover:bg-[#2d2d2d] transition-colors">
             Cancelar
           </button>
           <button onClick={onSave} disabled={saving}

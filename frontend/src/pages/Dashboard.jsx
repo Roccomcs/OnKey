@@ -233,7 +233,7 @@ function DashboardContratosRecientes({ leases, properties, tenants, setActive })
               <button
                 key={l.id}
                 onClick={() => setActive({ page: "leases", filter: "activo" })}
-                className="w-full text-left flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-[#333333]00 transition-colors"
+                className="w-full text-left flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-[#2d2d2d] transition-colors"
               >
                 <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
                   <FileText size={14} className="text-blue-600 dark:text-blue-400" />
