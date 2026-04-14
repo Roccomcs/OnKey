@@ -4,9 +4,19 @@ export const fmtDate = d =>
   new Date(d).toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" });
 
 export const diffDays = (dateStr) => {
+  // Validación defensiva
+  if (!dateStr || typeof dateStr !== 'string') {
+    console.warn('[diffDays] dateStr inválido:', dateStr);
+    return 0;
+  }
   // Fuerza interpretación en zona horaria local (Argentina UTC-3)
   // evitando el offset UTC que new Date("YYYY-MM-DD") aplica por defecto
-  const [y, m, d] = dateStr.split("-").map(Number);
+  const parts = dateStr.split("-").map(Number);
+  if (parts.length !== 3 || !parts[0] || !parts[1] || !parts[2]) {
+    console.warn('[diffDays] formato de fecha inválido:', dateStr);
+    return 0;
+  }
+  const [y, m, d] = parts;
   const target = new Date(y, m - 1, d);
   const today  = new Date();
   today.setHours(0, 0, 0, 0);
@@ -33,8 +43,10 @@ export const fmtCurrency = (n) =>
 // Verifica que una fecha string "YYYY-MM-DD" sea realmente válida
 // (evita fechas como 30/02 que los inputs de tipo date normalizan o rechazan)
 export const isValidDate = (str) => {
-  if (!str) return false;
-  const [y, m, d] = str.split("-").map(Number);
+  if (!str || typeof str !== 'string') return false;
+  const parts = str.split("-").map(Number);
+  if (parts.length !== 3 || !parts[0] || !parts[1] || !parts[2]) return false;
+  const [y, m, d] = parts;
   const dt = new Date(y, m - 1, d);
   return (
     dt.getFullYear() === y &&
@@ -53,9 +65,21 @@ export const getAlertLevel = (days) => {
 };
 
 // ─── URL BASE DE LA API ───────────────────────────────────────
-// En desarrollo usa el proxy de Vite (/api), en producción usa la URL del .env (debe incluir /api)
+// En desarrollo usa el proxy de Vite (/api), en producción usa la URL del .env (DEBE estar configurada en Vercel)
 
-export const API = import.meta.env.DEV ? "/api" : (import.meta.env.VITE_API_URL?.replace(/\/$/, '') || "http://localhost:3001/api");
+const getApiUrl = () => {
+  if (import.meta.env.DEV) {
+    return "/api"; // Proxy de Vite en desarrollo
+  }
+  const url = import.meta.env.VITE_API_URL?.replace(/\/$/, '');
+  if (!url) {
+    console.error('[API] VITE_API_URL no está configurada. Backend no será accesible en producción.');
+    console.error('[API] Configura en Vercel: VITE_API_URL=https://onkey-production.up.railway.app/api');
+  }
+  return url || 'https://onkey-production.up.railway.app/api';
+};
+
+export const API = getApiUrl();
 
 // ─── API CALLS CON AUTENTICACIÓN ──────────────────────────────
 /**
