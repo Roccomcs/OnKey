@@ -225,7 +225,7 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-4xl font-bold text-gray-100 tracking-tight">Notificaciones</h1>
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">Notificaciones</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Sistema de alertas de vencimiento de contratos</p>
       </motion.div>
 
@@ -354,12 +354,12 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
                   <motion.button
                     key={a.id}
                     onClick={() => handleOpen(a)}
-                    className={`w-full text-left rounded-2xl ${s.card} bg-white dark:bg-gray-800 p-5 transition-all hover:shadow-md active:scale-[0.99]`}
+                    className={`w-full text-left rounded-2xl ${s.card} bg-white dark:bg-gray-800 p-5 hover:border-gray-400 dark:hover:border-gray-600 transition-all active:scale-[0.99]`}
                     variants={{
                       hidden: { opacity: 0, y: 20 },
                       visible: { opacity: 1, y: 0 },
                     }}
-                    whileHover={{ y: -4, boxShadow: "0 8px 12px rgba(59, 130, 246, 0.1)" }}
+                    whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     <div className="flex items-center gap-4">
@@ -441,12 +441,12 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
                 return (
                   <motion.div
                     key={l.id}
-                    className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] p-5 transition-all"
+                    className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] p-5 hover:border-gray-400 dark:hover:border-gray-600 transition-all"
                     variants={{
                       hidden: { opacity: 0, x: -20 },
                       visible: { opacity: 1, x: 0 },
                     }}
-                    whileHover={{ y: -2, boxShadow: "0 4px 12px rgba(34, 197, 94, 0.1)" }}
+                    whileHover={{ scale: 1.02 }}
                   >
                     <div className="flex items-start gap-4">
                       <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0">
@@ -522,12 +522,12 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
                 return (
                   <motion.div
                     key={a.id}
-                    className="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040]/60 px-5 py-4"
+                    className="flex items-center gap-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040]/60 hover:border-gray-400 dark:hover:border-gray-600 px-5 py-4 transition-all"
                     variants={{
                       hidden: { opacity: 0, x: -20 },
                       visible: { opacity: 0.6 },
                     }}
-                    whileHover={{ opacity: 0.9, x: 4 }}
+                    whileHover={{ scale: 1.02 }}
                   >
                     <div className={`w-2 h-2 rounded-full flex-shrink-0 ${s.dot}`} />
                     <div className="flex-1 min-w-0">
@@ -536,7 +536,7 @@ export function Notifications({ leases, properties, tenants, activeAlerts, dismi
                     </div>
                     <div className="flex items-center gap-3 flex-shrink-0">
                       <p className={`text-sm font-bold ${s.days}`}>
-                        {a.days <= 0 ? "Venció" : `${a.days}d`}
+                        {a.days <= 0 ? "Venció" : `${a.days} días`}
                       </p>
                       <button
                         onClick={() => handleUndismiss(a)}

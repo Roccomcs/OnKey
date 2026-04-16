@@ -74,7 +74,7 @@ export function DocumentsSection({ entityType, entityId, docs, loading, uploadin
         className={`relative border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-all ${
           dragOver
             ? "border-blue-400 bg-blue-50 dark:bg-blue-900/20"
-            : "border-gray-200 dark:border-[#404040] hover:border-blue-300 dark:hover:border-blue-600 hover:bg-gray-50 dark:hover:bg-[#2d2d2d]/30"
+            : "border-gray-200 dark:border-[#404040] hover:border-gray-400 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-[#2d2d2d]/30"
         }`}
       >
         <input

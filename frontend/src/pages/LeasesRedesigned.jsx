@@ -42,8 +42,8 @@ export function LeasesRedesigned({ leases = [], properties = [], onAdd, onEdit, 
   const getUrgency = (fechaFin) => {
     const dias = diffDays(fechaFin);
     if (dias < 0) return { label: '⚠ Vencido', color: 'error', dias };
-    if (dias <= 7) return { label: `⚡ Termina en ${dias}d`, color: 'error', dias };
-    if (dias <= 30) return { label: `● Termina en ${dias}d`, color: 'warning', dias };
+    if (dias <= 7) return { label: `⚡ Termina en ${dias} días`, color: 'error', dias };
+    if (dias <= 30) return { label: `● Termina en ${dias} días`, color: 'warning', dias };
     return { label: `✓ Activo`, color: 'success', dias };
   };
 

@@ -50,10 +50,7 @@ const LandingPageModern = ({ onLoginClick, onSignupClick, dark, toggleDark }) =>
       >
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
           <motion.div className="font-semibold text-xl text-gray-900 dark:text-gray-100 dark:text-gray-100 flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <Building2 size={18} className="text-white" />
-            </div>
-            <span>OnKey</span>
+            <img src="/Gemini_Generated_Image_h8o191h8o191h8o1 (1).svg" alt="OnKey" className="h-32" />
           </motion.div>
 
           {/* Desktop Menu */}

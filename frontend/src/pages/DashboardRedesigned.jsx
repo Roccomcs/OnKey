@@ -1,7 +1,7 @@
 // frontend/src/pages/DashboardRedesigned.jsx
 // Dashboard mejorado - Funcional, interactivo y hermoso
 
-import { Plus, Building2, CheckCircle, DollarSign, FileText, Key, Users, PieChart, ArrowUpRight, ArrowDownRight, ScrollText } from 'lucide-react';
+import { Plus, Building2, CheckCircle, DollarSign, FileText, Key, Users, PieChart, ArrowUpRight, ArrowDownRight, ScrollText, AlertCircle, AlertTriangle, Clock } from 'lucide-react';
 import { motion } from 'motion/react';
 import {
   BtnPrimary,
@@ -24,11 +24,11 @@ function StatCard({ icon: Icon, label, value, color = "blue", onClick }) {
     <motion.button
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -3, boxShadow: '0 12px 28px rgba(0,0,0,0.09)' }}
       transition={{ duration: 0.25 }}
       viewport={{ once: true }}
       onClick={onClick}
-      className={`w-full text-left bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-[#333] p-5 transition-all ${onClick ? "cursor-pointer" : "cursor-default"} hover:border-blue-200 dark:hover:border-blue-500/30 hover:shadow-md dark:hover:shadow-black/40`}
+      whileHover={{ scale: 1.02 }}
+      className={`w-full text-left bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-300 dark:border-gray-600 p-5 transition-all ${onClick ? "cursor-pointer" : "cursor-default"} hover:bg-gray-50 dark:hover:bg-[#262626]`}
     >
       <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${colors[color] || colors.blue} flex items-center justify-center mb-4`}>
         <Icon size={18} className="text-white" />
@@ -49,11 +49,11 @@ function OcupacionBar({ properties, setActive }) {
     <motion.button
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -2 }}
       transition={{ duration: 0.25 }}
       viewport={{ once: true }}
       onClick={() => setActive({ page: "properties", filter: "todos" })}
-      className="w-full text-left bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-[#333] p-5 hover:border-blue-200 dark:hover:border-blue-500/30 hover:shadow-md dark:hover:shadow-black/40 transition-all"
+      whileHover={{ scale: 1.02 }}
+      className="w-full text-left bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-300 dark:border-gray-600 p-5 hover:bg-gray-50 dark:hover:bg-[#262626] transition-all"
     >
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
@@ -83,14 +83,18 @@ function OcupacionBar({ properties, setActive }) {
 export function DashboardRedesigned({ properties, leases, tenants, setActive }) {
   const occupied = properties.filter(p => p.status === "ocupado").length;
   const vacant = properties.filter(p => p.status === "desocupado").length;
-  const totalRent = leases.filter(l => l.status === "activo").reduce((s, l) => s + (l.renta_mensual || 0), 0);
+  const totalRent = leases.filter(l => l.status === "activo").reduce((s, l) => s + (l.rent || 0), 0);
   const activeLeases = leases.filter(l => l.status === "activo").length;
+
+  // Debug: verificar datos de leases
+  console.log('[Dashboard] leases:', leases);
+  console.log('[Dashboard] activeLeases count:', activeLeases);
 
   // Alertas de vencimiento
   const dashAlerts = leases
     .filter(l => l.status === "activo")
     .map(l => {
-      const days = diffDays(l.fecha_fin);
+      const days = diffDays(l.endDate);
       const level = getAlertLevel(days);
       if (!level) return null;
       return { ...l, days, level };
@@ -102,7 +106,7 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive }) 
   // Contratos recientes
   const recentLeases = [...leases]
     .filter(l => l.status === "activo")
-    .sort((a, b) => new Date(b.fecha_inicio) - new Date(a.fecha_inicio))
+    .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
     .slice(0, 5);
 
   // Animación de entrada para contenedor
@@ -137,15 +141,6 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive }) 
             {new Date().toLocaleDateString("es-AR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
           </p>
         </div>
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <BtnPrimary onClick={() => setActive('properties')} className="flex gap-2">
-            <Plus size={18} />
-            Agregar propiedad
-          </BtnPrimary>
-        </motion.div>
       </motion.div>
 
       {/* ══════ STATS GRID (5 Cards) ══════ */}
@@ -240,7 +235,7 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive }) 
         >
           <SectionHeader title="Alertas de Vencimiento" />
           <motion.div
-            className="space-y-2"
+            className="grid gap-3"
             variants={staggerContainer}
             initial="initial"
             animate="animate"
@@ -249,16 +244,35 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive }) 
               <motion.button
                 key={alert.id}
                 variants={fadeInUp}
-                whileHover={{ x: 3 }}
+                whileHover={{ scale: 1.02 }}
                 onClick={() => setActive({ page: "leases", filter: "activo" })}
-                className={`w-full text-left flex items-center justify-between px-4 py-3 rounded-lg border transition-all ${alert.level.bg} ${alert.level.border}`}
+                className={`w-full text-left group bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] p-5 hover:border-gray-400 dark:hover:border-gray-600 transition-all cursor-pointer flex items-start gap-4`}
               >
-                <p className={`text-sm font-medium ${alert.level.color}`}>
-                  {alert.nominatario || "Contrato"}
-                </p>
-                <p className={`text-sm font-bold ${alert.level.color} flex-shrink-0`}>
-                  {alert.days <= 0 ? "Venció" : fmtDuration(alert.days)}
-                </p>
+                {/* Icono con fondo de alerta */}
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${alert.level.bg} border ${alert.level.border}`}>
+                  {alert.level.label.includes('Crítico') && <AlertCircle size={16} className={alert.level.color} />}
+                  {alert.level.label.includes('Urgente') && <AlertTriangle size={16} className={alert.level.color} />}
+                  {alert.level.label.includes('Próximo') && <Clock size={16} className={alert.level.color} />}
+                </div>
+
+                {/* Contenido */}
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-gray-900 dark:text-gray-100">
+                    {alert.nominatario || "Contrato"}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className={`text-xs font-medium ${alert.level.color}`}>
+                      {alert.level.label}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Días restantes */}
+                <div className="text-right flex-shrink-0">
+                  <p className={`font-bold text-lg leading-none ${alert.level.color}`}>
+                    {alert.days <= 0 ? "Venció" : `${alert.days} días`}
+                  </p>
+                </div>
               </motion.button>
             ))}
           </motion.div>
@@ -269,17 +283,17 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive }) 
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-800/50 rounded-lg p-4 text-center"
+          className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] p-5 text-center"
         >
-          <p className="text-base text-green-700 dark:text-green-400 font-medium">✓ Sin alertas</p>
-          <p className="text-sm text-green-600 dark:text-green-400/70 mt-1">Todos los contratos están en orden</p>
+          <p className="text-base font-semibold text-gray-900 dark:text-gray-100 font-medium">✓ Sin alertas</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Todos los contratos están en orden</p>
         </motion.div>
       )}
 
       <Separator />
 
       {/* ══════ CONTRATOS RECIENTES ══════ */}
-      {recentLeases.length > 0 && (
+      {recentLeases.length > 0 ? (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -290,43 +304,65 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive }) 
             description={`Los últimos ${recentLeases.length} contratos`}
           />
 
-          <Card>
-            <motion.div 
-              className="space-y-2"
-              variants={staggerContainer}
-              initial="initial"
-              animate="animate"
-            >
+          <motion.div 
+            className="grid gap-3"
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+          >
               {recentLeases.map((lease, idx) => {
-                const days = diffDays(lease.fecha_fin);
+                const days = diffDays(lease.endDate);
                 const alert = getAlertLevel(days);
+                const prop = properties.find(p => p.id === lease.propertyId);
                 return (
                   <motion.button
                     key={lease.id}
                     variants={fadeInUp}
-                    whileHover={{ x: 2 }}
+                    whileHover={{ scale: 1.02 }}
                     onClick={() => setActive({ page: "leases", filter: "activo" })}
-                    className="w-full text-left flex items-center justify-between px-4 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-[#2d2d2d] transition-colors border border-transparent hover:border-gray-100 dark:hover:border-[#333]"
+                    className="w-full text-left bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] p-5 hover:border-gray-400 dark:hover:border-gray-600 transition-all cursor-pointer flex items-start gap-4"
                   >
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">{lease.nominatario || `Propiedad #${lease.propiedad_id}`}</p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500">Propiedad #{lease.propiedad_id}</p>
+                    {/* Icono */}
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-blue-100 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800">
+                      <FileText size={16} className="text-blue-600 dark:text-blue-400" />
                     </div>
-                    <div className="text-right flex-shrink-0 ml-4">
-                      <p className="text-sm font-bold text-gray-900 dark:text-gray-200">{fmtCurrency(lease.renta_mensual)}</p>
+
+                    {/* Contenido */}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-900 dark:text-gray-100 truncate">
+                        {prop?.address || `Propiedad #${lease.propertyId}`}
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                        {fmtCurrency(lease.rent)}/mes
+                      </p>
+                    </div>
+
+                    {/* Estado */}
+                    <div className="text-right flex-shrink-0">
                       {alert ? (
-                        <p className={`text-xs font-medium ${alert.color}`}>
-                          {days <= 0 ? "Vencido" : fmtDuration(days)}
-                        </p>
+                        <>
+                          <p className={`font-bold text-lg leading-none ${alert.color}`}>
+                            {days <= 0 ? "Vencido" : `${days} días`}
+                          </p>
+                          <p className={`text-xs mt-0.5 ${alert.color}`}>{alert.label}</p>
+                        </>
                       ) : (
-                        <p className="text-xs text-gray-400">Hasta {fmtDate(lease.fecha_fin)}</p>
+                        <p className="text-xs text-gray-400">Hasta {fmtDate(lease.endDate)}</p>
                       )}
                     </div>
                   </motion.button>
                 );
               })}
             </motion.div>
-          </Card>
+        </motion.div>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] p-5 text-center"
+        >
+          <p className="text-base font-semibold text-gray-900 dark:text-gray-100">No hay contratos activos</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Creá el primer contrato para comenzar</p>
         </motion.div>
       )}
     </motion.div>

@@ -11,7 +11,7 @@ export function BtnPrimary({ children, onClick, disabled = false, className = ''
     <motion.button
       onClick={onClick}
       disabled={disabled}
-      whileHover={{ scale: 1.02, boxShadow: '0 10px 25px rgba(37, 99, 235, 0.3)' }}
+      whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.95 }}
       className={`px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-medium 
         hover:from-blue-700 hover:to-blue-800 active:from-blue-800 active:to-blue-900 transition-all
@@ -67,7 +67,7 @@ export function BtnDanger({ children, onClick, className = '' }) {
 export function Card({ children, className = '', hover = true }) {
   return (
     <motion.div
-      whileHover={hover ? { y: -4, boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)' } : {}}
+      whileHover={hover ? { scale: 1.02 } : {}}
       className={`bg-gray-800 border border-gray-700 rounded-lg p-4 
         ${hover ? 'transition-all cursor-pointer' : ''} ${className}`}
     >
@@ -84,10 +84,10 @@ export function CardProperty({ property }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(59, 130, 246, 0.2)' }}
+      whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.3 }}
       viewport={{ once: true }}
-      className="bg-gradient-to-br from-gray-800 to-gray-850 border border-gray-700/50 rounded-lg p-4 cursor-pointer hover:border-blue-600/30"
+      className="bg-gradient-to-br from-gray-800 to-gray-850 border border-gray-700/50 rounded-lg p-4 cursor-pointer hover:border-gray-600/50"
     >
       <div className="flex items-start justify-between mb-3">
         <h3 className="text-16 font-semibold text-gray-100">{property.address}</h3>
@@ -276,10 +276,10 @@ export function MetricCard({ label, value, trend, unit = '' }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4, boxShadow: '0 20px 40px rgba(59, 130, 246, 0.15)' }}
+      whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.3 }}
       viewport={{ once: true }}
-      className="bg-gradient-to-br from-gray-800 to-gray-850 border border-blue-600/20 rounded-lg p-4 hover:border-blue-600/40 transition-all"
+      className="bg-gradient-to-br from-gray-800 to-gray-850 border border-gray-700/50 rounded-lg p-4 hover:border-gray-600/50 transition-all"
     >
       <p className="text-12 text-gray-600 uppercase tracking-wide font-medium">{label}</p>
       <div className="text-28 font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mt-2">
@@ -354,8 +354,8 @@ export function SectionHeader({ title, description, action }) {
   return (
     <div className="flex items-start justify-between mb-6 gap-4">
       <div>
-        <h2 className="text-24 font-semibold text-gray-100">{title}</h2>
-        {description && <p className="text-14 text-gray-500 mt-1">{description}</p>}
+        <h2 className="text-24 font-semibold text-gray-900 dark:text-gray-100">{title}</h2>
+        {description && <p className="text-14 text-gray-600 dark:text-gray-400 mt-1">{description}</p>}
       </div>
       {action && <div>{action}</div>}
     </div>

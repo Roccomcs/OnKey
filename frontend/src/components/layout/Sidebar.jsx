@@ -27,15 +27,15 @@ export function Sidebar({ active, setActive, alertCount, dark, toggleDark, user,
         transition={{ delay: 0.1 }}
       >
         <div className="flex items-center gap-3">
-          <motion.div 
-            className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-md"
+          <motion.img 
+            src="/Gemini_Generated_Image_h8o191h8o191h8o1.svg"
+            alt="OnKey"
+            className="w-20 h-20"
             whileHover={{ scale: 1.05 }}
-          >
-            <Building2 size={20} className="text-white" />
-          </motion.div>
+          />
           <div>
             <p className="text-base font-bold text-gray-900 dark:text-gray-100">
-              {tenant?.nombre === 'Default Tenant' ? 'OnKey' : (tenant?.nombre || 'OnKey')}
+              OnKey
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400">Gestión inmobiliaria</p>
           </div>

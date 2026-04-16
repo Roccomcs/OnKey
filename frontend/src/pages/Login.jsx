@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
+import { GoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from 'jwt-decode';
 import { API } from '../utils/helpers';
 import '../App.css';
 
@@ -14,7 +16,7 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
 
   const [regForm, setRegForm] = useState({
     nombre: '', apellido: '', email: '',
-    tenantNombre: '', password: '',
+    password: '',
   });
 
   useEffect(() => {
@@ -68,7 +70,6 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
     setError('');
     if (!regForm.nombre.trim())        return setError('Ingresá tu nombre');
     if (!regForm.apellido.trim())      return setError('Ingresá tu apellido');
-    if (!regForm.tenantNombre.trim())  return setError('Ingresá el nombre de tu inmobiliaria');
     if (!regForm.email.trim())         return setError('Ingresá tu email');
     if (!regForm.email.includes('@'))  return setError('Email inválido');
     if (!regForm.password)             return setError('Creá una contraseña');
@@ -80,7 +81,6 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          tenantNombre: regForm.tenantNombre.trim(),
           nombre:       regForm.nombre.trim(),
           apellido:     regForm.apellido.trim(),
           email:        regForm.email.trim(),
@@ -95,6 +95,63 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
     } finally {
       setLoading(false);
     }
+  };
+
+  // ── Google OAuth ───────────────────────────────────────────────────────────
+  const handleGoogleLoginSuccess = async (credentialResponse) => {
+    try {
+      setError('');
+      setLoading(true);
+      
+      const res = await fetch(`${API}/auth/google-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: credentialResponse.credential }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error al iniciar sesión con Google');
+
+      // Guardar token y usuario
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('usuario', JSON.stringify(data.usuario));
+      localStorage.setItem('tenant', JSON.stringify(data.tenant));
+
+      onLoginSuccess?.();
+    } catch (err) {
+      setError(err.message || 'Error al iniciar sesión con Google');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleRegisterSuccess = async (credentialResponse) => {
+    try {
+      setError('');
+      setLoading(true);
+      
+      const decoded = jwtDecode(credentialResponse.credential);
+      const { email, given_name, family_name } = decoded;
+      
+      // Auto-rellenar el formulario con datos de Google
+      setRegForm(prev => ({
+        ...prev,
+        nombre: given_name || '',
+        apellido: family_name || '',
+        email: email,
+      }));
+      
+      // Mostrar mensaje informativo
+      setError('');
+    } catch (err) {
+      setError(err.message || 'Error al procesar datos de Google');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleError = () => {
+    setError('Error al conectar con Google');
   };
 
   // ── Clases reutilizables ───────────────────────────────────────────────────
@@ -114,13 +171,14 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
         {/* Botón Volver */}
         <button
           onClick={() => onBackClick?.()}
-          className={`text-sm mb-4 px-3 py-1 rounded-lg transition ${
+          className={`flex items-center gap-2 text-sm mb-4 px-3 py-1 rounded-lg transition ${
             dark 
               ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-700' 
               : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
           }`}
         >
-          ✉ Volver a Inicio
+          <ArrowLeft size={16} />
+          <span>Volver a Inicio</span>
         </button>
 
         {/* Header */}
@@ -223,6 +281,16 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
               >
                 {loading ? 'Autenticando...' : 'Ingresar'}
               </button>
+
+              <div className="flex justify-center">
+                <GoogleLogin
+                  onSuccess={handleGoogleLoginSuccess}
+                  onError={handleGoogleError}
+                  text="signin_with"
+                  type="standard"
+                  disabled={loading}
+                />
+              </div>
             </form>
 
             <div className={`mt-6 pt-6 border-t text-center text-sm ${
@@ -236,19 +304,7 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
               </p>
             </div>
 
-            <div className={`mt-4 pt-4 border-t text-center text-sm ${
-              dark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-600'
-            }`}>
-              <p className="font-medium mb-3">Para testing:</p>
-              <div className={`text-xs space-y-1.5 p-3 rounded font-mono ${
-                dark ? 'bg-gray-700/50 text-gray-300' : 'bg-gray-50'
-              }`}>
-                <p><strong>Admin:</strong> admin@localhost / admin123</p>
-                <p><strong>Starter:</strong> starter@localhost / starter123</p>
-                <p><strong>Pro:</strong> pro@localhost / pro123</p>
-                <p><strong>Viewer:</strong> viewer@localhost / viewer123</p>
-              </div>
-            </div>
+
           </>
         )}
 
@@ -283,15 +339,6 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
                     className={inputCls} disabled={loading}
                   />
                 </div>
-              </div>
-
-              <div>
-                <label className={labelCls}>Nombre de la inmobiliaria</label>
-                <input
-                  type="text" name="tenantNombre" value={regForm.tenantNombre}
-                  onChange={handleRegChange} placeholder="Inmobiliaria Ejemplo"
-                  className={inputCls} disabled={loading}
-                />
               </div>
 
               <div>
@@ -333,6 +380,28 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
               >
                 {loading ? 'Registrando...' : 'Crear cuenta'}
               </button>
+
+              <div className={`relative text-center text-xs font-medium mt-4 mb-4 ${
+                dark ? 'text-gray-400' : 'text-gray-500'
+              }`}>
+                <div className="absolute inset-x-0 top-1/2 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-gray-600"></div>
+                <span className={`relative px-2 ${dark ? 'bg-gray-800' : 'bg-white'}`}>O</span>
+              </div>
+
+              <div className="text-center">
+                <p className={`text-sm mb-3 font-medium ${dark ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Registrarse rápidamente con Google
+                </p>
+                <div className="flex justify-center">
+                  <GoogleLogin
+                    onSuccess={handleGoogleRegisterSuccess}
+                    onError={handleGoogleError}
+                    text="signup_with"
+                    type="standard"
+                    disabled={loading}
+                  />
+                </div>
+              </div>
             </form>
 
             <div className={`mt-6 pt-6 border-t text-center text-sm ${

@@ -287,7 +287,7 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
     <motion.div className="space-y-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
       <motion.div className="flex items-center justify-between" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3 }}>
         <div>
-          <h1 className="text-4xl font-bold text-gray-100 tracking-tight">Contactos</h1>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">Contactos</h1>
           <p className="text-gray-400 mt-2">
             {owners.length} propietarios · {tenants.length} inquilinos
           </p>
@@ -335,9 +335,9 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
             <motion.div
               key={person.id}
               variants={fadeInUp}
-              whileHover={{ y: -2, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
+              whileHover={{ scale: 1.02 }}
               onClick={() => setDetailPerson(person)}
-              className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] p-5 hover:border-blue-300 dark:hover:border-blue-500/40 hover:shadow-sm transition-all cursor-pointer"
+              className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] p-5 hover:border-gray-400 dark:hover:border-gray-600 transition-all cursor-pointer"
             >
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">

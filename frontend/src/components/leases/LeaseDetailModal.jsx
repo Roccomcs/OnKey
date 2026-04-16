@@ -118,7 +118,7 @@ export function LeaseDetailModal({ lease, properties, tenants, owners, onClose, 
             <AjusteBadge tipo={lease.tipoAjuste} />
             {alert && lease.status === "activo" && (
               <span className="text-white/90 text-sm font-bold ml-auto">
-                {days <= 0 ? "Venció" : `${days}d restantes`}
+                {days <= 0 ? "Venció" : `${days} días restantes`}
               </span>
             )}
           </div>

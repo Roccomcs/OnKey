@@ -189,7 +189,7 @@ export function Leases({ properties, setProperties, owners, tenants, leases, set
       {/* Encabezado */}
       <motion.div className="flex items-center justify-between" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3 }}>
         <div>
-          <h1 className="text-4xl font-bold text-gray-100 tracking-tight">Contratos</h1>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">Contratos</h1>
           <p className="text-gray-400 mt-2">
             {leasesModo.filter(l => l.status === "activo").length} contratos activos · {esVenta ? "Venta" : "Alquiler"}
           </p>
@@ -284,29 +284,32 @@ export function Leases({ properties, setProperties, owners, tenants, leases, set
           const alert  = l.status === "activo" ? getAlertLevel(days) : null;
 
           return (
-            <motion.div
+            <motion.button
               key={l.id}
               variants={fadeInUp}
-              whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(59, 130, 246, 0.2)' }}
+              whileHover={{ scale: 1.02 }}
               onClick={() => setDetail(l)}
-              className="bg-gradient-to-br from-gray-800 to-gray-850 rounded-2xl border border-gray-700/50 p-5 hover:border-blue-600/30 transition-all cursor-pointer"
+              className="w-full text-left group bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] p-5 hover:border-gray-400 dark:hover:border-gray-600 transition-all cursor-pointer"
             >
               <div className="flex items-start gap-4">
+                {/* Icono */}
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
                   alert
                     ? `${alert.bg} border ${alert.border}`
                     : esVenta
-                      ? "bg-amber-50 dark:bg-amber-900/30"
-                      : "bg-blue-50 dark:bg-blue-900/30"
+                      ? "bg-amber-100 dark:bg-amber-900/30"
+                      : "bg-blue-100 dark:bg-blue-900/30"
                 }`}>
                   {esVenta
-                    ? <ShoppingBag size={16} className={alert ? alert.color : "text-amber-500 dark:text-amber-400"} />
+                    ? <ShoppingBag size={16} className={alert ? alert.color : "text-amber-600 dark:text-amber-400"} />
                     : <FileText    size={16} className={alert ? alert.color : "text-blue-600 dark:text-blue-400"} />
                   }
                 </div>
+
+                {/* Contenido principal */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-semibold text-gray-800 dark:text-gray-200 truncate">
+                    <p className="font-semibold text-gray-900 dark:text-gray-100 truncate">
                       {prop?.address || "(propiedad eliminada)"}
                     </p>
                     <Badge status={l.status} />
@@ -315,46 +318,43 @@ export function Leases({ properties, setProperties, owners, tenants, leases, set
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
                     {esVenta ? "Comprador: " : "Inquilino: "}{tenant?.name || "(eliminado)"}
                   </p>
-                  <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-gray-400 dark:text-gray-500">
+                  <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-gray-500 dark:text-gray-400">
                     <span className="flex items-center gap-1">
-                      <Calendar size={11} />{fmtDate(l.startDate)} — {fmtDate(l.endDate)}
+                      <Calendar size={12} />{fmtDate(l.startDate)} — {fmtDate(l.endDate)}
                     </span>
                     <span className="flex items-center gap-1">
-                      <DollarSign size={11} />
+                      <DollarSign size={12} />
                       {fmtCurrency(l.rent)}{esVenta ? " precio venta" : "/mes"}
                     </span>
                     {!esVenta && l.tipoAjuste === "FIJO" && l.increase > 0 && (
                       <span className="flex items-center gap-1">
-                        <Percent size={11} />+{l.increase}% {l.period}
-                      </span>
-                    )}
-                    {!esVenta && l.proximaActualizacion && (
-                      <span className="flex items-center gap-1 text-teal-600 dark:text-teal-400">
-                        <TrendingUp size={11} />Próx. act.: {fmtDate(l.proximaActualizacion)}
+                        <Percent size={12} />+{l.increase}% {l.period}
                       </span>
                     )}
                   </div>
                 </div>
+
+                {/* Alerta y botones */}
                 <div className="flex items-start gap-2 flex-shrink-0" onClick={e => e.stopPropagation()}>
                   {alert && !esVenta && (
                     <div className="text-right mr-1">
-                      <p className={`text-xl font-black leading-none ${alert.color}`}>
-                        {days <= 0 ? "Venció" : `${days}d`}
+                      <p className={`text-lg font-bold leading-none ${alert.color}`}>
+                        {days <= 0 ? "Venció" : `${days} días`}
                       </p>
-                      <p className={`text-xs ${alert.color}`}>{alert.label}</p>
+                      <p className={`text-xs mt-0.5 ${alert.color}`}>{alert.label}</p>
                     </div>
                   )}
                   <button onClick={() => openEdit(l)}
-                    className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#333333]00 transition-colors">
-                    <Edit2 size={13} className="text-gray-400" />
+                    className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#333333] transition-colors">
+                    <Edit2 size={14} className="text-gray-400" />
                   </button>
                   <button onClick={() => del(l.id)}
                     className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
-                    <Trash2 size={13} className="text-red-400" />
+                    <Trash2 size={14} className="text-red-400" />
                   </button>
                 </div>
               </div>
-            </motion.div>
+            </motion.button>
           );
         })}
 

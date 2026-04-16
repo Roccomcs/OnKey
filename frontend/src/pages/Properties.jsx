@@ -476,10 +476,10 @@ function PropertyCard({ p, owners, leases, tenants, onClick, onEdit, onDelete })
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -2, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
+      whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.3 }}
       onClick={onClick}
-      className="bg-white dark:bg-[#262626] rounded-2xl border border-gray-100 dark:border-[#404040] hover:border-blue-300 dark:hover:border-blue-500/40 hover:shadow-sm transition-all cursor-pointer overflow-hidden flex h-44"
+      className="bg-white dark:bg-[#262626] rounded-2xl border border-gray-100 dark:border-[#404040] hover:border-gray-400 dark:hover:border-gray-600 transition-all cursor-pointer overflow-hidden flex h-44"
     >
       {/* Imagen lateral izquierda */}
       <CardCarousel photos={photos} />

@@ -1,4 +1,5 @@
 import { useState, createContext, useMemo, useEffect } from "react";
+import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { Sidebar }       from "./components/layout/Sidebar";
 import { UserMenu }      from "./components/layout/UserMenu";
 import { DashboardRedesigned as Dashboard }     from "./pages/DashboardRedesigned";
@@ -18,36 +19,17 @@ import LandingPageModern from "./pages/LandingPageModern";
 // AuthContext para acceso global a autenticación
 export const AuthContext = createContext(null);
 
-export default function App() {
-  const [active,      setActiveRaw] = useState("dashboard");
-  const [propFilter,  setPropFilter] = useState("todos");
-  const [leaseFilter, setLeaseFilter] = useState("activo");
-  const [currentPage, setCurrentPage] = useState("landing"); // "landing" | "login" | "app"
-  const { dark, toggleDark } = useTheme();
-
-  const auth = useAuth();
-
-  // Calcular verifiedStatus solo una vez para evitar re-renders infinitos
-  const verifiedStatus = useMemo(() => new URLSearchParams(window.location.search).get('verified'), []);
-
-  // Sincronizar currentPage con auth.user - evita ciclo infinito
+// Componente protegido para rutas autenticadas
+function ProtectedRoute({ children, isAuthenticated, isLoading }) {
+  const navigate = useNavigate();
+  
   useEffect(() => {
-    if (auth.user && currentPage !== "app") {
-      setCurrentPage("app");
-    } else if (!auth.user && currentPage === "app") {
-      setCurrentPage("landing");
+    if (!isLoading && !isAuthenticated) {
+      navigate("/");
     }
-  }, [auth.user, currentPage]);
+  }, [isAuthenticated, isLoading, navigate]);
 
-  const { data: properties, setData: setProperties, loading: lProps,   error: eProps,   reload: reloadProps }   = useApi(auth.token ? "/properties" : null, auth.token);
-  const { data: owners,     setData: setOwners,     loading: lOwners,  error: eOwners,  reload: reloadOwners }  = useApi(auth.token ? "/owners"     : null, auth.token);
-  const { data: tenants,    setData: setTenants,    loading: lTenants, error: eTenants, reload: reloadTenants } = useApi(auth.token ? "/tenants"    : null, auth.token);
-  const { data: leases,     setData: setLeases,     loading: lLeases,  error: eLeases,  reload: reloadLeases }  = useApi(auth.token ? "/leases"     : null, auth.token);
-  const { data: subscription, loading: lSub } = useApi(auth.token ? "/subscriptions/mi-plan" : null, auth.token);
-
-  const { badgeCount, dismiss, activeAlerts } = useAlerts(leases);
-
-  if (auth.loading) {
+  if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-[#1a1a1a]">
         <div className="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin" />
@@ -55,99 +37,52 @@ export default function App() {
     );
   }
 
-  // Landing page pública (sin autenticación)
-  if (currentPage === "landing") {
-    return (
-      <LandingPageModern 
-        onLoginClick={() => setCurrentPage("login")}
-        onSignupClick={() => setCurrentPage("signup")}
-        dark={dark}
-        toggleDark={toggleDark}
-      />
-    );
-  }
+  return isAuthenticated ? children : null;
+}
 
-  // Página de login
-  if (currentPage === "login") {
-    return (
-      <Login
-        onLoginSuccess={() => setCurrentPage("app")}
-        onBackClick={() => setCurrentPage("landing")}
-        initialView="login"
-        auth={auth}
-        verifiedStatus={verifiedStatus}
-      />
-    );
-  }
+// Componente de layout para la app autenticada
+function AppLayout({ children, auth, dark, toggleDark, shared, activeAlerts, dismiss }) {
+  const [active, setActiveRaw] = useState("dashboard");
+  const [propFilter, setPropFilter] = useState("todos");
+  const [leaseFilter, setLeaseFilter] = useState("activo");
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // Página de signup/registro
-  if (currentPage === "signup") {
-    return (
-      <Login
-        onLoginSuccess={() => setCurrentPage("app")}
-        onBackClick={() => setCurrentPage("landing")}
-        initialView="register"
-        auth={auth}
-        verifiedStatus={verifiedStatus}
-      />
-    );
-  }
-
-  // Si el usuario se desautentica, vuelve a landing
-  if (!auth.user) {
-    setCurrentPage("landing");
-    return null;
-  }
-
-  const dataLoading = lProps || lOwners || lTenants || lLeases;
-  const dataError   = eProps || eOwners || eTenants || eLeases;
+  // Sincronizar active con la ruta actual
+  useEffect(() => {
+    const path = location.pathname.replace("/", "");
+    if (path === "dashboard" || path === "") setActiveRaw("dashboard");
+    else if (path === "propiedades") setActiveRaw("properties");
+    else if (path === "contactos") setActiveRaw("contacts");
+    else if (path === "contratos") setActiveRaw("leases");
+    else if (path === "alertas") setActiveRaw("notifications");
+    else if (path === "planes") setActiveRaw("planes");
+  }, [location]);
 
   const handleSetActive = (target) => {
     if (typeof target === "string") {
       setActiveRaw(target);
+      const routeMap = {
+        dashboard: "/dashboard",
+        properties: "/propiedades",
+        contacts: "/contactos",
+        leases: "/contratos",
+        notifications: "/alertas",
+        planes: "/planes"
+      };
+      navigate(routeMap[target] || "/dashboard");
     } else {
       const { page, filter } = target;
       setActiveRaw(page);
       if (page === "properties" && filter) setPropFilter(filter);
-      if (page === "leases"     && filter) setLeaseFilter(filter);
+      if (page === "leases" && filter) setLeaseFilter(filter);
     }
   };
 
   const handleLogout = () => {
     auth.logout();
+    navigate("/");
   };
-
-  const shared = { properties, setProperties, owners, setOwners, tenants, setTenants, leases, setLeases };
-
-  if (dataLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-[#1a1a1a]">
-        <div className="text-center">
-          <div className="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin mx-auto" />
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">Cargando datos…</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (dataError) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-[#1a1a1a] p-8">
-        <div className="max-w-sm w-full space-y-4">
-          <ErrorBox
-            message={dataError}
-            onRetry={() => { reloadProps(); reloadOwners(); reloadTenants(); reloadLeases(); }}
-          />
-          <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
-            Verificá que el servidor esté corriendo en{" "}
-            <code className="bg-gray-100 dark:bg-[#262626] px-1 rounded">
-              {import.meta.env.VITE_API_URL || "http://localhost:3001"}
-            </code>
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <AuthContext.Provider value={auth}>
@@ -155,13 +90,13 @@ export default function App() {
         <Sidebar
           active={active}
           setActive={handleSetActive}
-          alertCount={badgeCount}
+          alertCount={activeAlerts?.length || 0}
           dark={dark}
           toggleDark={toggleDark}
           user={auth.user}
           tenant={auth.tenant}
           onLogout={handleLogout}
-          subscription={subscription}
+          subscription={shared.subscription}
         />
         <main className="flex-1 flex flex-col overflow-auto">
           {/* Header con UserMenu */}
@@ -180,16 +115,209 @@ export default function App() {
           {/* Contenido */}
           <div className="flex-1 overflow-auto">
             <div className="px-8 py-3">
-              {active === "dashboard"     && <Dashboard     {...shared} setActive={handleSetActive} activeAlerts={activeAlerts} />}
-              {active === "properties"    && <Properties    {...shared} initialFilter={propFilter} />}
-              {active === "contacts"      && <Contacts      {...shared} />}
-              {active === "leases"        && <Leases        {...shared} initialTab={leaseFilter} />}
-              {active === "notifications" && <Notifications {...shared} activeAlerts={activeAlerts} dismiss={dismiss} setActive={handleSetActive} />}
-              {active === "planes"        && <Planes token={auth.token} />}
+              {children}
             </div>
           </div>
         </main>
       </div>
     </AuthContext.Provider>
+  );
+}
+
+export default function App() {
+  const { dark, toggleDark } = useTheme();
+  const auth = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const verifiedStatus = useMemo(() => new URLSearchParams(window.location.search).get('verified'), []);
+
+  const { data: properties, setData: setProperties, loading: lProps, error: eProps, reload: reloadProps } = useApi(auth.token ? "/properties" : null, auth.token);
+  const { data: owners, setData: setOwners, loading: lOwners, error: eOwners, reload: reloadOwners } = useApi(auth.token ? "/owners" : null, auth.token);
+  const { data: tenants, setData: setTenants, loading: lTenants, error: eTenants, reload: reloadTenants } = useApi(auth.token ? "/tenants" : null, auth.token);
+  const { data: leases, setData: setLeases, loading: lLeases, error: eLeases, reload: reloadLeases } = useApi(auth.token ? "/leases" : null, auth.token);
+  const { data: subscription, loading: lSub } = useApi(auth.token ? "/subscriptions/mi-plan" : null, auth.token);
+
+  const { badgeCount, dismiss, activeAlerts } = useAlerts(leases);
+
+  const shared = { properties, setProperties, owners, setOwners, tenants, setTenants, leases, setLeases, subscription };
+
+  if (auth.loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-[#1a1a1a]">
+        <div className="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin" />
+      </div>
+    );
+  }
+
+  const dataLoading = lProps || lOwners || lTenants || lLeases || lSub;
+  const dataError = eProps || eOwners || eTenants || eLeases;
+
+  return (
+    <Routes>
+      {/* Landing page (pública) */}
+      <Route
+        path="/"
+        element={
+          auth.user ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <LandingPageModern
+              onLoginClick={() => navigate("/iniciarSesion")}
+              onSignupClick={() => navigate("/registrarse")}
+              dark={dark}
+              toggleDark={toggleDark}
+            />
+          )
+        }
+      />
+
+      {/* Login */}
+      <Route
+        path="/iniciarSesion"
+        element={
+          auth.user ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <Login
+              onLoginSuccess={() => navigate("/dashboard")}
+              onBackClick={() => navigate("/")}
+              initialView="login"
+              auth={auth}
+              verifiedStatus={verifiedStatus}
+            />
+          )
+        }
+      />
+
+      {/* Registro */}
+      <Route
+        path="/registrarse"
+        element={
+          auth.user ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <Login
+              onLoginSuccess={() => navigate("/dashboard")}
+              onBackClick={() => navigate("/")}
+              initialView="register"
+              auth={auth}
+              verifiedStatus={verifiedStatus}
+            />
+          )
+        }
+      />
+
+      {/* Rutas protegidas - Dashboard */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute isAuthenticated={!!auth.user} isLoading={auth.loading}>
+            {dataLoading ? (
+              <div className="flex items-center justify-center h-screen">
+                <div className="text-center">
+                  <div className="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin mx-auto" />
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">Cargando datos…</p>
+                </div>
+              </div>
+            ) : dataError ? (
+              <ErrorBox
+                message={dataError}
+                onRetry={() => { reloadProps(); reloadOwners(); reloadTenants(); reloadLeases(); }}
+              />
+            ) : (
+              <AppLayout auth={auth} dark={dark} toggleDark={toggleDark} shared={shared} activeAlerts={activeAlerts} dismiss={dismiss}>
+                <Dashboard {...shared} setActive={() => {}} activeAlerts={activeAlerts} />
+              </AppLayout>
+            )}
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Rutas protegidas - Propiedades */}
+      <Route
+        path="/propiedades"
+        element={
+          <ProtectedRoute isAuthenticated={!!auth.user} isLoading={auth.loading}>
+            {dataLoading ? (
+              <div>Cargando...</div>
+            ) : dataError ? (
+              <ErrorBox message={dataError} onRetry={reloadProps} />
+            ) : (
+              <AppLayout auth={auth} dark={dark} toggleDark={toggleDark} shared={shared} activeAlerts={activeAlerts} dismiss={dismiss}>
+                <Properties {...shared} />
+              </AppLayout>
+            )}
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Rutas protegidas - Contactos */}
+      <Route
+        path="/contactos"
+        element={
+          <ProtectedRoute isAuthenticated={!!auth.user} isLoading={auth.loading}>
+            {dataLoading ? (
+              <div>Cargando...</div>
+            ) : dataError ? (
+              <ErrorBox message={dataError} onRetry={reloadOwners} />
+            ) : (
+              <AppLayout auth={auth} dark={dark} toggleDark={toggleDark} shared={shared} activeAlerts={activeAlerts} dismiss={dismiss}>
+                <Contacts {...shared} />
+              </AppLayout>
+            )}
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Rutas protegidas - Contratos */}
+      <Route
+        path="/contratos"
+        element={
+          <ProtectedRoute isAuthenticated={!!auth.user} isLoading={auth.loading}>
+            {dataLoading ? (
+              <div>Cargando...</div>
+            ) : dataError ? (
+              <ErrorBox message={dataError} onRetry={reloadLeases} />
+            ) : (
+              <AppLayout auth={auth} dark={dark} toggleDark={toggleDark} shared={shared} activeAlerts={activeAlerts} dismiss={dismiss}>
+                <Leases {...shared} />
+              </AppLayout>
+            )}
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Rutas protegidas - Alertas */}
+      <Route
+        path="/alertas"
+        element={
+          <ProtectedRoute isAuthenticated={!!auth.user} isLoading={auth.loading}>
+            {dataLoading ? (
+              <div>Cargando...</div>
+            ) : (
+              <AppLayout auth={auth} dark={dark} toggleDark={toggleDark} shared={shared} activeAlerts={activeAlerts} dismiss={dismiss}>
+                <Notifications {...shared} activeAlerts={activeAlerts} dismiss={dismiss} setActive={() => {}} />
+              </AppLayout>
+            )}
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Rutas protegidas - Planes */}
+      <Route
+        path="/planes"
+        element={
+          <ProtectedRoute isAuthenticated={!!auth.user} isLoading={auth.loading}>
+            <AppLayout auth={auth} dark={dark} toggleDark={toggleDark} shared={shared} activeAlerts={activeAlerts} dismiss={dismiss}>
+              <Planes token={auth.token} />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Ruta por defecto */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }

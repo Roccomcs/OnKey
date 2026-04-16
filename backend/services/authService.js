@@ -129,7 +129,8 @@ export async function createUser(tenantId, email, passwordPlain, nombre, apellid
   const existing = await findUserByEmail(email, tenantId);
   if (existing) throw new Error('El email ya está registrado');
 
-  const passwordHash = await hashPassword(passwordPlain);
+  // Si no hay password (Google OAuth), dejar el hash como NULL
+  const passwordHash = passwordPlain ? await hashPassword(passwordPlain) : null;
   const verificationToken = crypto.randomBytes(32).toString('hex');
   const tokenExpira = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24hs
 
@@ -167,13 +168,32 @@ export async function verifyEmailToken(token) {
 
 export async function authenticateUser(email, passwordPlain, tenantId) {
   const usuario = await findUserByEmail(email, tenantId);
-  if (!usuario) throw new Error('Email o contraseña incorrectos');
-  if (!usuario.activo) throw new Error('Usuario inactivo');
-  if (!usuario.email_verificado) throw new Error('Debés verificar tu email antes de ingresar');
+  if (!usuario) {
+    console.warn(`[authenticateUser] Usuario no encontrado: ${email} en tenant ${tenantId}`);
+    throw new Error('Email o contraseña incorrectos');
+  }
+  if (!usuario.activo) {
+    console.warn(`[authenticateUser] Usuario inactivo: ${email}`);
+    throw new Error('Usuario inactivo');
+  }
+  if (!usuario.email_verificado) {
+    console.warn(`[authenticateUser] Email no verificado: ${email}`);
+    throw new Error('Debés verificar tu email antes de ingresar');
+  }
+
+  // ⚠️ Si el usuario se registró con Google, no tiene password_hash
+  if (!usuario.password_hash) {
+    console.warn(`[authenticateUser] Usuario ${email} no tiene contraseña (probablemente registrado con Google)`);
+    throw new Error('Este usuario está registrado con Google. Usa "Ingresar con Google"');
+  }
 
   const match = await verifyPassword(passwordPlain, usuario.password_hash);
-  if (!match) throw new Error('Email o contraseña incorrectos');
+  if (!match) {
+    console.warn(`[authenticateUser] Contraseña incorrecta: ${email}`);
+    throw new Error('Email o contraseña incorrectos');
+  }
 
   await pool.query('UPDATE usuarios SET last_login = NOW() WHERE id = ?', [usuario.id]);
+  console.log(`✅ [authenticateUser] ${email} autenticado exitosamente`);
   return { token: generateToken(usuario), usuario: { id: usuario.id, email: usuario.email, nombre: usuario.nombre, apellido: usuario.apellido, rol: usuario.rol } };
 }

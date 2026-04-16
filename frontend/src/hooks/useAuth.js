@@ -35,57 +35,78 @@ export function useAuth() {
   const login = useCallback(async (tenantName, email, password) => {
     setError(null);
     setLoading(true);
-    try {
-      // 🔄 Limpiar datos anteriores antes de hacer login
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('authUser');
-      localStorage.removeItem('authTenant');
+    
+    // Número de reintentos en caso de error
+    const MAX_RETRIES = 2;
+    let lastError = null;
 
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const text = await response.text();
-
-      let data;
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
-        data = JSON.parse(text);
-      } catch {
-        console.error('Respuesta no-JSON del servidor:', text.slice(0, 300));
-        throw new Error(`Error del servidor (${response.status}): respuesta inesperada`);
+        // 🔄 Limpiar datos anteriores SOLO al primer intento
+        if (attempt === 1) {
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('authUser');
+          localStorage.removeItem('authTenant');
+        }
+
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+          signal: AbortSignal.timeout(10000), // Timeout de 10 segundos
+        });
+
+        const text = await response.text();
+
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          console.error('Respuesta no-JSON del servidor:', text.slice(0, 300));
+          throw new Error(`Error del servidor (${response.status}): respuesta inesperada`);
+        }
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Error al autenticar');
+        }
+
+        const { token: newToken, usuario, tenant: tenantInfo } = data;
+
+        // ✅ Solo guardar si el login fue exitoso
+        setToken(newToken);
+        setUser(usuario);
+        setTenant(tenantInfo);
+
+        localStorage.setItem('authToken',  newToken);
+        localStorage.setItem('authUser',   JSON.stringify(usuario));
+        localStorage.setItem('authTenant', JSON.stringify(tenantInfo));
+
+        setLoading(false);
+        return { token: newToken, usuario, tenant: tenantInfo };
+        
+      } catch (err) {
+        lastError = err;
+        console.error(`Login attempt ${attempt} failed:`, err.message);
+        
+        // Si es el último intento, lanzar el error
+        if (attempt === MAX_RETRIES) {
+          const errorMsg = err.message || 'Error al autenticar';
+          setError(errorMsg);
+          // 🧹 Si hay error, limpiar también el estado
+          setToken(null);
+          setUser(null);
+          setTenant(null);
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('authUser');
+          localStorage.removeItem('authTenant');
+          setLoading(false);
+          throw err;
+        }
+        
+        // Si no es el último intento, esperar un poco y reintentar
+        console.log(`Reintentando login (${attempt + 1}/${MAX_RETRIES})...`);
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Error al autenticar');
-      }
-
-      const { token: newToken, usuario, tenant: tenantInfo } = data;
-
-      // ✅ Solo guardar si el login fue exitoso
-      setToken(newToken);
-      setUser(usuario);
-      setTenant(tenantInfo);
-
-      localStorage.setItem('authToken',  newToken);
-      localStorage.setItem('authUser',   JSON.stringify(usuario));
-      localStorage.setItem('authTenant', JSON.stringify(tenantInfo));
-
-      return { token: newToken, usuario, tenant: tenantInfo };
-    } catch (err) {
-      const errorMsg = err.message || 'Error al autenticar';
-      setError(errorMsg);
-      // 🧹 Si hay error, limpiar también el estado
-      setToken(null);
-      setUser(null);
-      setTenant(null);
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('authUser');
-      localStorage.removeItem('authTenant');
-      throw err;
-    } finally {
-      setLoading(false);
     }
   }, []);
 
