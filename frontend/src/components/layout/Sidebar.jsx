@@ -24,35 +24,46 @@ export function Sidebar({ active, setActive, alertCount, dark, toggleDark, user,
 
       {/* Logo */}
       <motion.div 
-        className="px-3 py-5 border-b border-gray-200 dark:border-[#333333] flex items-center justify-between gap-1"
+        className={`px-3 py-5 border-b border-gray-200 dark:border-[#333333] flex gap-1 transition-all duration-300 ${
+          sidebarOpen 
+            ? "items-center justify-between" 
+            : "flex-col items-center justify-center"
+        }`}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.1 }}
       >
-        <div className="flex items-center gap-0.5 min-w-0">
+        {/* Logo Image - Solo cuando está abierto */}
+        {sidebarOpen && (
           <motion.img 
             src="/Gemini_Generated_Image_5pu4335pu4335pu4-removebg-preview.png"
             alt="OnKey"
-            className={`${sidebarOpen ? "h-16 w-auto" : "h-10 w-auto"} flex-shrink-0 transition-all duration-300`}
+            className="h-16 w-auto flex-shrink-0 transition-all duration-300 order-1"
             whileHover={{ scale: 1.05 }}
           />
-          {sidebarOpen && (
-            <motion.div
-              initial={{ opacity: 0, width: 0 }}
-              animate={{ opacity: 1, width: "auto" }}
-              exit={{ opacity: 0, width: 0 }}
-              transition={{ duration: 0.2 }}
-              className="flex-1 min-w-0"
-            >
-              <p className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent dark:from-blue-400 dark:to-cyan-400 truncate">
-                OnKey
-              </p>
-            </motion.div>
-          )}
-        </div>
+        )}
+
+        {/* OnKey Text - Cuando está abierto o cerrado */}
+        <motion.div
+          initial={{ opacity: 0, width: 0 }}
+          animate={{ opacity: 1, width: "auto" }}
+          exit={{ opacity: 0, width: 0 }}
+          transition={{ duration: 0.2 }}
+          className={`flex-shrink-0 ${sidebarOpen ? "flex-1 min-w-0 order-2" : "order-2"}`}
+        >
+          <p className={`font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent dark:from-blue-400 dark:to-cyan-400 ${
+            sidebarOpen ? "text-xl truncate" : "text-sm"
+          }`}>
+            onKey
+          </p>
+        </motion.div>
+
+        {/* Toggle Button */}
         <motion.button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-1 hover:bg-gray-100 dark:hover:bg-[#1a1a1a] rounded-lg transition-colors flex-shrink-0"
+          className={`p-1 hover:bg-gray-100 dark:hover:bg-[#1a1a1a] rounded-lg transition-colors flex-shrink-0 ${
+            sidebarOpen ? "order-3" : "order-1"
+          }`}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
           title={sidebarOpen ? "Cerrar sidebar" : "Abrir sidebar"}

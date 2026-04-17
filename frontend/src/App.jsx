@@ -144,7 +144,7 @@ export default function App() {
     auth.logout();
   };
 
-  const shared = { properties, setProperties, owners, setOwners, tenants, setTenants, leases, setLeases };
+  const shared = { properties, setProperties, owners, setOwners, tenants, setTenants, leases, setLeases, user: auth.user };
 
   if (dataLoading) {
     return (
@@ -194,7 +194,7 @@ export default function App() {
         />
         <main className="flex-1 flex flex-col overflow-auto">
           {/* Header con UserMenu */}
-          <div className="sticky top-0 z-40 bg-[#f0f2f5]/90 dark:bg-[#0d0d0f]/90 backdrop-blur-md border-b border-[#e2e8f0]/60 dark:border-[#1f1f23]/60">
+          <div className="sticky top-0 z-40 bg-[#f0f2f5]/90 dark:bg-[#0d0d0f]/90 backdrop-blur-md">
             <div className="px-6 py-1 flex justify-end">
               <UserMenu
                 user={auth.user}
@@ -208,7 +208,7 @@ export default function App() {
 
           {/* Contenido */}
           <div className="flex-1 overflow-auto flex flex-col">
-            <div className="flex-1 px-8 py-5">
+            <div className="flex-1 px-8 py-2">
               {active === "dashboard"     && <Dashboard     {...shared} setActive={handleSetActive} activeAlerts={activeAlerts} dark={dark} />}
               {active === "properties"    && <Properties    {...shared} initialFilter={propFilter} initialPropertyId={selectedPropertyId} />}
               {active === "contacts"      && <Contacts      {...shared} />}

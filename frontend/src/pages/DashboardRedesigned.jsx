@@ -1,12 +1,13 @@
 // frontend/src/pages/DashboardRedesigned.jsx
 // Dashboard rediseñado — estilo moderno dark/light con gráfico de ingresos
 
-import { Plus, Building2, CheckCircle, DollarSign, FileText, Bell, ArrowUpRight, TrendingUp, Home, Users } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Building2, CheckCircle, DollarSign, FileText, Bell, ArrowUpRight, TrendingUp, Home, Users } from 'lucide-react';
 import { motion } from 'motion/react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
-import { fmtCurrency, fmtDate, diffDays, fmtDuration, getAlertLevel } from '../utils/helpers';
+import { fmtCurrency, fmtDate, diffDays, fmtDuration, getAlertLevel, apiCall } from '../utils/helpers';
 
 // ─── Colores del gráfico de dona ──────────────────────────────────────────────
 const DONUT_COLORS = ['#4a9fff', '#27272a'];
@@ -41,7 +42,7 @@ function StatCard({ icon: Icon, label, value, trend, color = "blue", onClick }) 
       whileHover={{ y: -2 }}
       transition={{ duration: 0.2 }}
       onClick={onClick}
-      className={`w-full text-left bg-white dark:bg-[#18181b] border border-[#e2e8f0] dark:border-[#27272a] rounded-2xl p-5 transition-all hover:border-blue-300 dark:hover:border-blue-500/40 hover:shadow-lg dark:hover:shadow-black/40 ${onClick ? "cursor-pointer" : "cursor-default"}`}
+      className={`w-full text-left bg-white dark:bg-[#262626] border border-gray-100 dark:border-[#404040] rounded-2xl p-5 transition-all hover:border-gray-400 dark:hover:border-gray-600 hover:shadow-lg dark:hover:shadow-black/40 ${onClick ? "cursor-pointer" : "cursor-default"}`}
     >
       <div className="flex items-center justify-between mb-4">
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${iconBg[color] || iconBg.blue}`}>
@@ -145,7 +146,24 @@ function PerfRow({ label, value, trend }) {
 }
 
 // ─── Propiedad reciente card ──────────────────────────────────────────────────
+// ─── Propiedad reciente card con fotos ──────────────────────────────────────
 function RecentPropertyCard({ property, onClick }) {
+  const [photo, setPhoto] = useState(null);
+  
+  useEffect(() => {
+    const loadPhoto = async () => {
+      try {
+        const data = await apiCall(`/properties/${property.id}/photos`);
+        if (data && data.length > 0) {
+          setPhoto(data[0].url);
+        }
+      } catch (e) {
+        // Silenciar si no hay fotos
+      }
+    };
+    if (property.id) loadPhoto();
+  }, [property.id]);
+
   const statusCfg = {
     ocupado:      { label: "Ocupada",      cls: "bg-emerald-500/90 text-white" },
     desocupado:   { label: "Disponible",   cls: "bg-blue-500/90 text-white" },
@@ -157,13 +175,17 @@ function RecentPropertyCard({ property, onClick }) {
     <motion.button
       whileHover={{ y: -3 }}
       onClick={onClick}
-      className="w-full text-left bg-white dark:bg-[#18181b] border border-[#e2e8f0] dark:border-[#27272a] rounded-2xl overflow-hidden hover:border-blue-300 dark:hover:border-blue-500/40 hover:shadow-lg dark:hover:shadow-black/40 transition-all"
+      className="w-full text-left bg-white dark:bg-[#262626] border border-gray-100 dark:border-[#404040] rounded-2xl overflow-hidden hover:border-gray-400 dark:hover:border-gray-600 hover:shadow-lg dark:hover:shadow-black/40 transition-all"
     >
-      {/* Placeholder imagen */}
-      <div className="h-32 bg-gradient-to-br from-slate-800 to-slate-900 dark:from-[#1a1a2e] dark:to-[#0f0f1a] relative">
-        <div className="absolute inset-0 flex items-center justify-center opacity-10">
-          <Home size={48} className="text-white" />
-        </div>
+      {/* Imagen */}
+      <div className="h-32 bg-gradient-to-br from-slate-800 to-slate-900 dark:from-[#1a1a2e] dark:to-[#0f0f1a] relative overflow-hidden">
+        {photo ? (
+          <img src={photo} alt={property.address} className="w-full h-full object-cover" />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center opacity-10">
+            <Home size={48} className="text-white" />
+          </div>
+        )}
         <span className={`absolute top-3 right-3 text-[11px] font-semibold px-2.5 py-1 rounded-full ${cfg.cls}`}>
           {cfg.label}
         </span>
@@ -172,11 +194,11 @@ function RecentPropertyCard({ property, onClick }) {
       <div className="p-4">
         <div className="flex items-center gap-1.5 mb-1">
           <span className="text-[10px] text-gray-400 dark:text-[#71717a]">📍</span>
-          <p className="text-sm font-semibold text-gray-800 dark:text-[#e4e4e7] truncate">{property.address || property.direccion || `Propiedad #${property.id}`}</p>
+          <p className="text-sm font-semibold text-gray-800 dark:text-[#e4e4e7] truncate">{property.address || `Propiedad #${property.id}`}</p>
         </div>
-        <p className="text-[11px] text-gray-400 dark:text-[#71717a] mb-3">{property.type || property.tipo || "Propiedad"}</p>
+        <p className="text-[11px] text-gray-400 dark:text-[#71717a] mb-3">{property.type || "Propiedad"}</p>
         <div className="flex items-baseline gap-1">
-          <span className="text-base font-bold text-gray-900 dark:text-[#f4f4f5]">{fmtCurrency(property.precio_alquiler || 0)}</span>
+          <span className="text-base font-bold text-gray-900 dark:text-[#f4f4f5]">{fmtCurrency(property.price || 0)}</span>
           <span className="text-[11px] text-gray-400 dark:text-[#71717a]">/mes</span>
         </div>
       </div>
@@ -199,9 +221,9 @@ function buildChartData(leases) {
     const total = leases
       .filter(l => l.status === "activo" || l.status === "vencido")
       .reduce((acc, l) => {
-        const start = new Date(l.fecha_inicio);
-        const end   = new Date(l.fecha_fin);
-        if (start <= d && end >= d) acc += (l.renta_mensual || 0);
+        const start = new Date(l.startDate);
+        const end   = new Date(l.endDate);
+        if (start <= d && end >= d) acc += (l.rent || 0);
         return acc;
       }, 0);
 
@@ -211,15 +233,15 @@ function buildChartData(leases) {
 }
 
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
-export function DashboardRedesigned({ properties, leases, tenants, setActive, dark }) {
+export function DashboardRedesigned({ properties, leases, tenants, setActive, dark, user }) {
   const occupied    = properties.filter(p => p.status === "ocupado").length;
   const vacant      = properties.filter(p => p.status === "desocupado").length;
-  const totalRent   = leases.filter(l => l.status === "activo").reduce((s, l) => s + (l.renta_mensual || 0), 0);
+  const totalRent   = leases.filter(l => l.status === "activo").reduce((s, l) => s + (l.rent || 0), 0);
   const activeLeases = leases.filter(l => l.status === "activo").length;
 
   const dashAlerts = leases
     .filter(l => l.status === "activo")
-    .map(l => { const days = diffDays(l.fecha_fin); const level = getAlertLevel(days); if (!level) return null; return { ...l, days, level }; })
+    .map(l => { const days = diffDays(l.endDate); const level = getAlertLevel(days); if (!level) return null; return { ...l, days, level }; })
     .filter(Boolean).sort((a, b) => a.days - b.days).slice(0, 4);
 
   const recentLeases = [...leases]
@@ -253,21 +275,9 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive, da
       <motion.div {...fadeUp} className="flex items-center justify-between gap-4 pt-1">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-[#f4f4f5] tracking-tight">
-            {getGreeting()}, {getFirstName(properties, tenants)}
+            {getGreeting()}, {getFirstName(user)}
           </h1>
-          <p className="text-sm text-gray-500 dark:text-[#71717a] mt-1 capitalize">
-            {new Date().toLocaleDateString("es-AR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
-          </p>
         </div>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={() => setActive('properties')}
-          className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-colors shadow-lg shadow-blue-500/20"
-        >
-          <Plus size={16} />
-          Agregar propiedad
-        </motion.button>
       </motion.div>
 
       {/* ══ STAT CARDS ══ */}
@@ -365,46 +375,59 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive, da
               <p className="text-sm text-gray-400 dark:text-[#52525b] text-center py-4">Sin actividad reciente</p>
             ) : (
               <>
-                {recentLeases.slice(0, 2).map(l => (
-                  <ActivityItem
-                    key={`lease-${l.id}`}
-                    icon={DollarSign}
-                    iconBg="bg-emerald-500/10 text-emerald-400"
-                    title="Pago de renta"
-                    subtitle={`${l.nominatario || 'Contrato'} · ${fmtCurrency(l.renta_mensual)}`}
-                    time="Activo"
-                  />
-                ))}
-                {recentLeases.slice(2, 3).map(l => (
-                  <ActivityItem
-                    key={`renew-${l.id}`}
-                    icon={FileText}
-                    iconBg="bg-blue-500/10 text-blue-400"
-                    title="Contrato activo"
-                    subtitle={l.nominatario || `Propiedad #${l.propiedad_id}`}
-                    time={`hasta ${fmtDate(l.fecha_fin)}`}
-                  />
-                ))}
-                {dashAlerts.slice(0, 2).map(a => (
-                  <ActivityItem
-                    key={`alert-${a.id}`}
-                    icon={Bell}
-                    iconBg="bg-orange-500/10 text-orange-400"
-                    title="Alerta de vencimiento"
-                    subtitle={a.nominatario || `Contrato #${a.id}`}
-                    time={a.days <= 0 ? "Venció" : fmtDuration(a.days)}
-                  />
-                ))}
-                {recentLeases.slice(3, 4).map(l => (
-                  <ActivityItem
-                    key={`prop-${l.id}`}
-                    icon={Home}
-                    iconBg="bg-purple-500/10 text-purple-400"
-                    title="Propiedad con contrato"
-                    subtitle={`Propiedad #${l.propiedad_id}`}
-                    time={`inicio ${fmtDate(l.fecha_inicio)}`}
-                  />
-                ))}
+                {recentLeases.slice(0, 2).map(l => {
+                  const tenant = tenants.find(t => t.id === l.tenantId);
+                  return (
+                    <ActivityItem
+                      key={`lease-${l.id}`}
+                      icon={DollarSign}
+                      iconBg="bg-emerald-500/10 text-emerald-400"
+                      title="Pago de renta"
+                      subtitle={`${tenant?.name || 'Inquilino'} · ${fmtCurrency(l.rent)}`}
+                      time="Activo"
+                    />
+                  );
+                })}
+                {recentLeases.slice(2, 3).map(l => {
+                  const prop = properties.find(p => p.id === l.propertyId);
+                  return (
+                    <ActivityItem
+                      key={`renew-${l.id}`}
+                      icon={FileText}
+                      iconBg="bg-blue-500/10 text-blue-400"
+                      title="Contrato activo"
+                      subtitle={prop?.address || `Propiedad #${l.propertyId}`}
+                      time={`hasta ${fmtDate(l.endDate)}`}
+                    />
+                  );
+                })}
+                {dashAlerts.slice(0, 2).map(a => {
+                  const prop = properties.find(p => p.id === a.propertyId);
+                  const tenant = tenants.find(t => t.id === a.tenantId);
+                  return (
+                    <ActivityItem
+                      key={`alert-${a.id}`}
+                      icon={Bell}
+                      iconBg="bg-orange-500/10 text-orange-400"
+                      title="Alerta de vencimiento"
+                      subtitle={prop?.address || tenant?.name || `Contrato #${a.id}`}
+                      time={fmtDuration(a.days)}
+                    />
+                  );
+                })}
+                {recentLeases.slice(3, 4).map(l => {
+                  const prop = properties.find(p => p.id === l.propertyId);
+                  return (
+                    <ActivityItem
+                      key={`prop-${l.id}`}
+                      icon={Home}
+                      iconBg="bg-purple-500/10 text-purple-400"
+                      title="Propiedad con contrato"
+                      subtitle={prop?.address || `Propiedad #${l.propertyId}`}
+                      time={`inicio ${fmtDate(l.startDate)}`}
+                    />
+                  );
+                })}
               </>
             )}
           </div>
@@ -451,16 +474,16 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive, da
                 key={alert.id}
                 whileHover={{ scale: 1.01 }}
                 onClick={() => setActive({ page: "leases", filter: "activo" })}
-                className={`w-full text-left flex items-center justify-between px-4 py-3.5 rounded-xl border transition-all ${alert.level.bg} ${alert.level.border}`}
+                className="w-full text-left flex items-center justify-between px-4 py-3.5 rounded-xl border border-gray-200 dark:border-[#404040] bg-white dark:bg-[#262626] hover:border-gray-400 dark:hover:border-gray-600 transition-all"
               >
                 <div className="flex items-center gap-3">
                   <Bell size={15} className={alert.level.color} />
-                  <p className={`text-sm font-semibold ${alert.level.color}`}>
+                  <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                     {alert.nominatario || "Contrato"}
                   </p>
                 </div>
-                <p className={`text-sm font-bold ${alert.level.color}`}>
-                  {alert.days <= 0 ? "Venció" : fmtDuration(alert.days)}
+                <p className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                  {fmtDuration(alert.days)}
                 </p>
               </motion.button>
             ))}
@@ -517,9 +540,8 @@ function getGreeting() {
   return "Buenas noches";
 }
 
-function getFirstName(properties, tenants) {
-  // Devuelve el primer nombre del primer tenant si existe
-  const t = tenants?.[0];
-  if (t?.nombre) return t.nombre.split(" ")[0];
+function getFirstName(user) {
+  // Devuelve el primer nombre del usuario autenticado
+  if (user?.nombre) return user.nombre.split(" ")[0];
   return "";
 }

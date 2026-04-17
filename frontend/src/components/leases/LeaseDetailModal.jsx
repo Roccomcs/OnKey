@@ -79,7 +79,7 @@ function ProyeccionAjuste({ lease }) {
   );
 }
 
-export function LeaseDetailModal({ lease, properties, tenants, owners, onClose, onEdit, onDelete, onStatusChange }) {
+export function LeaseDetailModal({ lease, properties, tenants, owners, onClose, onEdit, onDelete, onStatusChange, onRenew }) {
   if (!lease) return null;
 
   const prop    = properties.find(p => p.id === lease.propertyId);
@@ -93,7 +93,12 @@ export function LeaseDetailModal({ lease, properties, tenants, owners, onClose, 
     ? (alert.label === "Crítico" ? "bg-red-500" : alert.label === "Urgente" ? "bg-orange-400" : "bg-amber-500")
     : "bg-blue-600";
 
-  const otrosEstados = ["activo", "vencido", "rescindido", "renovado"].filter(s => s !== lease.status);
+  const otrosEstados = ["rescindido", "renovado"].filter(s => s !== lease.status);
+  
+  const estadoLabels = {
+    rescindido: "Rescindir Contrato",
+    renovado: "Renovar Contrato",
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -211,12 +216,27 @@ export function LeaseDetailModal({ lease, properties, tenants, owners, onClose, 
           {/* Cambiar estado */}
           {otrosEstados.length > 0 && (
             <div>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">Cambiar estado:</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">Acciones:</p>
               <div className="flex flex-wrap gap-2">
                 {otrosEstados.map(s => (
-                  <button key={s} onClick={() => onStatusChange(lease.id, s)}
-                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-[#404040] text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2d2d2d] transition-colors capitalize">
-                    <ChevronRight size={11} /> {s}
+                  <button 
+                    key={s} 
+                    onClick={() => {
+                      if (s === "renovado") {
+                        onClose();
+                        onRenew?.(lease);
+                      } else {
+                        onStatusChange(lease.id, s);
+                      }
+                    }}
+                    className={`flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
+                      s === "rescindido" 
+                        ? "border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                        : s === "renovado"
+                        ? "border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+                        : "border-gray-200 dark:border-[#404040] text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2d2d2d]"
+                    }`}>
+                    <ChevronRight size={11} /> {estadoLabels[s]}
                   </button>
                 ))}
               </div>

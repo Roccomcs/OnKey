@@ -371,11 +371,19 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
           );
         })}
         {list.length === 0 && (
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.3 }} className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl border border-green-200 dark:border-green-800/50 py-16 text-center">
-            <CheckCircle size={36} className="text-green-400 mx-auto mb-3" />
-            <p className="font-medium text-green-700 dark:text-green-400">
-              {search ? "Sin resultados para tu búsqueda" : "Sin contactos registrados"}
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.3 }} className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] py-16 text-center">
+            <Users size={36} className="text-emerald-400 mx-auto mb-3" />
+            <p className="font-medium text-gray-700 dark:text-gray-300">
+              {search ? "Sin resultados para tu búsqueda" : `Sin ${tab === "owners" ? "propietarios" : "inquilinos"} registrados`}
             </p>
+            {!search && (
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                {tab === "owners"
+                  ? "Creá el primer propietario con el botón de arriba"
+                  : "Creá el primer inquilino con el botón de arriba"
+                }
+              </p>
+            )}
           </motion.div>
         )}
       </motion.div>

@@ -5,6 +5,7 @@ import { FileText, Plus, Search, Edit2, Trash2, Calendar, DollarSign, Percent, T
 import { Badge }              from "../components/ui/Badge";
 import { AjusteBadge, LeaseDetailModal } from "../components/leases/LeaseDetailModal";
 import { LeaseFormModal }     from "../components/leases/LeaseFormModal";
+import { LeaseRenewModal }    from "../components/leases/LeaseRenewModal";
 import { IndicesPanel }       from "../components/leases/IndicesPanel";
 import { fmtDate, fmtCurrency, diffDays, getAlertLevel, isValidDate, API, apiCall } from "../utils/helpers";
 
@@ -25,6 +26,7 @@ export function Leases({ properties, setProperties, owners, tenants, leases, set
   const [editing, setEditing] = useState(null);
   const [saving,  setSaving]  = useState(false);
   const [detail,  setDetail]  = useState(null);
+  const [renewingLease, setRenewingLease] = useState(null);
   const [formErr, setFormErr] = useState("");
   const [form,    setForm]    = useState(EMPTY_FORM);
 
@@ -162,6 +164,17 @@ export function Leases({ properties, setProperties, owners, tenants, leases, set
         body: JSON.stringify({ status }),
       });
       setLeases(prev => prev.map(l => l.id === id ? { ...l, status } : l));
+      
+      // Si se rescinde, actualizar la propiedad a desocupado
+      // Si es renovado, mantener ocupado (se maneja en el modal)
+      if (status === "rescindido") {
+        const rescindedLease = leases.find(l => l.id === id);
+        if (rescindedLease) {
+          setProperties(prev => prev.map(p =>
+            p.id === rescindedLease.propertyId ? { ...p, status: "desocupado", leaseId: null } : p
+          ));
+        }
+      }
     } catch (e) {
       alert("Error: " + e.message);
     }
@@ -289,7 +302,7 @@ export function Leases({ properties, setProperties, owners, tenants, leases, set
               variants={fadeInUp}
               whileHover={{ scale: 1.02 }}
               onClick={() => setDetail(l)}
-              className="bg-white dark:bg-[#18181b] rounded-2xl border border-[#e2e8f0] dark:border-[#27272a] p-5 hover:border-blue-300 dark:hover:border-blue-500/40 hover:shadow-md dark:hover:shadow-black/40 transition-all cursor-pointer"
+              className="bg-white dark:bg-[#262626] rounded-2xl border border-gray-100 dark:border-[#404040] p-5 hover:border-gray-400 dark:hover:border-gray-600 hover:shadow-md dark:hover:shadow-black/40 transition-all cursor-pointer"
             >
               <div className="flex items-start gap-4">
                 {/* Icono */}
@@ -359,20 +372,28 @@ export function Leases({ properties, setProperties, owners, tenants, leases, set
         })}
 
         {filtered.length === 0 && (
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.3 }} className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl border border-green-200 dark:border-green-800/50 py-16 text-center">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.3 }} className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] py-16 text-center">
             {esVenta
-              ? <ShoppingBag size={36} className="text-green-400 mx-auto mb-3" />
-              : <FileText size={36} className="text-green-400 mx-auto mb-3" />
+              ? <ShoppingBag size={36} className="text-emerald-400 mx-auto mb-3" />
+              : <FileText size={36} className="text-emerald-400 mx-auto mb-3" />
             }
-            <p className="font-medium text-green-700 dark:text-green-400">
-              {search ? "Sin resultados para tu búsqueda" : esVenta ? "Sin contratos de venta" : "Sin contratos de alquiler"}
+            <p className="font-medium text-gray-700 dark:text-gray-300">
+              {search 
+                ? "Sin resultados para tu búsqueda" 
+                : tab === "todos"
+                  ? esVenta ? "Sin contratos de venta" : "Sin contratos de alquiler"
+                  : `Sin contratos ${tab}s`
+              }
             </p>
             {!search && (
-              <p className="text-sm text-green-600 dark:text-green-400/70 mt-1">
-                {esVenta
-                  ? "Creá el primer contrato de venta con el botón de arriba"
-                  : "Creá el primer contrato de alquiler con el botón de arriba"
-                }
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                {tab === "todos" ? (
+                  esVenta
+                    ? "Creá el primer contrato de venta con el botón de arriba"
+                    : "Creá el primer contrato de alquiler con el botón de arriba"
+                ) : (
+                  `No hay contratos en estado "${tab}" en este momento`
+                )}
               </p>
             )}
           </motion.div>
@@ -392,6 +413,32 @@ export function Leases({ properties, setProperties, owners, tenants, leases, set
           onStatusChange={(id, status) => {
             updateStatus(id, status);
             setDetail(prev => prev ? { ...prev, status } : null);
+          }}
+          onRenew={(l) => {
+            setDetail(null);
+            setRenewingLease(l);
+          }}
+        />
+      )}
+
+      {/* Modal renovar */}
+      {renewingLease && (
+        <LeaseRenewModal
+          lease={renewingLease}
+          property={properties.find(p => p.id === renewingLease.propertyId)}
+          tenant={tenants.find(t => t.id === renewingLease.tenantId)}
+          owner={owners.find(o => o.id === properties.find(p => p.id === renewingLease.propertyId)?.ownerId)}
+          onClose={() => setRenewingLease(null)}
+          onRenewed={(newLease) => {
+            setRenewingLease(null);
+            setLeases(prev => [...prev, newLease]);
+            setProperties(prev =>
+              prev.map(p =>
+                p.id === renewingLease.propertyId
+                  ? { ...p, leaseId: newLease.id, status: "ocupado" }
+                  : p
+              )
+            );
           }}
         />
       )}
