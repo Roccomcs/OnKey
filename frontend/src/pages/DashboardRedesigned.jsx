@@ -8,18 +8,29 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
 import { fmtCurrency, fmtDate, diffDays, fmtDuration, getAlertLevel, apiCall } from '../utils/helpers';
+import { useActivity } from '../hooks/useActivity';
+import { ActivityLog } from '../components/ActivityLog';
 
 // ─── Colores del gráfico de dona ──────────────────────────────────────────────
 const DONUT_COLORS = ['#4a9fff', '#27272a'];
 const DONUT_COLORS_LIGHT = ['#4a9fff', '#e2e8f0'];
 
 // ─── Tooltip personalizado para el área chart ────────────────────────────────
-function CustomTooltip({ active, payload, label }) {
+function CustomTooltip({ active, payload, label, moneda }) {
   if (!active || !payload?.length) return null;
+  
+  const value = payload[0]?.value || 0;
+  const color = moneda === "ARS" ? "text-blue-400" : "text-green-400";
+  const symbol = moneda === "ARS" ? "$" : "USD $";
+  
   return (
-    <div className="bg-[#18181b] dark:bg-[#18181b] light:bg-white border border-[#27272a] dark:border-[#27272a] rounded-xl px-4 py-3 shadow-2xl">
-      <p className="text-xs text-[#71717a] mb-1">{label}</p>
-      <p className="text-base font-bold text-white dark:text-white">{fmtCurrency(payload[0].value)}</p>
+    <div className="bg-[#18181b] dark:bg-[#18181b] light:bg-white border border-[#27272a] dark:border-[#27272a] rounded-xl px-4 py-3 shadow-2xl space-y-2">
+      <p className="text-xs text-[#71717a] mb-2 font-medium">{label}</p>
+      <p className={`text-sm font-semibold ${color}`}>
+        {moneda}: <span className="text-white">
+          {moneda === "ARS" ? `$${value.toLocaleString()}` : `${value.toLocaleString()}`}
+        </span>
+      </p>
     </div>
   );
 }
@@ -206,28 +217,36 @@ function RecentPropertyCard({ property, onClick }) {
   );
 }
 
-// ─── Generar datos del gráfico (6 meses anteriores + actual) ─────────────────
-function buildChartData(leases) {
+// ─── Generar datos del gráfico por moneda ─────────────────────────────────────
+function buildChartDataByMoneda(leases, properties, monthsToShow = 6, moneda = "ARS") {
   const now   = new Date();
   const months = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
   const result = [];
 
-  for (let i = 5; i >= 0; i--) {
+  for (let i = monthsToShow - 1; i >= 0; i--) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const key = `${d.getFullYear()}-${d.getMonth()}`;
     const label = months[d.getMonth()];
 
-    // Sumar rentas de contratos activos en ese mes
-    const total = leases
+    let ingresos = 0;
+
+    // Sumar rentas por moneda de los contratos activos en ese mes
+    leases
       .filter(l => l.status === "activo" || l.status === "vencido")
-      .reduce((acc, l) => {
+      .forEach(l => {
         const start = new Date(l.startDate);
         const end   = new Date(l.endDate);
-        if (start <= d && end >= d) acc += (l.rent || 0);
-        return acc;
-      }, 0);
+        if (start <= d && end >= d) {
+          // Obtener moneda de la propiedad asociada
+          const prop = properties.find(p => p.id === l.propertyId);
+          const propMoneda = prop?.moneda || "ARS";
+          
+          if (propMoneda === moneda) {
+            ingresos += (l.rent || 0);
+          }
+        }
+      });
 
-    result.push({ mes: label, ingresos: total });
+    result.push({ mes: label, ingresos });
   }
   return result;
 }
@@ -254,10 +273,21 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive, da
     ? recentViewedIds.map(id => properties.find(p => p.id === id)).filter(Boolean).slice(0, 3)
     : [...properties].sort((a, b) => b.id - a.id).slice(0, 3);
 
-  const chartData = buildChartData(leases);
+  const [chartZoom, setChartZoom] = useState(6);
+  const [selectedMoneda, setSelectedMoneda] = useState("ARS");
+  const chartDataARS = buildChartDataByMoneda(leases, properties, chartZoom, "ARS");
+  const chartDataUSD = buildChartDataByMoneda(leases, properties, chartZoom, "USD");
+  const chartData = selectedMoneda === "ARS" ? chartDataARS : chartDataUSD;
   const isDark    = dark ?? document.documentElement.classList.contains('dark');
 
-  // Calcular trend vs mes anterior desde el chart
+  // ─── Hook para actividades ───────────────────────────────
+  const { activities, loading: activitiesLoading, getActivities } = useActivity();
+
+  useEffect(() => {
+    getActivities(50);
+  }, [getActivities]);
+
+  // Calcular trend vs mes anterior desde el chart (según moneda seleccionada)
   const lastVal  = chartData[chartData.length - 1]?.ingresos || 0;
   const prevVal  = chartData[chartData.length - 2]?.ingresos || 0;
   const rentTrend = prevVal > 0 ? (((lastVal - prevVal) / prevVal) * 100).toFixed(1) : null;
@@ -296,31 +326,83 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive, da
 
       {/* ══ GRÁFICO + OCUPACIÓN ══ */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Área chart — ocupa 2/3 */}
+        {/* Selector de Moneda + Gráfico */}
         <motion.div
           {...fadeUp}
           transition={{ delay: 0.15 }}
           className="lg:col-span-2 bg-white dark:bg-[#18181b] border border-[#e2e8f0] dark:border-[#27272a] rounded-2xl p-6"
         >
-          <div className="flex items-start justify-between mb-1">
+          <div className="flex items-start justify-between mb-4">
             <div>
               <p className="text-sm text-gray-500 dark:text-[#71717a] font-medium">Ingresos Mensuales</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-[#f4f4f5] mt-1">{fmtCurrency(lastVal)}</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-[#f4f4f5] mt-1">
+                {selectedMoneda === "ARS" ? fmtCurrency(lastVal) : `$${lastVal.toLocaleString()}`}
+              </p>
               {rentTrend !== null && (
                 <p className="text-sm text-emerald-500 font-semibold mt-0.5">
                   +{rentTrend}% vs mes anterior
                 </p>
               )}
             </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setChartZoom(Math.max(6, chartZoom - 3))}
+                className="px-2.5 py-1.5 text-sm font-medium rounded-lg border border-gray-200 dark:border-[#404040] text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#333333] transition-colors"
+                title="Ver mas tiempo atras"
+              >
+                −
+              </button>
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400 min-w-12 text-center">{chartZoom} meses</span>
+              <button
+                onClick={() => setChartZoom(Math.min(60, chartZoom + 3))}
+                className="px-2.5 py-1.5 text-sm font-medium rounded-lg border border-gray-200 dark:border-[#404040] text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#333333] transition-colors"
+                title="Ver menos tiempo atras / Acercar"
+              >
+                +
+              </button>
+            </div>
           </div>
 
+          {/* Botones de selección de moneda */}
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => setSelectedMoneda("ARS")}
+              className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                selectedMoneda === "ARS"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 dark:bg-[#262626] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#333333]"
+              }`}
+            >
+              ARS
+            </button>
+            <button
+              onClick={() => setSelectedMoneda("USD")}
+              className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                selectedMoneda === "USD"
+                  ? "bg-green-600 text-white"
+                  : "bg-gray-100 dark:bg-[#262626] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#333333]"
+              }`}
+            >
+              USD
+            </button>
+          </div>
+
+          {/* Gráfico */}
           <div className="mt-4 h-52">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData} margin={{ top: 5, right: 4, left: 0, bottom: 0 }}>
                 <defs>
-                  <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%"  stopColor="#4a9fff" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="#4a9fff" stopOpacity={0} />
+                  <linearGradient id={`incomeGrad${selectedMoneda}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop 
+                      offset="5%" 
+                      stopColor={selectedMoneda === "ARS" ? "#3b82f6" : "#10b981"} 
+                      stopOpacity={0.25} 
+                    />
+                    <stop 
+                      offset="95%" 
+                      stopColor={selectedMoneda === "ARS" ? "#3b82f6" : "#10b981"} 
+                      stopOpacity={0} 
+                    />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#27272a" : "#f1f5f9"} vertical={false} />
@@ -331,21 +413,21 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive, da
                   tickLine={false}
                 />
                 <YAxis
-                  tickFormatter={v => v === 0 ? '$0' : `$${(v/1000).toFixed(0)}K`}
+                  tickFormatter={v => selectedMoneda === "ARS" ? `$${(v/1000).toFixed(0)}K` : `${(v/1000).toFixed(0)}K`}
                   tick={{ fill: isDark ? '#71717a' : '#94a3b8', fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                   width={50}
                 />
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={<CustomTooltip moneda={selectedMoneda} />} />
                 <Area
                   type="monotone"
                   dataKey="ingresos"
-                  stroke="#4a9fff"
+                  stroke={selectedMoneda === "ARS" ? "#3b82f6" : "#10b981"}
                   strokeWidth={2.5}
-                  fill="url(#incomeGrad)"
+                  fill={`url(#incomeGrad${selectedMoneda})`}
                   dot={false}
-                  activeDot={{ r: 5, fill: '#4a9fff', strokeWidth: 0 }}
+                  activeDot={{ r: 5, fill: selectedMoneda === "ARS" ? "#3b82f6" : "#10b981", strokeWidth: 0 }}
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -370,66 +452,8 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive, da
         {/* Actividad reciente */}
         <motion.div {...fadeUp} transition={{ delay: 0.25 }} className="bg-white dark:bg-[#18181b] border border-[#e2e8f0] dark:border-[#27272a] rounded-2xl p-6">
           <p className="text-sm font-semibold text-gray-700 dark:text-[#a1a1aa] mb-5">Actividad Reciente</p>
-          <div className="space-y-4">
-            {recentLeases.length === 0 && dashAlerts.length === 0 ? (
-              <p className="text-sm text-gray-400 dark:text-[#52525b] text-center py-4">Sin actividad reciente</p>
-            ) : (
-              <>
-                {recentLeases.slice(0, 2).map(l => {
-                  const tenant = tenants.find(t => t.id === l.tenantId);
-                  return (
-                    <ActivityItem
-                      key={`lease-${l.id}`}
-                      icon={DollarSign}
-                      iconBg="bg-emerald-500/10 text-emerald-400"
-                      title="Pago de renta"
-                      subtitle={`${tenant?.name || 'Inquilino'} · ${fmtCurrency(l.rent)}`}
-                      time="Activo"
-                    />
-                  );
-                })}
-                {recentLeases.slice(2, 3).map(l => {
-                  const prop = properties.find(p => p.id === l.propertyId);
-                  return (
-                    <ActivityItem
-                      key={`renew-${l.id}`}
-                      icon={FileText}
-                      iconBg="bg-blue-500/10 text-blue-400"
-                      title="Contrato activo"
-                      subtitle={prop?.address || `Propiedad #${l.propertyId}`}
-                      time={`hasta ${fmtDate(l.endDate)}`}
-                    />
-                  );
-                })}
-                {dashAlerts.slice(0, 2).map(a => {
-                  const prop = properties.find(p => p.id === a.propertyId);
-                  const tenant = tenants.find(t => t.id === a.tenantId);
-                  return (
-                    <ActivityItem
-                      key={`alert-${a.id}`}
-                      icon={Bell}
-                      iconBg="bg-orange-500/10 text-orange-400"
-                      title="Alerta de vencimiento"
-                      subtitle={prop?.address || tenant?.name || `Contrato #${a.id}`}
-                      time={fmtDuration(a.days)}
-                    />
-                  );
-                })}
-                {recentLeases.slice(3, 4).map(l => {
-                  const prop = properties.find(p => p.id === l.propertyId);
-                  return (
-                    <ActivityItem
-                      key={`prop-${l.id}`}
-                      icon={Home}
-                      iconBg="bg-purple-500/10 text-purple-400"
-                      title="Propiedad con contrato"
-                      subtitle={prop?.address || `Propiedad #${l.propertyId}`}
-                      time={`inicio ${fmtDate(l.startDate)}`}
-                    />
-                  );
-                })}
-              </>
-            )}
+          <div className="space-y-0">
+            <ActivityLog activities={activities} loading={activitiesLoading} />
           </div>
         </motion.div>
 

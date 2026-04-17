@@ -4,9 +4,11 @@ import { motion } from "motion/react";
 import { FileText, Plus, Search, Edit2, Trash2, Calendar, DollarSign, Percent, TrendingUp, Home, ShoppingBag } from "lucide-react";
 import { Badge }              from "../components/ui/Badge";
 import { AjusteBadge, LeaseDetailModal } from "../components/leases/LeaseDetailModal";
+import { AjusteDinamico }     from "../components/leases/AjusteDinamico";
 import { LeaseFormModal }     from "../components/leases/LeaseFormModal";
 import { LeaseRenewModal }    from "../components/leases/LeaseRenewModal";
 import { IndicesPanel }       from "../components/leases/IndicesPanel";
+import { useActivity }        from "../hooks/useActivity";
 import { fmtDate, fmtCurrency, diffDays, getAlertLevel, isValidDate, API, apiCall } from "../utils/helpers";
 
 const TABS_ALQUILER = ["activo", "vencido", "rescindido", "renovado", "todos"];
@@ -14,10 +16,10 @@ const TABS_VENTA    = ["activo", "rescindido", "todos"];
 
 const EMPTY_FORM = {
   propertyId: "", tenantId: "", startDate: "", endDate: "", rent: "",
-  tipoAjuste: "FIJO", increase: "6", iclVariacion: "", period: "anual", status: "activo",
+  tipoAjuste: "FIJO", increase: "6", iclVariacion: "", indiceBase: "", period: "anual", status: "activo",
 };
 
-export function Leases({ properties, setProperties, owners, tenants, leases, setLeases, initialTab = "activo" }) {
+export function Leases({ properties, setProperties, owners, tenants, leases, setLeases, initialTab = "activo", setActive }) {
   // Modo principal: alquiler | venta
   const [modo,    setModo]    = useState("alquiler");
   const [tab,     setTab]     = useState(initialTab);
@@ -29,6 +31,8 @@ export function Leases({ properties, setProperties, owners, tenants, leases, set
   const [renewingLease, setRenewingLease] = useState(null);
   const [formErr, setFormErr] = useState("");
   const [form,    setForm]    = useState(EMPTY_FORM);
+
+  const { logActivity } = useActivity();
 
   useEffect(() => { setTab(initialTab); }, [initialTab]);
   // Al cambiar de modo resetear tab
@@ -78,7 +82,8 @@ export function Leases({ properties, setProperties, owners, tenants, leases, set
       rent:         String(l.rent),
       tipoAjuste:   l.tipoAjuste   ?? "FIJO",
       increase:     String(l.increase ?? 6),
-      iclVariacion: String(l.indiceBaseValor ?? ""),
+      iclVariacion: String(l.increase ?? ""),
+      indiceBase:   String(l.indiceBaseValor ?? ""),
       period:       l.period       ?? "anual",
       status:       l.status       ?? "activo",
     });
@@ -121,13 +126,21 @@ export function Leases({ properties, setProperties, owners, tenants, leases, set
           tipoAjuste:   form.tipoAjuste,
           increase:     form.tipoAjuste === "FIJO" ? Number(form.increase) : 0,
           iclVariacion: form.tipoAjuste === "ICL"  ? form.iclVariacion : undefined,
+          indiceBase:   (form.tipoAjuste === "ICL" || form.tipoAjuste === "IPC") && form.indiceBase ? Number(form.indiceBase) : undefined,
           period:       form.period,
           status:       form.status,
         }),
       });
+      
+      const prop = properties.find(p => p.id === form.propertyId);
+      const tenant = tenants.find(t => t.id === form.tenantId);
+      const title = modo === "alquiler" ? "Contrato de Alquiler" : "Contrato de Venta";
+      
       if (editing) {
+        logActivity('lease_updated', `${title} actualizado`, `${prop?.address} - ${tenant?.name}`, saved.id, 'lease');
         setLeases(prev => prev.map(l => l.id === editing ? { ...l, ...saved } : l));
       } else {
+        logActivity('lease_created', `${title} creado`, `${prop?.address} - ${tenant?.name}`, saved.id, 'lease');
         setLeases(prev => [...prev, saved]);
         setProperties(prev => prev.map(p =>
           p.id === form.propertyId ? { ...p, status: "ocupado", leaseId: saved.id } : p
@@ -163,6 +176,20 @@ export function Leases({ properties, setProperties, owners, tenants, leases, set
         method: "PATCH",
         body: JSON.stringify({ status }),
       });
+      const lease = leases.find(l => l.id === id);
+      const prop = properties.find(p => p.id === lease?.propertyId);
+      const tenant = tenants.find(t => t.id === lease?.tenantId);
+      const description = `${prop?.address} - ${tenant?.name}`;
+      
+      // Registrar actividad según el estado
+      if (status === "rescindido") {
+        logActivity('lease_rescinded', `Contrato rescindido`, description, id, 'lease');
+      } else if (status === "vencido") {
+        logActivity('lease_ended', `Contrato vencido`, description, id, 'lease');
+      } else if (status === "renovado") {
+        logActivity('lease_renewed', `Contrato renovado`, description, id, 'lease');
+      }
+      
       setLeases(prev => prev.map(l => l.id === id ? { ...l, status } : l));
       
       // Si se rescinde, actualizar la propiedad a desocupado
@@ -344,6 +371,9 @@ export function Leases({ properties, setProperties, owners, tenants, leases, set
                         <Percent size={12} />+{l.increase}% {l.period}
                       </span>
                     )}
+                    {!esVenta && (l.tipoAjuste === "ICL" || l.tipoAjuste === "IPC") && (
+                      <AjusteDinamico lease={l} />
+                    )}
                   </div>
                 </div>
 
@@ -457,6 +487,7 @@ export function Leases({ properties, setProperties, owners, tenants, leases, set
         tenants={tenants}
         leases={leases}
         modo={modo}
+        onNavigate={setActive}
       />
     </motion.div>
   );

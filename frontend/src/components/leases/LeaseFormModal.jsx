@@ -1,5 +1,5 @@
 // frontend/src/components/leases/LeaseFormModal.jsx
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Plus } from "lucide-react";
 import { Modal }                from "../ui/Modal";
 import { Field, Input, Select } from "../ui/FormField";
 import { DocumentsSection }     from "../ui/DocumentsSection";
@@ -27,6 +27,7 @@ export function LeaseFormModal({
   form, setForm, onSave,
   properties, tenants, leases,
   modo = "alquiler",
+  onNavigate,
 }) {
   const esVenta = modo === "venta";
 
@@ -37,6 +38,13 @@ export function LeaseFormModal({
 
   const handlePropertyChange = (e) => {
     const propId    = e.target.value;
+    
+    // Si selecciona opción de agregar propiedad
+    if (propId === "ADD_NEW_PROPERTY") {
+      onNavigate?.({ page: "properties" });
+      return;
+    }
+    
     const propiedad = properties.find(p => String(p.id) === String(propId));
     const nuevoForm = { ...form, propertyId: propId };
     if (propiedad?.price) nuevoForm.rent = String(propiedad.price);
@@ -46,6 +54,18 @@ export function LeaseFormModal({
   const propiedadSeleccionada = form.propertyId
     ? properties.find(p => String(p.id) === String(form.propertyId))
     : null;
+
+  const handleTenantChange = (e) => {
+    const tenantId = e.target.value;
+    
+    // Si selecciona opción de agregar inquilino
+    if (tenantId === "ADD_NEW_TENANT") {
+      onNavigate?.({ page: "contacts" });
+      return;
+    }
+    
+    setForm({ ...form, tenantId });
+  };
 
   const monedaProp    = propiedadSeleccionada?.moneda || "ARS";
   const labelPrecio   = esVenta
@@ -81,14 +101,16 @@ export function LeaseFormModal({
               {propiedadesDisponibles.map(p => (
                 <option key={p.id} value={p.id}>{p.address}</option>
               ))}
+              <option value="ADD_NEW_PROPERTY" className="font-semibold text-blue-600">+ Agregar propiedad</option>
             </Select>
           </Field>
           <Field label={labelInquilino}>
-            <Select value={form.tenantId} onChange={e => setForm({ ...form, tenantId: e.target.value })}>
+            <Select value={form.tenantId} onChange={handleTenantChange}>
               <option value="">Seleccionar...</option>
               {tenants.map(t => (
                 <option key={t.id} value={t.id}>{t.name}</option>
               ))}
+              <option value="ADD_NEW_TENANT" className="font-semibold text-blue-600">+ Agregar {esVenta ? "comprador" : "inquilino"}</option>
             </Select>
           </Field>
         </div>
@@ -140,6 +162,8 @@ export function LeaseFormModal({
               onIncrease={v => setForm({ ...form, increase: v })}
               iclVariacion={form.iclVariacion ?? ""}
               onIclVariacion={v => setForm({ ...form, iclVariacion: v })}
+              indiceBase={form.indiceBase ?? ""}
+              onIndiceBase={v => setForm({ ...form, indiceBase: v })}
               rentaBase={form.rent}
             />
           </div>

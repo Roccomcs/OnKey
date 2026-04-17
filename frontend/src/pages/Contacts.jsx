@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { Modal }                from "../components/ui/Modal";
 import { Field, Input, Select } from "../components/ui/FormField";
+import { useActivity }          from "../hooks/useActivity";
 import { fmtDate, API, apiCall }         from "../utils/helpers";
 
 // ─── Modal de detalle de contacto ────────────────────────────
@@ -190,6 +191,8 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
   const [form,         setForm]         = useState({ name: "", email: "", phone: "", document: "", role: "owner" });
   const [formError,    setFormError]    = useState("");
 
+  const { logActivity } = useActivity();
+
   const list = (tab === "owners" ? owners : tenants).filter(person => {
     if (!search) return true;
     const q = search.toLowerCase();
@@ -244,14 +247,32 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
         method,
         body: JSON.stringify({ name: form.name, email: form.email, phone: form.phone, document: form.document }),
       });
+      
+      const roleLabel = form.role === "owner" ? "Propietario" : "Inquilino";
+      
       if (form.role === "owner") {
+        if (editing) {
+          logActivity('owner_updated', `${roleLabel} actualizado`, form.name, saved.id, 'owner');
+        } else {
+          logActivity('owner_created', `${roleLabel} agregado a los contactos`, form.name, saved.id, 'owner');
+        }
         setOwners(prev => editing ? prev.map(o => o.id === editing ? saved : o) : [...prev, saved]);
       } else {
+        if (editing) {
+          logActivity('tenant_updated', `${roleLabel} actualizado`, form.name, saved.id, 'tenant');
+        } else {
+          logActivity('tenant_created', `${roleLabel} agregado a los contactos`, form.name, saved.id, 'tenant');
+        }
         setTenants(prev => editing ? prev.map(t => t.id === editing ? saved : t) : [...prev, saved]);
       }
       setModal(false);
     } catch (e) {
-      setFormError("Error al guardar: " + e.message);
+      // Mejorar mensaje del error 409
+      if (e.message.includes("409")) {
+        setFormError("Este email o documento ya existe en el sistema");
+      } else {
+        setFormError("Error al guardar: " + e.message);
+      }
     } finally {
       setSaving(false);
       setEditing(null);
@@ -262,7 +283,12 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
     if (!confirm("¿Eliminar este contacto?")) return;
     const endpoint = tab === "owners" ? "owners" : "tenants";
     try {
+      const contact = tab === "owners" ? owners.find(o => o.id === id) : tenants.find(t => t.id === id);
       await apiCall(`/${endpoint}/${id}`, { method: "DELETE" });
+      
+      const roleLabel = tab === "owners" ? "Propietario" : "Inquilino";
+      logActivity(`${tab === "owners" ? 'owner' : 'tenant'}_deleted`, `${roleLabel} eliminado`, contact?.name, id, tab === "owners" ? 'owner' : 'tenant');
+      
       if (tab === "owners") setOwners(prev => prev.filter(o => o.id !== id));
       else                  setTenants(prev => prev.filter(t => t.id !== id));
     } catch (e) {

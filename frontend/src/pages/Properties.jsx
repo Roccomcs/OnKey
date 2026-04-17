@@ -12,6 +12,7 @@ import { Field, Input, Select } from "../components/ui/FormField";
 import { Badge }                from "../components/ui/Badge";
 import { DocumentsSection }     from "../components/ui/DocumentsSection";
 import { useDocuments }         from "../hooks/useDocuments";
+import { useActivity }          from "../hooks/useActivity";
 import { fmtCurrency, API, apiCall } from "../utils/helpers";
 
 const TIPOS = ["Departamento", "Casa", "Local Comercial", "Oficina", "Galpón", "Terreno", "Otro"];
@@ -154,7 +155,7 @@ function BigCarousel({ photos }) {
 }
 
 // ── Sección de gestión de fotos (dentro del modal editar) ────────────────────
-function PhotoManager({ propertyId }) {
+function PhotoManager({ propertyId, isNewProperty }) {
   const { photos, loading, upload, remove } = usePropertyPhotos(propertyId);
   const [uploading, setUploading] = useState(false);
   const inputRef = useRef();
@@ -168,9 +169,13 @@ function PhotoManager({ propertyId }) {
   };
 
   if (!propertyId) return (
-    <p className="text-xs text-gray-400 dark:text-gray-500 text-center py-2">
-      Guardá la propiedad primero para agregar fotos.
-    </p>
+    <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+      <p className="text-sm text-amber-700 dark:text-amber-300 text-center">
+        {isNewProperty 
+          ? "📸 Después de crear la propiedad, podrás agregar fotos aquí"
+          : "📸 Guardá la propiedad primero para agregar fotos."}
+      </p>
+    </div>
   );
 
   return (
@@ -567,9 +572,12 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
   const [search,         setSearch]         = useState("");
   const [filter,         setFilter]         = useState(initialFilter);
   const [modal,          setModal]          = useState(false);
+  const [photoModal,     setPhotoModal]     = useState(false);
   const [editing,        setEditing]        = useState(null);
   const [saving,         setSaving]         = useState(false);
   const [detailProperty, setDetailProperty] = useState(null);
+
+  const { logActivity } = useActivity();
 
   useEffect(() => {
     if (initialPropertyId && properties.length > 0) {
@@ -630,13 +638,19 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
         method,
         body: JSON.stringify({ ...form, price: Number(form.price) }),
       });
+      
+      // Registrar actividad
       if (editing) {
+        logActivity('property_updated', `Propiedad actualizada`, saved.address, saved.id, 'property');
         setProperties(prev => prev.map(p => p.id === editing ? saved : p));
         setModal(false);
       } else {
-        // Propiedad nueva creada: quedarse en el modal en modo edición para subir fotos
+        logActivity('property_created', `Propiedad para ${form.operacion} agregada`, saved.address, saved.id, 'property');
+        // Propiedad nueva: cerrar modal principal y abrir modal de fotos
         setProperties(prev => [...prev, saved]);
         setEditing(saved.id);
+        setModal(false);
+        setPhotoModal(true);
       }
     } catch (e) {
       alert("Error al guardar: " + e.message);
@@ -645,10 +659,26 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
     }
   };
 
+  const closePhotoModal = async () => {
+    setPhotoModal(false);
+    // Recargar la propiedad para que aparezcan las fotos
+    if (editing) {
+      try {
+        const updated = await apiCall(`/properties/${editing}`);
+        setProperties(prev => prev.map(p => p.id === editing ? updated : p));
+      } catch (e) {
+        console.error("Error recargando propiedad:", e);
+      }
+    }
+    setEditing(null);
+  };
+
   const del = async (id) => {
     if (!confirm("¿Eliminar esta propiedad?")) return;
     try {
+      const prop = properties.find(p => p.id === id);
       await apiCall(`/properties/${id}`, { method: "DELETE" });
+      logActivity('property_deleted', `Propiedad eliminada`, prop?.address, id, 'property');
       setProperties(prev => prev.filter(p => p.id !== id));
     } catch (e) {
       alert("Error al eliminar: " + e.message);
@@ -760,7 +790,7 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
       )}
 
       {/* Modal crear/editar */}
-      <Modal open={modal} onClose={() => setModal(false)} title={editing ? "Editar Propiedad" : "Nueva Propiedad"} wide>
+      <Modal open={modal} onClose={() => { setModal(false); setEditing(null); }} title={editing ? "Editar Propiedad" : "Nueva Propiedad"} wide>
         <div className="space-y-4">
           {/* Operación */}
           <div>
@@ -900,10 +930,12 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
             </Field>
           </div>
 
-          {/* Fotos */}
-          <div className="rounded-xl border border-gray-200 dark:border-[#404040] bg-gray-50 dark:bg-[#1e1e1e] p-4">
-            <PhotoManager propertyId={editing} />
-          </div>
+          {/* Fotos — solo al editar, no en creación */}
+          {editing && (
+            <div className="rounded-xl border border-gray-200 dark:border-[#404040] bg-gray-50 dark:bg-[#1e1e1e] p-4">
+              <PhotoManager propertyId={editing} isNewProperty={false} />
+            </div>
+          )}
 
           {/* Documentos — solo al editar */}
           {editing && (
@@ -920,7 +952,26 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
             </button>
             <button onClick={save} disabled={saving}
               className="flex-1 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors">
-              {saving ? "Guardando…" : (editing ? "Actualizar" : "Crear Propiedad")}
+              {saving ? "Guardando…" : (editing ? "Guardar cambios" : "Agregar Fotos")}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Modal para agregar fotos (solo cuando se crea propiedad nueva) */}
+      <Modal open={photoModal} onClose={closePhotoModal} title="Agregar Fotos" wide>
+        <div className="space-y-4">
+          {editing && (
+            <div className="rounded-xl border border-gray-200 dark:border-[#404040] bg-gray-50 dark:bg-[#1e1e1e] p-4">
+              <PhotoManager propertyId={editing} isNewProperty={false} />
+            </div>
+          )}
+          
+          {/* Botones */}
+          <div className="flex gap-3 pt-2">
+            <button onClick={closePhotoModal}
+              className="flex-1 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition-colors">
+              Listo
             </button>
           </div>
         </div>

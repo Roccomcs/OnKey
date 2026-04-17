@@ -66,7 +66,7 @@ export function UserMenu({ user, dark, toggleDark, onLogout, onSelectPlanes }) {
         onClick={() => setOpen(!open)}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="flex items-center gap-2 px-3 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-[#2d2d2d] transition-colors"
+        className="flex items-center gap-2 px-3 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-[#2d2d2d] transition-colors mt-2"
       >
         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold">
           {userInitial}

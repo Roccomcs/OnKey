@@ -167,6 +167,8 @@ function SinDatosFallback({ tipo, onSuccess }) {
  *   onIncrease   fn(val)
  *   iclVariacion string|number porcentaje ICL manual por período
  *   onIclVariacion fn(val)
+ *   indiceBase   string|number valor del índice base al inicio (ICL/IPC)
+ *   onIndiceBase fn(val)
  *   rentaBase    string|number renta mensual actual (para la calculadora)
  */
 export function AjusteSelector({
@@ -178,6 +180,8 @@ export function AjusteSelector({
   onIncrease,
   iclVariacion = "",
   onIclVariacion,
+  indiceBase = "",
+  onIndiceBase,
   rentaBase = "",
 }) {
   const { rows: ipcRows, loading, error, reload } = useIndice(
@@ -320,6 +324,17 @@ export function AjusteSelector({
               placeholder="Ej: 85.32"
               value={iclVariacion}
               onChange={(e) => onIclVariacion?.(e.target.value.replace(/[^0-9.]/g, ''))}
+            />
+          </Field>
+
+          {/* Índice base inicial */}
+          <Field label="Índice base al inicio del contrato">
+            <Input
+              type="text"
+              inputMode="decimal"
+              placeholder="Ej: 750.25"
+              value={indiceBase}
+              onChange={(e) => onIndiceBase?.(e.target.value.replace(/[^0-9.]/g, ''))}
             />
           </Field>
 

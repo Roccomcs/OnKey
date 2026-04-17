@@ -3,6 +3,26 @@
 export const fmtDate = d =>
   new Date(d).toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" });
 
+export const fmtDateRelative = (date) => {
+  if (!date) return '';
+  const d = new Date(date);
+  const now = new Date();
+  const seconds = Math.floor((now - d) / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  
+  if (seconds < 60) return 'Hace un momento';
+  if (minutes < 60) return `Hace ${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}`;
+  if (hours < 24) return `Hace ${hours} ${hours === 1 ? 'hora' : 'horas'}`;
+  if (days < 7) return `Hace ${days} ${days === 1 ? 'día' : 'días'}`;
+  if (days < 30) {
+    const weeks = Math.floor(days / 7);
+    return `Hace ${weeks} ${weeks === 1 ? 'semana' : 'semanas'}`;
+  }
+  return fmtDate(date);
+};
+
 export const diffDays = (dateStr) => {
   // Validación defensiva
   if (!dateStr || typeof dateStr !== 'string') {

@@ -212,7 +212,7 @@ export default function App() {
               {active === "dashboard"     && <Dashboard     {...shared} setActive={handleSetActive} activeAlerts={activeAlerts} dark={dark} />}
               {active === "properties"    && <Properties    {...shared} initialFilter={propFilter} initialPropertyId={selectedPropertyId} />}
               {active === "contacts"      && <Contacts      {...shared} />}
-              {active === "leases"        && <Leases        {...shared} initialTab={leaseFilter} />}
+              {active === "leases"        && <Leases        {...shared} setActive={handleSetActive} initialTab={leaseFilter} />}
               {active === "notifications" && <Notifications {...shared} activeAlerts={activeAlerts} dismiss={dismiss} setActive={handleSetActive} />}
               {active === "planes"        && <Planes token={auth.token} />}
             </div>

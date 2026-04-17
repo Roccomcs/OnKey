@@ -24,9 +24,9 @@ export function Sidebar({ active, setActive, alertCount, dark, toggleDark, user,
 
       {/* Logo */}
       <motion.div 
-        className={`px-3 py-5 border-b border-gray-200 dark:border-[#333333] flex gap-1 transition-all duration-300 ${
+        className={`-ml-1 py-5 flex gap-0 transition-all duration-300 ${
           sidebarOpen 
-            ? "items-center justify-between" 
+            ? "items-center justify-start" 
             : "flex-col items-center justify-center"
         }`}
         initial={{ opacity: 0 }}

@@ -52,6 +52,7 @@ router.post("/", checkLimits('contratos'), async (req, res) => {
     tipoAjuste = "FIJO",
     increase,
     iclVariacion,
+    indiceBase,
     period = "anual",
   } = req.body;
 
@@ -79,10 +80,17 @@ router.post("/", checkLimits('contratos'), async (req, res) => {
     if (tipoAjuste === "ICL") {
       if (!iclVariacion || isNaN(parseFloat(iclVariacion)))
         throw new Error("Ingresá la variación ICL por período para continuar.");
-      indiceBaseValor = parseFloat(iclVariacion);
+      // Guardar el índice base si se proporciona, si no usar iclVariacion (fallo silencioso)
+      if (indiceBase && !isNaN(parseFloat(indiceBase))) {
+        indiceBaseValor = parseFloat(indiceBase);
+      } else {
+        indiceBaseValor = parseFloat(iclVariacion);
+      }
       indiceBaseFecha = startDate.slice(0, 7) + "-01";
     } else if (tipoAjuste === "IPC") {
-      indiceBaseValor = await getIndiceBase(conn, "IPC", startDate);
+      indiceBaseValor = indiceBase && !isNaN(parseFloat(indiceBase)) 
+        ? parseFloat(indiceBase)
+        : await getIndiceBase(conn, "IPC", startDate);
       if (!indiceBaseValor) throw new Error(
         `No se encontró valor de IPC para la fecha ${startDate}. ` +
         `Sincronizá los índices desde el panel de índices.`
@@ -172,6 +180,7 @@ router.put("/:id", async (req, res) => {
     tipoAjuste = "FIJO",
     increase,
     iclVariacion,
+    indiceBase,
     period = "anual",
     status,
   } = req.body;
@@ -200,10 +209,17 @@ router.put("/:id", async (req, res) => {
     if (tipoAjuste === "ICL") {
       if (!iclVariacion || isNaN(parseFloat(iclVariacion)))
         throw new Error("Ingresá la variación ICL por período para continuar.");
-      indiceBaseValor = parseFloat(iclVariacion);
+      // Guardar el índice base si se proporciona, si no usar iclVariacion (fallo silencioso)
+      if (indiceBase && !isNaN(parseFloat(indiceBase))) {
+        indiceBaseValor = parseFloat(indiceBase);
+      } else {
+        indiceBaseValor = parseFloat(iclVariacion);
+      }
       indiceBaseFecha = startDate.slice(0, 7) + "-01";
     } else if (tipoAjuste === "IPC") {
-      indiceBaseValor = await getIndiceBase(conn, "IPC", startDate);
+      indiceBaseValor = indiceBase && !isNaN(parseFloat(indiceBase)) 
+        ? parseFloat(indiceBase)
+        : await getIndiceBase(conn, "IPC", startDate);
       if (!indiceBaseValor) throw new Error(
         `No se encontró valor de IPC para la fecha ${startDate}. Sincronizá los índices.`
       );

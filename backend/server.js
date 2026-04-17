@@ -31,6 +31,7 @@ import documentsRouter      from "./routes/documents.js";
 import indicesRouter        from "./routes/indices.js";
 import authRouter           from "./routes/auth.js";
 import subscriptionsRouter  from "./routes/subscriptions.js";
+import activitiesRouter     from "./routes/activities.js";
 
 import { pool, columnExists } from "./db.js";
 import "./cron.js";
@@ -113,6 +114,23 @@ async function runMigrations() {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
   `;
 
+  // Crear tabla activities si no existe
+  const createActivitiesTable = `
+    CREATE TABLE IF NOT EXISTS activities (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      userId INT UNSIGNED NOT NULL,
+      type VARCHAR(50) NOT NULL,
+      title VARCHAR(255) NOT NULL,
+      description TEXT,
+      relatedId INT,
+      relatedType VARCHAR(50),
+      createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (userId) REFERENCES usuarios(id) ON DELETE CASCADE,
+      INDEX idx_userId_createdAt (userId, createdAt DESC),
+      INDEX idx_createdAt (createdAt DESC)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  `;
+
   // Crear plan Starter si no existe (required para new users)
   const ensureStarterPlan = `
     INSERT IGNORE INTO planes (nombre, activo, precio_mensual, max_propiedades, max_contratos, max_contactos, max_usuarios)
@@ -156,6 +174,15 @@ async function runMigrations() {
   }
 
   try {
+    await pool.query(createActivitiesTable);
+    console.log("  ✅ Tabla 'activities' creada/verificada");
+  } catch (err) {
+    if (err.code !== 'ER_TABLE_EXISTS_ERROR') {
+      console.error("  ❌ Error al crear tabla activities:", err.message);
+    }
+  }
+
+  try {
     await pool.query(ensureStarterPlan);
     console.log("  ✅ Plan Starter verificado/creado");
   } catch (err) {
@@ -194,6 +221,7 @@ app.use('/api/tenants',       tenantsRouter);
 app.use('/api/leases',        leasesRouter);
 app.use('/api/documents',     documentsRouter);
 app.use('/api/indices',       indicesRouter);
+app.use('/api/activities',    activitiesRouter);
 
 // ─── HEALTH CHECK ────────────────────────────────────────────
 app.get("/api/health", (_req, res) => res.json({ status: "ok", ts: new Date() }));
