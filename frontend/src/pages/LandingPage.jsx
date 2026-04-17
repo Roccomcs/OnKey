@@ -17,7 +17,10 @@ const LandingPage = ({ onLoginClick, onSignupClick }) => {
       {/* Navigation */}
       <nav className="fixed top-0 w-full bg-white/80 dark:bg-[#0f0f0f]/90 backdrop-blur-md border-b border-gray-100 dark:border-[#1f1f1f] z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <img src="/Gemini_Generated_Image_h8o191h8o191h8o1.svg" alt="OnKey" className="h-40" />
+          <div className="flex items-center gap-2">
+            <img src="/Gemini_Generated_Image_5pu4335pu4335pu4-removebg-preview.png" alt="OnKey" className="h-12 w-auto" />
+            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">OnKey</span>
+          </div>
           <div className="hidden md:flex gap-8 items-center">
             <a href="#features" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">Funcionalidades</a>
             <a href="#pricing" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">Planes</a>

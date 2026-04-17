@@ -1,4 +1,4 @@
-import { Building2, Users, FileText, Bell, LayoutDashboard } from "lucide-react";
+import { Building2, Users, FileText, Bell, LayoutDashboard, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "motion/react";
 
 const NAV = [
@@ -9,41 +9,64 @@ const NAV = [
   { id: "notifications", label: "Alertas",     icon: Bell },
 ];
 
-export function Sidebar({ active, setActive, alertCount, dark, toggleDark, user, tenant, onLogout, subscription }) {
+export function Sidebar({ active, setActive, alertCount, dark, toggleDark, user, tenant, onLogout, subscription, sidebarOpen, setSidebarOpen }) {
   
   return (
     <motion.aside
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.3 }}
-      className="w-60 flex-shrink-0 bg-white dark:bg-[#0f0f0f] border-r border-gray-200 dark:border-[#333333] flex flex-col h-screen sticky top-0"
+      layout
+      className={`flex-shrink-0 bg-white dark:bg-[#0f0f0f] border-r border-gray-200 dark:border-[#333333] flex flex-col h-screen sticky top-0 overflow-hidden transition-all duration-300 ${
+        sidebarOpen ? "w-60" : "w-20"
+      }`}
     >
 
       {/* Logo */}
       <motion.div 
-        className="px-5 py-8 border-b border-gray-200 dark:border-[#333333]"
+        className="px-3 py-5 border-b border-gray-200 dark:border-[#333333] flex items-center justify-between gap-1"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.1 }}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-0.5 min-w-0">
           <motion.img 
-            src="/Gemini_Generated_Image_h8o191h8o191h8o1.svg"
+            src="/Gemini_Generated_Image_5pu4335pu4335pu4-removebg-preview.png"
             alt="OnKey"
-            className="w-20 h-20"
+            className={`${sidebarOpen ? "h-16 w-auto" : "h-10 w-auto"} flex-shrink-0 transition-all duration-300`}
             whileHover={{ scale: 1.05 }}
           />
-          <div>
-            <p className="text-base font-bold text-gray-900 dark:text-gray-100">
-              OnKey
-            </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Gestión inmobiliaria</p>
-          </div>
+          {sidebarOpen && (
+            <motion.div
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: "auto" }}
+              exit={{ opacity: 0, width: 0 }}
+              transition={{ duration: 0.2 }}
+              className="flex-1 min-w-0"
+            >
+              <p className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent dark:from-blue-400 dark:to-cyan-400 truncate">
+                OnKey
+              </p>
+            </motion.div>
+          )}
         </div>
+        <motion.button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-1 hover:bg-gray-100 dark:hover:bg-[#1a1a1a] rounded-lg transition-colors flex-shrink-0"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          title={sidebarOpen ? "Cerrar sidebar" : "Abrir sidebar"}
+        >
+          {sidebarOpen ? (
+            <ChevronLeft size={16} className="text-gray-500 dark:text-gray-500" />
+          ) : (
+            <ChevronRight size={16} className="text-gray-500 dark:text-gray-500" />
+          )}
+        </motion.button>
       </motion.div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="flex-1 px-2 py-4 space-y-1">
         {NAV.map(({ id, label, icon: Icon }, idx) => {
           const isActive = active === id;
           const badge    = id === "notifications" && alertCount > 0;
@@ -53,21 +76,35 @@ export function Sidebar({ active, setActive, alertCount, dark, toggleDark, user,
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 + idx * 0.05 }}
-              whileHover={{ x: 4 }}
+              whileHover={{ x: sidebarOpen ? 4 : 0 }}
               onClick={() => setActive(id)}
-              className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-base font-medium transition-all ${
+              title={!sidebarOpen ? label : ""}
+              className={`relative w-full flex items-center gap-3 px-3 py-3 rounded-lg text-base font-medium transition-all ${
                 isActive
                   ? "bg-gradient-to-r from-blue-600/10 to-purple-600/10 text-blue-700 dark:text-blue-400 border border-blue-200/50 dark:border-blue-900/50"
                   : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#1a1a1a]"
-              }`}
+              } ${!sidebarOpen ? "justify-center" : ""}`}
             >
               <Icon size={20} className={isActive ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-500"} />
-              <span className="flex-1 text-left">{label}</span>
-              {badge && (
+              {sidebarOpen && (
+                <>
+                  <span className="flex-1 text-left">{label}</span>
+                  {badge && (
+                    <motion.span 
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold flex-shrink-0"
+                    >
+                      {alertCount}
+                    </motion.span>
+                  )}
+                </>
+              )}
+              {!sidebarOpen && badge && (
                 <motion.span 
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"
+                  className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold absolute top-0 right-0 transform translate-x-1/3 -translate-y-1/3 flex-shrink-0"
                 >
                   {alertCount}
                 </motion.span>

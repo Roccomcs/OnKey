@@ -9,7 +9,10 @@ export const Navigation = () => {
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <img src="/Gemini_Generated_Image_h8o191h8o191h8o1.svg" alt="OnKey" className="h-40" />
+          <div className="flex items-center gap-2">
+            <img src="/Gemini_Generated_Image_5pu4335pu4335pu4-removebg-preview.png" alt="OnKey" className="h-12 w-auto" />
+            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent hidden sm:inline">OnKey</span>
+          </div>
 
           {/* Desktop Links */}
           <div className="hidden md:flex gap-8 items-center">

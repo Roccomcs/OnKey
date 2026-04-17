@@ -1,7 +1,6 @@
 // frontend/src/components/ui/redesigned.jsx
-// Componentes UI rediseñados - Animados y sofisticados
+// Componentes UI rediseñados — estilo moderno dark/light
 
-import React from 'react';
 import { motion } from 'motion/react';
 
 // ■■■ BOTONES ■■■
@@ -12,11 +11,8 @@ export function BtnPrimary({ children, onClick, disabled = false, className = ''
       onClick={onClick}
       disabled={disabled}
       whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.95 }}
-      className={`px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-medium 
-        hover:from-blue-700 hover:to-blue-800 active:from-blue-800 active:to-blue-900 transition-all
-        disabled:opacity-50 disabled:cursor-not-allowed
-        text-14 ${className}`}
+      whileTap={{ scale: 0.96 }}
+      className={`inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-semibold rounded-xl transition-colors shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
     >
       {children}
     </motion.button>
@@ -28,10 +24,7 @@ export function BtnSecondary({ children, onClick, disabled = false, className = 
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`px-4 py-2 bg-gray-700 text-gray-100 rounded-lg font-medium 
-        hover:bg-gray-600 transition
-        disabled:opacity-50 disabled:cursor-not-allowed
-        text-14 ${className}`}
+      className={`inline-flex items-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-[#27272a] hover:bg-gray-200 dark:hover:bg-[#3f3f46] text-gray-700 dark:text-[#a1a1aa] text-sm font-semibold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
     >
       {children}
     </button>
@@ -42,8 +35,7 @@ export function BtnTertiary({ children, onClick, className = '' }) {
   return (
     <button
       onClick={onClick}
-      className={`px-4 py-2 bg-transparent text-blue-500 rounded-lg font-medium
-        hover:bg-gray-800 transition text-14 ${className}`}
+      className={`inline-flex items-center gap-2 px-4 py-2.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 text-sm font-semibold rounded-xl transition-colors ${className}`}
     >
       {children}
     </button>
@@ -54,8 +46,7 @@ export function BtnDanger({ children, onClick, className = '' }) {
   return (
     <button
       onClick={onClick}
-      className={`px-4 py-2 bg-red-600/10 text-red-500 rounded-lg font-medium
-        hover:bg-red-600/20 transition text-14 ${className}`}
+      className={`inline-flex items-center gap-2 px-4 py-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 text-sm font-semibold rounded-xl transition-colors ${className}`}
     >
       {children}
     </button>
@@ -64,68 +55,47 @@ export function BtnDanger({ children, onClick, className = '' }) {
 
 // ■■■ CARDS ■■■
 
-export function Card({ children, className = '', hover = true }) {
+export function Card({ children, className = '', hover = false, onClick }) {
   return (
-    <motion.div
-      whileHover={hover ? { scale: 1.02 } : {}}
-      className={`bg-gray-800 border border-gray-700 rounded-lg p-4 
-        ${hover ? 'transition-all cursor-pointer' : ''} ${className}`}
+    <div
+      onClick={onClick}
+      className={`bg-white dark:bg-[#18181b] border border-[#e2e8f0] dark:border-[#27272a] rounded-2xl p-5 ${hover ? 'hover:border-blue-200 dark:hover:border-blue-500/30 hover:shadow-md transition-all cursor-pointer' : ''} ${className}`}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
 
 export function CardProperty({ property }) {
-  const statusColor = property.estado === 'ocupado' ? 'green' : 'gray';
-  const statusLabel = property.estado === 'ocupado' ? '✓ Ocupado' : '○ Desocupado';
+  const cfg = {
+    ocupado:      { label: "Ocupado",       cls: "bg-emerald-500/10 text-emerald-500" },
+    desocupado:   { label: "Disponible",    cls: "bg-blue-500/10 text-blue-500" },
+    mantenimiento:{ label: "Mantenimiento", cls: "bg-orange-500/10 text-orange-500" },
+  };
+  const s = cfg[property.status] || cfg.desocupado;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
-      whileHover={{ scale: 1.02 }}
-      transition={{ duration: 0.3 }}
+      whileHover={{ y: -3 }}
+      transition={{ duration: 0.2 }}
       viewport={{ once: true }}
-      className="bg-gradient-to-br from-gray-800 to-gray-850 border border-gray-700/50 rounded-lg p-4 cursor-pointer hover:border-gray-600/50"
+      className="bg-white dark:bg-[#18181b] border border-[#e2e8f0] dark:border-[#27272a] rounded-2xl p-5 hover:border-blue-200 dark:hover:border-blue-500/30 hover:shadow-md transition-all cursor-pointer"
     >
       <div className="flex items-start justify-between mb-3">
-        <h3 className="text-16 font-semibold text-gray-100">{property.address}</h3>
-        <motion.button 
-          whileHover={{ rotate: 90 }}
-          className="text-gray-500 hover:text-gray-400 text-16"
-        >
-          ⋮
-        </motion.button>
+        <h3 className="text-sm font-semibold text-gray-800 dark:text-[#e4e4e7]">{property.address}</h3>
+        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${s.cls}`}>{s.label}</span>
       </div>
-
-      <div className="flex gap-3 mb-4 text-12 text-gray-500">
+      <div className="flex gap-2 mb-4 text-xs text-gray-400 dark:text-[#71717a]">
         <span>{property.tipo}</span>
-        <span>•</span>
-        <span>{property.zona}</span>
+        {property.zona && <><span>·</span><span>{property.zona}</span></>}
       </div>
-
-      <motion.div 
-        initial={{ opacity: 0.8 }}
-        whileHover={{ opacity: 1 }}
-        className="inline-flex px-2 py-1 bg-green-600/10 text-green-400 text-11 rounded border border-green-600/20"
-      >
-        {statusLabel}
-      </motion.div>
-
-      <div className="mt-4 pt-4 border-t border-gray-700/50">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="text-11 text-gray-600">Precio</p>
-            <p className="text-16 font-semibold text-gray-100 font-mono mt-1">
-              {property.price ? `$${property.price.toLocaleString()}` : '—'}
-            </p>
-          </div>
-          <div>
-            <p className="text-11 text-gray-600">Estado</p>
-            <p className="text-14 text-gray-300 mt-1 capitalize">{property.status || '—'}</p>
-          </div>
-        </div>
+      <div className="pt-3 border-t border-[#e2e8f0] dark:border-[#27272a]">
+        <p className="text-xs text-gray-400 dark:text-[#71717a] mb-1">Renta mensual</p>
+        <p className="text-base font-bold text-gray-900 dark:text-[#f4f4f5]">
+          {property.price ? `$${property.price.toLocaleString()}` : '—'}
+        </p>
       </div>
     </motion.div>
   );
@@ -135,88 +105,57 @@ export function CardProperty({ property }) {
 
 export function SearchInput({ placeholder = "Buscar...", onChange }) {
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="relative group"
-    >
+    <div className="relative">
       <input
         type="text"
         placeholder={placeholder}
         onChange={onChange}
-        className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-3 py-2 pl-10
-          text-gray-100 placeholder-gray-500
-          focus:border-blue-600 focus:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600/20 transition-all
-          text-14"
+        className="w-full bg-gray-50 dark:bg-[#27272a] border border-[#e2e8f0] dark:border-[#3f3f46] rounded-xl px-3.5 py-2.5 pl-9 text-sm text-gray-800 dark:text-[#e4e4e7] placeholder-gray-400 dark:placeholder-[#52525b] focus:border-blue-400 dark:focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/15 transition-all"
       />
-      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-400 transition-colors">🔍</span>
-    </motion.div>
+      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#52525b] text-sm">🔍</span>
+    </div>
   );
 }
 
-// ■■■ BADGES / TAGS ■■■
+// ■■■ BADGES ■■■
 
 export function Badge({ children, variant = 'default' }) {
-  const variants = {
-    default: 'bg-gray-700 text-gray-300',
-    success: 'bg-green-600/10 text-green-400',
-    warning: 'bg-amber-600/10 text-amber-500',
-    error: 'bg-red-600/10 text-red-500',
-    info: 'bg-cyan-600/10 text-cyan-400',
+  const v = {
+    default: 'bg-gray-100 dark:bg-[#27272a] text-gray-600 dark:text-[#a1a1aa]',
+    success: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+    warning: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+    error:   'bg-red-500/10 text-red-600 dark:text-red-400',
+    info:    'bg-blue-500/10 text-blue-600 dark:text-blue-400',
   };
-
   return (
-    <span className={`inline-flex px-2 py-1 text-11 rounded font-medium ${variants[variant]}`}>
+    <span className={`inline-flex items-center px-2.5 py-0.5 text-[11px] font-semibold rounded-full ${v[variant]}`}>
       {children}
     </span>
   );
 }
 
-// ■■■ ALERT / ALERT CARD ■■■
+// ■■■ ALERT CARD ■■■
 
 export function AlertCard({ icon, title, description, action, variant = 'info' }) {
-  const variantStyles = {
-    error: 'bg-red-600/5 border-red-600/30 text-red-500',
-    warning: 'bg-amber-600/5 border-amber-600/30 text-amber-500',
-    info: 'bg-cyan-600/5 border-cyan-600/30 text-cyan-500',
-    success: 'bg-green-600/5 border-green-600/30 text-green-400',
+  const s = {
+    error:   'bg-red-500/5   border-red-500/20   text-red-500',
+    warning: 'bg-amber-500/5 border-amber-500/20 text-amber-500',
+    info:    'bg-blue-500/5  border-blue-500/20  text-blue-400',
+    success: 'bg-emerald-500/5 border-emerald-500/20 text-emerald-500',
   };
-
-  const iconColor = {
-    error: 'text-red-500',
-    warning: 'text-amber-500',
-    info: 'text-cyan-400',
-    success: 'text-green-400',
-  };
-
   return (
-    <motion.div 
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      whileHover={{ x: 4 }}
-      transition={{ duration: 0.3 }}
-      className={`border rounded-lg p-4 flex items-start gap-3 hover:shadow-md transition-all ${variantStyles[variant]}`}
-    >
-      <motion.span 
-        animate={{ y: [0, -2, 0] }}
-        transition={{ duration: 2, repeat: Infinity }}
-        className={`text-16 flex-shrink-0 ${iconColor[variant]}`}
-      >
-        {icon}
-      </motion.span>
+    <div className={`border rounded-xl p-4 flex items-start gap-3 ${s[variant]}`}>
+      <span className="text-sm flex-shrink-0">{icon}</span>
       <div className="flex-1">
-        <p className="text-14 font-semibold text-gray-100">{title}</p>
-        <p className="text-12 text-gray-400 mt-1">{description}</p>
+        <p className="text-sm font-semibold text-gray-800 dark:text-[#e4e4e7]">{title}</p>
+        <p className="text-xs text-gray-500 dark:text-[#71717a] mt-0.5">{description}</p>
       </div>
       {action && (
-        <motion.button 
-          whileHover={{ scale: 1.05 }}
-          className="text-blue-400 text-12 font-medium hover:text-blue-300 ml-2 flex-shrink-0"
-        >
+        <button className="text-blue-500 text-xs font-semibold hover:text-blue-400 transition-colors ml-2 flex-shrink-0">
           {action}
-        </motion.button>
+        </button>
       )}
-    </motion.div>
+    </div>
   );
 }
 
@@ -225,43 +164,15 @@ export function AlertCard({ icon, title, description, action, variant = 'info' }
 export function EmptyState({ icon, title, description, action }) {
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
+      initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.4 }}
+      transition={{ duration: 0.3 }}
       className="text-center py-16 px-4"
     >
-      <motion.div
-        animate={{ y: [0, -8, 0] }}
-        transition={{ duration: 3, repeat: Infinity }}
-        className="text-48 mb-4"
-      >
-        {icon}
-      </motion.div>
-      <motion.h3 
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="text-18 font-semibold text-gray-100 mb-2"
-      >
-        {title}
-      </motion.h3>
-      <motion.p 
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15 }}
-        className="text-14 text-gray-500 mb-6 max-w-md mx-auto"
-      >
-        {description}
-      </motion.p>
-      {action && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <BtnPrimary onClick={action.onClick}>{action.label}</BtnPrimary>
-        </motion.div>
-      )}
+      <div className="text-4xl mb-4">{icon}</div>
+      <h3 className="text-base font-semibold text-gray-800 dark:text-[#e4e4e7] mb-2">{title}</h3>
+      <p className="text-sm text-gray-500 dark:text-[#71717a] mb-6 max-w-sm mx-auto">{description}</p>
+      {action && <BtnPrimary onClick={action.onClick}>{action.label}</BtnPrimary>}
     </motion.div>
   );
 }
@@ -269,36 +180,22 @@ export function EmptyState({ icon, title, description, action }) {
 // ■■■ METRIC CARD ■■■
 
 export function MetricCard({ label, value, trend, unit = '' }) {
-  const trendColor = trend > 0 ? 'text-green-400' : trend < 0 ? 'text-red-500' : 'text-gray-500';
-  const trendBg = trend > 0 ? 'bg-green-500/10' : trend < 0 ? 'bg-red-500/10' : 'bg-gray-700/30';
-
+  const isPos = trend > 0;
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      whileHover={{ scale: 1.02 }}
-      transition={{ duration: 0.3 }}
-      viewport={{ once: true }}
-      className="bg-gradient-to-br from-gray-800 to-gray-850 border border-gray-700/50 rounded-lg p-4 hover:border-gray-600/50 transition-all"
-    >
-      <p className="text-12 text-gray-600 uppercase tracking-wide font-medium">{label}</p>
-      <div className="text-28 font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mt-2">
+    <div className="bg-white dark:bg-[#18181b] border border-[#e2e8f0] dark:border-[#27272a] rounded-2xl p-5">
+      <p className="text-xs text-gray-400 dark:text-[#71717a] uppercase tracking-wide font-medium mb-2">{label}</p>
+      <p className="text-2xl font-bold text-gray-900 dark:text-[#f4f4f5]">
         {typeof value === 'number' ? value.toLocaleString() : value}{unit}
-      </div>
+      </p>
       {trend !== undefined && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className={`text-12 mt-2 font-medium flex items-center gap-1 ${trendColor}`}
-        >
-          <span className={`px-2 py-0.5 rounded text-10 ${trendBg}`}>
-            {trend > 0 ? '+' : ''}{trend}%
+        <div className={`text-xs mt-2 font-semibold flex items-center gap-1 ${isPos ? 'text-emerald-500' : 'text-red-500'}`}>
+          <span className={`px-2 py-0.5 rounded-full ${isPos ? 'bg-emerald-500/10' : 'bg-red-500/10'}`}>
+            {isPos ? '+' : ''}{trend}%
           </span>
-          vs. mes anterior
-        </motion.div>
+          <span className="text-gray-400 dark:text-[#52525b] font-normal">vs. mes anterior</span>
+        </div>
       )}
-    </motion.div>
+    </div>
   );
 }
 
@@ -309,38 +206,28 @@ export function Table({ headers, rows, actions }) {
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-gray-700">
+          <tr className="border-b border-[#e2e8f0] dark:border-[#27272a]">
             {headers.map((h, i) => (
-              <th
-                key={i}
-                className="px-4 py-3 text-left text-12 font-semibold text-gray-500 uppercase"
-              >
+              <th key={i} className="px-4 py-3 text-left text-[11px] font-semibold text-gray-400 dark:text-[#52525b] uppercase tracking-wide">
                 {h}
               </th>
             ))}
-            {actions && <th className="px-4 py-3 text-right text-12 font-semibold text-gray-500">Acciones</th>}
+            {actions && <th className="px-4 py-3 text-right text-[11px] font-semibold text-gray-400 dark:text-[#52525b] uppercase tracking-wide">Acciones</th>}
           </tr>
         </thead>
         <tbody>
           {rows.map((row, i) => (
-            <motion.tr
+            <tr
               key={i}
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              whileHover={{ backgroundColor: 'rgba(55, 65, 81, 0.5)' }}
-              transition={{ duration: 0.2, delay: i * 0.05 }}
-              viewport={{ once: true }}
-              className="border-b border-gray-700/50 transition-colors cursor-pointer"
+              className="border-b border-[#e2e8f0]/60 dark:border-[#27272a]/60 hover:bg-gray-50 dark:hover:bg-[#1f1f23] transition-colors cursor-pointer"
             >
               {row.cells.map((cell, j) => (
-                <td key={j} className="px-4 py-3 text-gray-300 text-14">
+                <td key={j} className="px-4 py-3 text-sm text-gray-700 dark:text-[#a1a1aa]">
                   {cell}
                 </td>
               ))}
-              {actions && (
-                <td className="px-4 py-3 text-right">{row.actions}</td>
-              )}
-            </motion.tr>
+              {actions && <td className="px-4 py-3 text-right">{row.actions}</td>}
+            </tr>
           ))}
         </tbody>
       </table>
@@ -352,10 +239,10 @@ export function Table({ headers, rows, actions }) {
 
 export function SectionHeader({ title, description, action }) {
   return (
-    <div className="flex items-start justify-between mb-6 gap-4">
+    <div className="flex items-start justify-between mb-5 gap-4">
       <div>
-        <h2 className="text-24 font-semibold text-gray-900 dark:text-gray-100">{title}</h2>
-        {description && <p className="text-14 text-gray-600 dark:text-gray-400 mt-1">{description}</p>}
+        <h2 className="text-lg font-bold text-gray-900 dark:text-[#f4f4f5]">{title}</h2>
+        {description && <p className="text-sm text-gray-400 dark:text-[#71717a] mt-0.5">{description}</p>}
       </div>
       {action && <div>{action}</div>}
     </div>
@@ -365,5 +252,5 @@ export function SectionHeader({ title, description, action }) {
 // ■■■ SEPARATOR ■■■
 
 export function Separator() {
-  return <div className="h-px bg-gray-700 my-6" />;
+  return <div className="h-px bg-[#e2e8f0] dark:bg-[#27272a] my-5" />;
 }

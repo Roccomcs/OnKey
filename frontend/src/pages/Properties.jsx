@@ -563,13 +563,21 @@ function PropertyCard({ p, owners, leases, tenants, onClick, onEdit, onDelete })
 }
 
 // ── Componente principal ──────────────────────────────────────────────────────
-export function Properties({ properties, setProperties, owners, leases, tenants, initialFilter = "todos" }) {
+export function Properties({ properties, setProperties, owners, leases, tenants, initialFilter = "todos", initialPropertyId = null }) {
   const [search,         setSearch]         = useState("");
   const [filter,         setFilter]         = useState(initialFilter);
   const [modal,          setModal]          = useState(false);
   const [editing,        setEditing]        = useState(null);
   const [saving,         setSaving]         = useState(false);
   const [detailProperty, setDetailProperty] = useState(null);
+
+  useEffect(() => {
+    if (initialPropertyId && properties.length > 0) {
+      const p = properties.find(p => p.id === initialPropertyId);
+      if (p) setDetailProperty(p);
+    }
+  }, [initialPropertyId, properties]);
+
   const [form, setForm] = useState({
     address: "", type: "Departamento", price: "", status: "vacante",
     ownerId: "", operacion: "alquiler", localidad: "", provincia: "",
@@ -714,7 +722,13 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
             owners={owners}
             leases={leases}
             tenants={tenants}
-            onClick={() => setDetailProperty(p)}
+            onClick={() => {
+            const key = "recentlyViewedProperties";
+            const prev = JSON.parse(localStorage.getItem(key) || "[]");
+            const updated = [p.id, ...prev.filter(id => id !== p.id)].slice(0, 10);
+            localStorage.setItem(key, JSON.stringify(updated));
+            setDetailProperty(p);
+          }}
             onEdit={openEdit}
             onDelete={del}
           />

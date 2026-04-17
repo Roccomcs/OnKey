@@ -6,6 +6,17 @@ import { useIndice } from "../../hooks/useIndice";
 import { AjusteCalculadora } from "./ajusteCalculadora";
 import { apiCall } from "../../utils/helpers";
 
+// ─── Helper: rango de fechas para consulta BCRA ──────────────
+const MESES_PERIODO = { trimestral: 3, cuatrimestral: 4, semestral: 6, anual: 12 };
+
+function iclBcraRango(period) {
+  const meses = MESES_PERIODO[period] ?? 3;
+  const hoy   = new Date();
+  const fin   = new Date(hoy.getFullYear(), hoy.getMonth() + meses, hoy.getDate());
+  const fmt   = d => d.toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" });
+  return { inicio: fmt(hoy), fin: fmt(fin) };
+}
+
 // ─── Helper: format periodo seguro ───────────────────────────
 function fmtPeriodo(val) {
   if (!val) return "—";
@@ -275,22 +286,31 @@ export function AjusteSelector({
       {tipoAjuste === "ICL" && (
         <div className="space-y-3">
           {/* Info pill azul */}
-          <div className="flex gap-2.5 p-3.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
-            <Info size={15} className="text-blue-500 flex-shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <p className="text-xs font-semibold text-blue-700 dark:text-blue-300 mb-0.5">Ajuste por ICL</p>
-              <p className="text-xs text-blue-600 dark:text-blue-400 mb-2">{descriptions.ICL}</p>
-              <a
-                href="https://www.bcra.gob.ar/calculadora-icl"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
-              >
-                <ExternalLink size={11} />
-                Consultá la variación ICL en el BCRA
-              </a>
-            </div>
-          </div>
+          {(() => {
+            const { inicio, fin } = iclBcraRango(period);
+            return (
+              <div className="flex gap-2.5 p-3.5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+                <Info size={15} className="text-blue-500 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-xs font-semibold text-blue-700 dark:text-blue-300 mb-0.5">Ajuste por ICL</p>
+                  <p className="text-xs text-blue-600 dark:text-blue-400 mb-2">{descriptions.ICL}</p>
+                  <div className="flex items-center gap-2 mb-2 px-3 py-2 bg-blue-100 dark:bg-blue-800/30 rounded-lg">
+                    <span className="text-[10px] font-semibold text-blue-600 dark:text-blue-300 uppercase tracking-wide">Fechas a consultar en BCRA</span>
+                    <span className="ml-auto text-xs font-bold text-blue-700 dark:text-blue-200">{inicio} → {fin}</span>
+                  </div>
+                  <a
+                    href="https://www.bcra.gob.ar/calculadora-icl/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+                  >
+                    <ExternalLink size={11} />
+                    Consultá la variación ICL en el BCRA
+                  </a>
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Input variación */}
           <Field label="Variación ICL por período (%)">

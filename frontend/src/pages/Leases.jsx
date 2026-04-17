@@ -289,7 +289,7 @@ export function Leases({ properties, setProperties, owners, tenants, leases, set
               variants={fadeInUp}
               whileHover={{ scale: 1.02 }}
               onClick={() => setDetail(l)}
-              className="w-full text-left group bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] p-5 hover:border-gray-400 dark:hover:border-gray-600 transition-all cursor-pointer"
+              className="bg-white dark:bg-[#18181b] rounded-2xl border border-[#e2e8f0] dark:border-[#27272a] p-5 hover:border-blue-300 dark:hover:border-blue-500/40 hover:shadow-md dark:hover:shadow-black/40 transition-all cursor-pointer"
             >
               <div className="flex items-start gap-4">
                 {/* Icono */}
@@ -345,7 +345,7 @@ export function Leases({ properties, setProperties, owners, tenants, leases, set
                     </div>
                   )}
                   <button onClick={() => openEdit(l)}
-                    className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#333333] transition-colors">
+                    className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#27272a] transition-colors">
                     <Edit2 size={14} className="text-gray-400" />
                   </button>
                   <button onClick={() => del(l.id)}

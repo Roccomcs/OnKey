@@ -6,6 +6,12 @@ import { DocumentsSection }     from "../ui/DocumentsSection";
 import { useDocuments }         from "../../hooks/useDocuments";
 import { AjusteSelector }       from "./ajusteSelector";
 
+const fmtInputPrice = (val) => {
+  if (!val && val !== 0) return "";
+  const digits = String(val).replace(/\D/g, "");
+  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
+
 function LeaseDocuments({ leaseId }) {
   const docState = useDocuments("lease", leaseId);
   if (!leaseId) return (
@@ -104,8 +110,11 @@ export function LeaseFormModal({
               type="text"
               inputMode="decimal"
               placeholder={placeholderP}
-              value={form.rent}
-              onChange={e => setForm({ ...form, rent: e.target.value.replace(/[^0-9.]/g, '') })}
+              value={fmtInputPrice(form.rent)}
+              onChange={e => {
+                const raw = e.target.value.replace(/\./g, "").replace(/\D/g, "");
+                setForm({ ...form, rent: raw });
+              }}
             />
             {propiedadSeleccionada?.price && (
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-[#2d2d2d] px-1.5 py-0.5 rounded pointer-events-none">
