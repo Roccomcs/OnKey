@@ -301,16 +301,6 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
                 {loading ? 'Autenticando...' : 'Ingresar'}
               </button>
 
-              <div className="flex justify-center">
-                <GoogleLogin
-                  key="google-login"
-                  onSuccess={handleGoogleLoginSuccess}
-                  onError={handleGoogleError}
-                  text="signin_with"
-                  type="standard"
-                  disabled={loading || googleLoading}
-                />
-              </div>
             </form>
 
             <div className={`mt-6 pt-6 border-t text-center text-sm ${
@@ -408,21 +398,6 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
                 <span className={`relative px-2 ${dark ? 'bg-gray-800' : 'bg-white'}`}>O</span>
               </div>
 
-              <div className="text-center">
-                <p className={`text-sm mb-3 font-medium ${dark ? 'text-gray-300' : 'text-gray-700'}`}>
-                  Registrarse rápidamente con Google
-                </p>
-                <div className="flex justify-center">
-                  <GoogleLogin
-                    key="google-register"
-                    onSuccess={handleGoogleRegisterSuccess}
-                    onError={handleGoogleError}
-                    text="signup_with"
-                    type="standard"
-                    disabled={loading || googleLoading}
-                  />
-                </div>
-              </div>
             </form>
 
             <div className={`mt-6 pt-6 border-t text-center text-sm ${
@@ -436,6 +411,28 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
               </p>
             </div>
           </>
+        )}
+
+        {/* ── Botón Google único — nunca se desmonta para evitar doble initialize() ── */}
+        {view !== 'registered' && (
+          <div className="mt-4">
+            <div className={`relative text-center text-xs font-medium mb-3 ${dark ? 'text-gray-400' : 'text-gray-500'}`}>
+              <div className="absolute inset-x-0 top-1/2 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-gray-600" />
+              <span className={`relative px-2 ${dark ? 'bg-gray-800' : 'bg-white'}`}>O</span>
+            </div>
+            <p className={`text-sm text-center mb-2 ${dark ? 'text-gray-300' : 'text-gray-600'}`}>
+              {view === 'login' ? 'Ingresar con Google' : 'Registrarse con Google'}
+            </p>
+            <div className="flex justify-center">
+              <GoogleLogin
+                onSuccess={view === 'login' ? handleGoogleLoginSuccess : handleGoogleRegisterSuccess}
+                onError={handleGoogleError}
+                text={view === 'login' ? 'signin_with' : 'signup_with'}
+                type="standard"
+                disabled={loading || googleLoading}
+              />
+            </div>
+          </div>
         )}
       </div>
     </div>
