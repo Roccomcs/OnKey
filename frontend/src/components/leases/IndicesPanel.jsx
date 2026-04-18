@@ -303,7 +303,7 @@ export function IndicesPanel() {
   const [refreshKey, setRefreshKey] = useState(0);
 
   return (
-    <div className="bg-white dark:bg-[#262626] rounded-2xl border border-gray-100 dark:border-[#404040] overflow-hidden">
+    <div className="bg-white dark:bg-[#333333] rounded-2xl border border-gray-100 dark:border-[#404040] overflow-hidden">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}

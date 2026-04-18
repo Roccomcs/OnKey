@@ -17,7 +17,7 @@ export function StatCard({ icon: Icon, label, value, sub, color = "blue", trend 
       whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.3 }}
       viewport={{ once: true }}
-      className={`bg-white dark:bg-[#262626] rounded-xl border border-gray-200 dark:border-[#404040] ${c.border} p-6 hover:shadow-md transition-all duration-200`}
+      className={`bg-white dark:bg-[#333333] rounded-xl border border-gray-200 dark:border-[#404040] ${c.border} p-6 hover:shadow-md transition-all duration-200`}
     >
       <div className="flex items-start justify-between">
         <motion.div 

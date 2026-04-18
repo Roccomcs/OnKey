@@ -70,7 +70,7 @@ export default function App() {
 
   if (auth.loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f0f2f5] dark:bg-[#0d0d0f]">
+      <div className="flex min-h-screen items-center justify-center bg-[#f0f2f5] dark:bg-[#2a2a2a]">
         <div className="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin" />
       </div>
     );
@@ -148,7 +148,7 @@ export default function App() {
 
   if (dataLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f0f2f5] dark:bg-[#0d0d0f]">
+      <div className="flex min-h-screen items-center justify-center bg-[#f0f2f5] dark:bg-[#2a2a2a] p-8">
         <div className="text-center">
           <div className="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin mx-auto" />
           <p className="text-sm text-gray-500 dark:text-[#71717a] mt-3">Cargando datos…</p>
@@ -159,7 +159,7 @@ export default function App() {
 
   if (dataError) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f0f2f5] dark:bg-[#0d0d0f] p-8">
+      <div className="flex min-h-screen items-center justify-center bg-[#f0f2f5] dark:bg-[#2a2a2a] p-8">
         <div className="max-w-sm w-full space-y-4">
           <ErrorBox
             message={dataError}
@@ -178,7 +178,7 @@ export default function App() {
 
   return (
     <AuthContext.Provider value={auth}>
-      <div className="flex min-h-screen bg-[#f0f2f5] dark:bg-[#0d0d0f] font-sans">
+      <div className="flex min-h-screen bg-[#f0f2f5] dark:bg-[#2a2a2a] font-sans">
         <Sidebar
           active={active}
           setActive={handleSetActive}
@@ -194,7 +194,7 @@ export default function App() {
         />
         <main className="flex-1 flex flex-col overflow-auto">
           {/* Header con UserMenu */}
-          <div className="sticky top-0 z-40 bg-[#f0f2f5]/90 dark:bg-[#0d0d0f]/90 backdrop-blur-md">
+          <div className="sticky top-0 z-40 bg-[#f0f2f5]/90 dark:bg-[#2a2a2a]/90 backdrop-blur-md">
             <div className="px-6 py-1 flex justify-end">
               <UserMenu
                 user={auth.user}

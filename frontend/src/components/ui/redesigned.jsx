@@ -59,7 +59,7 @@ export function Card({ children, className = '', hover = false, onClick }) {
   return (
     <div
       onClick={onClick}
-      className={`bg-white dark:bg-[#18181b] border border-[#e2e8f0] dark:border-[#27272a] rounded-2xl p-5 ${hover ? 'hover:border-blue-200 dark:hover:border-blue-500/30 hover:shadow-md transition-all cursor-pointer' : ''} ${className}`}
+      className={`bg-white dark:bg-[#333333] border border-[#e2e8f0] dark:border-[#3a3a3a] rounded-2xl p-5 ${hover ? 'hover:border-blue-200 dark:hover:border-blue-500/30 hover:shadow-md transition-all cursor-pointer' : ''} ${className}`}
     >
       {children}
     </div>
@@ -81,7 +81,7 @@ export function CardProperty({ property }) {
       whileHover={{ y: -3 }}
       transition={{ duration: 0.2 }}
       viewport={{ once: true }}
-      className="bg-white dark:bg-[#18181b] border border-[#e2e8f0] dark:border-[#27272a] rounded-2xl p-5 hover:border-blue-200 dark:hover:border-blue-500/30 hover:shadow-md transition-all cursor-pointer"
+      className="bg-white dark:bg-[#333333] border border-[#e2e8f0] dark:border-[#3a3a3a] rounded-2xl p-5 hover:border-blue-200 dark:hover:border-blue-500/30 hover:shadow-md transition-all cursor-pointer"
     >
       <div className="flex items-start justify-between mb-3">
         <h3 className="text-sm font-semibold text-gray-800 dark:text-[#e4e4e7]">{property.address}</h3>
@@ -182,7 +182,7 @@ export function EmptyState({ icon, title, description, action }) {
 export function MetricCard({ label, value, trend, unit = '' }) {
   const isPos = trend > 0;
   return (
-    <div className="bg-white dark:bg-[#18181b] border border-[#e2e8f0] dark:border-[#27272a] rounded-2xl p-5">
+    <div className="bg-white dark:bg-[#333333] border border-[#e2e8f0] dark:border-[#3a3a3a] rounded-2xl p-5">
       <p className="text-xs text-gray-400 dark:text-[#71717a] uppercase tracking-wide font-medium mb-2">{label}</p>
       <p className="text-2xl font-bold text-gray-900 dark:text-[#f4f4f5]">
         {typeof value === 'number' ? value.toLocaleString() : value}{unit}

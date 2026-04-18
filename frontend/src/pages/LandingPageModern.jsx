@@ -240,15 +240,15 @@ const LandingPageModern = ({ onLoginClick, onSignupClick, dark, toggleDark }) =>
                 <div className="w-2.5 h-2.5 rounded-full bg-yellow-400/80" />
                 <div className="w-2.5 h-2.5 rounded-full bg-green-400/80" />
               </div>
-              <div className="flex-1 h-5 mx-3 bg-white dark:bg-[#262626] rounded-md border border-gray-200/50 dark:border-[#333] flex items-center justify-center">
+              <div className="flex-1 h-5 mx-3 bg-white dark:bg-[#333333] rounded-md border border-gray-200/50 dark:border-[#3a3a3a] flex items-center justify-center">
                 <span className="text-[10px] text-gray-400">onkey.app/dashboard</span>
               </div>
             </div>
 
             {/* App UI */}
-            <div className="flex bg-white dark:bg-[#141414]" style={{ height: '360px' }}>
+            <div className="flex bg-white dark:bg-[#2a2a2a]" style={{ height: '360px' }}>
               {/* Sidebar */}
-              <div className="w-[130px] flex-shrink-0 bg-gray-50 dark:bg-[#0f0f0f] border-r border-gray-200/50 dark:border-[#2d2d2d] p-3 flex flex-col gap-1">
+              <div className="w-[130px] flex-shrink-0 bg-gray-50 dark:bg-[#1f1f1f] border-r border-gray-200/50 dark:border-[#3a3a3a] p-3 flex flex-col gap-1">
                 <div className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider px-2 mb-2">OnKey</div>
                 {[
                   { label: 'Dashboard', active: true },

@@ -169,7 +169,7 @@ export function AjusteCalculadora({ tipoAjuste, periodicidad, rentaBase, ipcRows
               <tr
                 key={r.num}
                 className={`border-t border-gray-100 dark:border-[#404040]/60 ${
-                  r.num === 0 ? "bg-gray-50/50 dark:bg-[#1a1a1a]" : ""
+                  r.num === 0 ? "bg-gray-50/50 dark:bg-[#333333]" : ""
                 }`}
               >
                 <td className="px-3 py-2 font-medium text-gray-700 dark:text-gray-300">{r.label}</td>

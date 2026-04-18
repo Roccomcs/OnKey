@@ -24,7 +24,7 @@ function CustomTooltip({ active, payload, label, moneda }) {
   const symbol = moneda === "ARS" ? "$" : "USD $";
   
   return (
-    <div className="bg-[#18181b] dark:bg-[#18181b] light:bg-white border border-[#27272a] dark:border-[#27272a] rounded-xl px-4 py-3 shadow-2xl space-y-2">
+    <div className="bg-[#333333] dark:bg-[#333333] light:bg-white border border-[#3a3a3a] dark:border-[#3a3a3a] rounded-xl px-4 py-3 shadow-2xl space-y-2">
       <p className="text-xs text-[#71717a] mb-2 font-medium">{label}</p>
       <p className={`text-sm font-semibold ${color}`}>
         {moneda}: <span className="text-white">
@@ -53,7 +53,7 @@ function StatCard({ icon: Icon, label, value, trend, color = "blue", onClick }) 
       whileHover={{ y: -2 }}
       transition={{ duration: 0.2 }}
       onClick={onClick}
-      className={`w-full text-left bg-white dark:bg-[#262626] border border-gray-100 dark:border-[#404040] rounded-2xl p-5 transition-all hover:border-gray-400 dark:hover:border-gray-600 hover:shadow-lg dark:hover:shadow-black/40 ${onClick ? "cursor-pointer" : "cursor-default"}`}
+      className={`w-full text-left bg-white dark:bg-[#333333] border border-gray-100 dark:border-[#404040] rounded-2xl p-5 transition-all hover:border-gray-400 dark:hover:border-gray-600 hover:shadow-lg dark:hover:shadow-black/40 ${onClick ? "cursor-pointer" : "cursor-default"}`}
     >
       <div className="flex items-center justify-between mb-4">
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${iconBg[color] || iconBg.blue}`}>
@@ -186,7 +186,7 @@ function RecentPropertyCard({ property, onClick }) {
     <motion.button
       whileHover={{ y: -3 }}
       onClick={onClick}
-      className="w-full text-left bg-white dark:bg-[#262626] border border-gray-100 dark:border-[#404040] rounded-2xl overflow-hidden hover:border-gray-400 dark:hover:border-gray-600 hover:shadow-lg dark:hover:shadow-black/40 transition-all"
+      className="w-full text-left bg-white dark:bg-[#333333] border border-gray-100 dark:border-[#404040] rounded-2xl overflow-hidden hover:border-gray-400 dark:hover:border-gray-600 hover:shadow-lg dark:hover:shadow-black/40 transition-all"
     >
       {/* Imagen */}
       <div className="h-32 bg-gradient-to-br from-slate-800 to-slate-900 dark:from-[#1a1a2e] dark:to-[#0f0f1a] relative overflow-hidden">
@@ -330,7 +330,7 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive, da
         <motion.div
           {...fadeUp}
           transition={{ delay: 0.15 }}
-          className="lg:col-span-2 bg-white dark:bg-[#18181b] border border-[#e2e8f0] dark:border-[#27272a] rounded-2xl p-6"
+          className="lg:col-span-2 bg-white dark:bg-[#333333] border border-[#e2e8f0] dark:border-[#3a3a3a] rounded-2xl p-6"
         >
           <div className="flex items-start justify-between mb-4">
             <div>
@@ -370,7 +370,7 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive, da
               className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
                 selectedMoneda === "ARS"
                   ? "bg-blue-600 text-white"
-                  : "bg-gray-100 dark:bg-[#262626] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#333333]"
+                  : "bg-gray-100 dark:bg-[#333333] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#3f3f3f]"
               }`}
             >
               ARS
@@ -380,7 +380,7 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive, da
               className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
                 selectedMoneda === "USD"
                   ? "bg-green-600 text-white"
-                  : "bg-gray-100 dark:bg-[#262626] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#333333]"
+                  : "bg-gray-100 dark:bg-[#333333] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#3f3f3f]"
               }`}
             >
               USD
@@ -438,7 +438,7 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive, da
         <motion.div
           {...fadeUp}
           transition={{ delay: 0.2 }}
-          className="bg-white dark:bg-[#18181b] border border-[#e2e8f0] dark:border-[#27272a] rounded-2xl p-6 flex flex-col"
+          className="bg-white dark:bg-[#333333] border border-[#e2e8f0] dark:border-[#3a3a3a] rounded-2xl p-6 flex flex-col"
         >
           <p className="text-sm font-semibold text-gray-700 dark:text-[#a1a1aa] mb-4">Ocupación del Portafolio</p>
           <div className="flex-1 flex items-center justify-center">
@@ -450,7 +450,7 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive, da
       {/* ══ ACTIVIDAD + RENDIMIENTO ══ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Actividad reciente */}
-        <motion.div {...fadeUp} transition={{ delay: 0.25 }} className="bg-white dark:bg-[#18181b] border border-[#e2e8f0] dark:border-[#27272a] rounded-2xl p-6">
+        <motion.div {...fadeUp} transition={{ delay: 0.25 }} className="bg-white dark:bg-[#333333] border border-[#e2e8f0] dark:border-[#3a3a3a] rounded-2xl p-6">
           <p className="text-sm font-semibold text-gray-700 dark:text-[#a1a1aa] mb-5">Actividad Reciente</p>
           <div className="space-y-0">
             <ActivityLog activities={activities} loading={activitiesLoading} />
@@ -458,7 +458,7 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive, da
         </motion.div>
 
         {/* Rendimiento del mes */}
-        <motion.div {...fadeUp} transition={{ delay: 0.3 }} className="bg-white dark:bg-[#18181b] border border-[#e2e8f0] dark:border-[#27272a] rounded-2xl p-6">
+        <motion.div {...fadeUp} transition={{ delay: 0.3 }} className="bg-white dark:bg-[#333333] border border-[#e2e8f0] dark:border-[#3a3a3a] rounded-2xl p-6">
           <p className="text-sm font-semibold text-gray-700 dark:text-[#a1a1aa] mb-5">Rendimiento del Mes</p>
           <div className="space-y-5">
             <PerfRow
@@ -498,7 +498,7 @@ export function DashboardRedesigned({ properties, leases, tenants, setActive, da
                 key={alert.id}
                 whileHover={{ scale: 1.01 }}
                 onClick={() => setActive({ page: "leases", filter: "activo" })}
-                className="w-full text-left flex items-center justify-between px-4 py-3.5 rounded-xl border border-gray-200 dark:border-[#404040] bg-white dark:bg-[#262626] hover:border-gray-400 dark:hover:border-gray-600 transition-all"
+                className="w-full text-left flex items-center justify-between px-4 py-3.5 rounded-xl border border-gray-200 dark:border-[#404040] bg-white dark:bg-[#333333] hover:border-gray-400 dark:hover:border-gray-600 transition-all"
               >
                 <div className="flex items-center gap-3">
                   <Bell size={15} className={alert.level.color} />

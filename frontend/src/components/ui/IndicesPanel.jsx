@@ -188,7 +188,7 @@ export function IndicesPanel({ embedded = false }) {
 
   const wrapClass = embedded
     ? "space-y-4"
-    : "bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] p-5 space-y-4";
+    : "bg-white dark:bg-[#333333] rounded-2xl border border-gray-100 dark:border-[#404040] p-5 space-y-4";
 
   return (
     <div className={wrapClass}>
@@ -252,7 +252,7 @@ export function IndicesPanel({ embedded = false }) {
       {/* ── Divisor ── */}
       <div className="relative">
         <div className="h-px bg-gray-100 dark:bg-[#333333]" />
-        <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 px-3 text-xs text-gray-400 dark:text-gray-500">
+        <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-[#333333] px-3 text-xs text-gray-400 dark:text-gray-500">
           o cargá manualmente
         </span>
       </div>
@@ -321,7 +321,7 @@ export function IndicesPanel({ embedded = false }) {
               onClick={() => setActiveTab(t)}
               className={`px-4 py-1 text-xs font-semibold rounded-md transition-all ${
                 activeTab === t
-                  ? "bg-white dark:bg-[#262626] text-gray-800 dark:text-gray-200 shadow-sm"
+                  ? "bg-white dark:bg-[#333333] text-gray-800 dark:text-gray-200 shadow-sm"
                   : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
               }`}
             >

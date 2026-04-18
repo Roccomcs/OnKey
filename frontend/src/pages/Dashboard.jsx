@@ -19,7 +19,7 @@ function StatCard({ icon: Icon, label, value, color = "blue", trend, onClick }) 
   return (
     <button
       onClick={onClick}
-      className={`w-full text-left bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] p-5 transition-all duration-200 hover:shadow-md hover:ring-2 ${c.ring} ${onClick ? "cursor-pointer" : "cursor-default"}`}
+      className={`w-full text-left bg-white dark:bg-[#333333] rounded-2xl border border-gray-100 dark:border-[#404040] p-5 transition-all duration-200 hover:shadow-md hover:ring-2 ${c.ring} ${onClick ? "cursor-pointer" : "cursor-default"}`}
     >
       <div className="flex items-start justify-between">
         <div className={`p-2.5 rounded-xl ${c.bg}`}>
@@ -134,7 +134,7 @@ function DashboardOcupacion({ properties, setActive }) {
   return properties.length > 0 && (
     <button
       onClick={() => setActive({ page: "properties", filter: "todos" })}
-      className="w-full text-left bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] p-5 hover:shadow-md hover:ring-2 hover:ring-blue-200 dark:hover:ring-blue-800 transition-all"
+      className="w-full text-left bg-white dark:bg-[#333333] rounded-2xl border border-gray-100 dark:border-[#404040] p-5 hover:shadow-md hover:ring-2 hover:ring-blue-200 dark:hover:ring-blue-800 transition-all"
     >
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">

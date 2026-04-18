@@ -84,7 +84,7 @@ export function UserMenu({ user, dark, toggleDark, onLogout, onSelectPlanes }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -12, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#262626] rounded-xl border border-gray-100 dark:border-[#404040] shadow-xl overflow-hidden z-50"
+            className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#333333] rounded-xl border border-gray-100 dark:border-[#404040] shadow-xl overflow-hidden z-50"
           >
             {/* Header */}
             <div className="px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white">

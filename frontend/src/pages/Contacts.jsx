@@ -32,7 +32,7 @@ function ContactDetailModal({ person, tab, properties, leases, onClose, onEdit, 
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
       <div
-        className="relative bg-white dark:bg-[#262626] rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto border border-gray-100 dark:border-[#404040]"
+        className="relative bg-white dark:bg-[#333333] rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto border border-gray-100 dark:border-[#404040]"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -324,7 +324,7 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
       </motion.div>
 
       {/* Tabs */}
-      <motion.div className="flex gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-[#404040] rounded-xl p-1 w-fit" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3, delay: 0.1 }}>
+      <motion.div className="flex gap-1 bg-white dark:bg-[#333333] border border-gray-200 dark:border-[#404040] rounded-xl p-1 w-fit" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3, delay: 0.1 }}>
         <button onClick={() => { setTab("owners"); setSearch(""); }}
           className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${tab === "owners" ? "bg-blue-600 text-white" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"}`}>
           Propietarios
@@ -342,7 +342,7 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Buscar por nombre, email o teléfono..."
-          className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 dark:border-[#404040] rounded-xl bg-white dark:bg-[#2d2d2d] text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all placeholder:text-gray-400"
+          className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 dark:border-[#404040] rounded-xl bg-white dark:bg-[#333333] text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 outline-none transition-all placeholder:text-gray-400"
         />
       </div>
 
@@ -363,7 +363,7 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
               variants={fadeInUp}
               whileHover={{ scale: 1.02 }}
               onClick={() => setDetailPerson(person)}
-              className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] p-5 hover:border-gray-400 dark:hover:border-gray-600 transition-all cursor-pointer"
+              className="bg-white dark:bg-[#333333] rounded-2xl border border-gray-100 dark:border-[#404040] p-5 hover:border-gray-400 dark:hover:border-gray-600 transition-all cursor-pointer"
             >
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
@@ -385,7 +385,7 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
                   )}
                 </div>
                 <div className="flex flex-col gap-1 flex-shrink-0" onClick={e => e.stopPropagation()}>
-                  <button onClick={() => openEdit(person)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#333333]00 transition-colors">
+                  <button onClick={() => openEdit(person)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#3a3a3a] transition-colors">
                     <Edit2 size={13} className="text-gray-400" />
                   </button>
                   <button onClick={() => del(person.id)} className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
@@ -397,7 +397,7 @@ export function Contacts({ owners, setOwners, tenants, setTenants, properties, l
           );
         })}
         {list.length === 0 && (
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.3 }} className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-[#404040] py-16 text-center">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.3 }} className="bg-white dark:bg-[#333333] rounded-2xl border border-gray-100 dark:border-[#404040] py-16 text-center">
             <Users size={36} className="text-emerald-400 mx-auto mb-3" />
             <p className="font-medium text-gray-700 dark:text-gray-300">
               {search ? "Sin resultados para tu búsqueda" : `Sin ${tab === "owners" ? "propietarios" : "inquilinos"} registrados`}

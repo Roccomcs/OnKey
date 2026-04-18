@@ -13,9 +13,9 @@ const LandingPage = ({ onLoginClick, onSignupClick }) => {
   };
 
   return (
-    <div className="w-full bg-white dark:bg-[#0f0f0f] overflow-hidden">
+    <div className="w-full bg-white dark:bg-[#2a2a2a] overflow-hidden">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-white/80 dark:bg-[#0f0f0f]/90 backdrop-blur-md border-b border-gray-100 dark:border-[#1f1f1f] z-50">
+      <nav className="fixed top-0 w-full bg-white/80 dark:bg-[#2a2a2a]/90 backdrop-blur-md border-b border-gray-100 dark:border-[#3a3a3a] z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <img src="/Gemini_Generated_Image_5pu4335pu4335pu4-removebg-preview.png" alt="OnKey" className="h-12 w-auto" />
@@ -74,7 +74,7 @@ const LandingPage = ({ onLoginClick, onSignupClick }) => {
             </button>
             <button
               onClick={() => onLoginClick?.()}
-              className="px-8 py-4 bg-white dark:bg-[#1a1a1a] text-blue-600 dark:text-blue-400 border-2 border-blue-200 dark:border-[#2d2d2d] rounded-lg font-semibold hover:border-blue-600 dark:hover:border-blue-500 transition"
+              className="px-8 py-4 bg-white dark:bg-[#333333] text-blue-600 dark:text-blue-400 border-2 border-blue-200 dark:border-[#3a3a3a] rounded-lg font-semibold hover:border-blue-600 dark:hover:border-blue-500 transition"
             >
               ¿Ya tienes cuenta?
             </button>
@@ -107,7 +107,7 @@ const LandingPage = ({ onLoginClick, onSignupClick }) => {
       </section>
 
       {/* PROBLEMAS SECTION */}
-      <section className="py-20 px-6 bg-white dark:bg-[#0f0f0f]">
+      <section className="py-20 px-6 bg-white dark:bg-[#2a2a2a]">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <p className="text-blue-600 dark:text-blue-400 font-semibold mb-2">El problema real</p>
@@ -224,7 +224,7 @@ const LandingPage = ({ onLoginClick, onSignupClick }) => {
       </section>
 
       {/* FEATURES SECTION */}
-      <section id="features" className="py-20 px-6 bg-white dark:bg-[#141414]">
+      <section id="features" className="py-20 px-6 bg-white dark:bg-[#2a2a2a]">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <p className="text-blue-600 dark:text-blue-400 font-semibold mb-2">Funcionalidades</p>
@@ -236,7 +236,7 @@ const LandingPage = ({ onLoginClick, onSignupClick }) => {
           {/* Features Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Feature 1: Dashboard */}
-            <div className="p-8 rounded-xl border border-gray-200 dark:border-[#2d2d2d] dark:bg-[#1a1a1a] hover:border-blue-300 dark:hover:border-blue-600/50 hover:shadow-lg dark:hover:shadow-black/40 transition">
+            <div className="p-8 rounded-xl border border-gray-200 dark:border-[#3a3a3a] dark:bg-[#333333] hover:border-blue-300 dark:hover:border-blue-600/50 hover:shadow-lg dark:hover:shadow-black/40 transition">
               <div className="w-14 h-14 bg-blue-100 dark:bg-blue-500/15 rounded-lg flex items-center justify-center mb-4">
                 <BarChart3 className="text-blue-600 dark:text-blue-400" size={28} />
               </div>
@@ -452,7 +452,7 @@ const LandingPage = ({ onLoginClick, onSignupClick }) => {
       </section>
 
       {/* TESTIMONIALS SECTION */}
-      <section id="testimonios" className="py-20 px-6 bg-white dark:bg-[#0f0f0f]">
+      <section id="testimonios" className="py-20 px-6 bg-white dark:bg-[#2a2a2a]">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <p className="text-blue-600 dark:text-blue-400 font-semibold mb-2">Lo que dicen nuestros usuarios</p>
@@ -463,7 +463,7 @@ const LandingPage = ({ onLoginClick, onSignupClick }) => {
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Testimonial 1 */}
-            <div className="p-8 border border-gray-200 dark:border-[#2d2d2d] dark:bg-[#1a1a1a] rounded-xl">
+            <div className="p-8 border border-gray-200 dark:border-[#3a3a3a] dark:bg-[#333333] rounded-xl">
               <div className="flex gap-1 mb-4">
                 {[...Array(5)].map((_, i) => (
                   <span key={i} className="text-yellow-400">★</span>
@@ -479,7 +479,7 @@ const LandingPage = ({ onLoginClick, onSignupClick }) => {
             </div>
 
             {/* Testimonial 2 */}
-            <div className="p-8 border border-gray-200 dark:border-[#2d2d2d] dark:bg-[#1a1a1a] rounded-xl">
+            <div className="p-8 border border-gray-200 dark:border-[#3a3a3a] dark:bg-[#333333] rounded-xl">
               <div className="flex gap-1 mb-4">
                 {[...Array(5)].map((_, i) => (
                   <span key={i} className="text-yellow-400">★</span>
@@ -495,7 +495,7 @@ const LandingPage = ({ onLoginClick, onSignupClick }) => {
             </div>
 
             {/* Testimonial 3 */}
-            <div className="p-8 border border-gray-200 dark:border-[#2d2d2d] dark:bg-[#1a1a1a] rounded-xl">
+            <div className="p-8 border border-gray-200 dark:border-[#3a3a3a] dark:bg-[#333333] rounded-xl">
               <div className="flex gap-1 mb-4">
                 {[...Array(5)].map((_, i) => (
                   <span key={i} className="text-yellow-400">★</span>
@@ -528,7 +528,7 @@ const LandingPage = ({ onLoginClick, onSignupClick }) => {
 
           <div className="grid md:grid-cols-3 gap-8 mb-12">
             {/* Plan 1: Starter */}
-            <div className="rounded-xl border border-gray-200 dark:border-[#2d2d2d] dark:bg-[#1a1a1a] p-8">
+            <div className="rounded-xl border border-gray-200 dark:border-[#3a3a3a] dark:bg-[#333333] p-8\">
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Starter</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">Para freelancers e independientes</p>
               <div className="mb-6">
@@ -662,7 +662,7 @@ const LandingPage = ({ onLoginClick, onSignupClick }) => {
       </section>
 
       {/* FAQ SECTION */}
-      <section className="py-20 px-6 bg-white dark:bg-[#141414]">
+      <section className="py-20 px-6 bg-white dark:bg-[#2a2a2a]">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-16">
             <p className="text-blue-600 dark:text-blue-400 font-semibold mb-2">FAQ</p>
@@ -745,7 +745,7 @@ const LandingPage = ({ onLoginClick, onSignupClick }) => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="tu@email.com"
               required
-              className="flex-1 px-6 py-4 rounded-lg bg-white dark:bg-[#1a1a1a] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 focus:outline-none border border-transparent dark:border-[#333]"
+              className="flex-1 px-6 py-4 rounded-lg bg-white dark:bg-[#333333] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 focus:outline-none border border-transparent dark:border-[#3a3a3a]"
             />
             <button
               type="submit"
