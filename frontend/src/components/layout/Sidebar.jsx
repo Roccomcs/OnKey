@@ -16,8 +16,7 @@ export function Sidebar({ active, setActive, alertCount, dark, toggleDark, user,
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.3 }}
-      layout
-      className={`flex-shrink-0 bg-white dark:bg-[#1f1f1f] border-r border-gray-200 dark:border-[#2a2a2a] flex flex-col h-screen sticky top-0 overflow-hidden transition-all duration-300 ${
+      className={`flex-shrink-0 bg-white dark:bg-[#1f1f1f] border-r border-gray-200 dark:border-[#2a2a2a] flex flex-col h-screen sticky top-0 overflow-hidden transition-[width] duration-300 ease-in-out ${
         sidebarOpen ? "w-60" : "w-20"
       }`}
     >

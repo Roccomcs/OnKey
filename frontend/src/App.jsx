@@ -192,7 +192,7 @@ export default function App() {
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
         />
-        <main className="flex-1 flex flex-col overflow-auto">
+        <main className="flex-1 flex flex-col overflow-auto transition-[margin,width] duration-300 ease-in-out">
           {/* Header con UserMenu */}
           <div className="sticky top-0 z-40 bg-[#f0f2f5]/90 dark:bg-[#2a2a2a]/90 backdrop-blur-md">
             <div className="px-6 py-1 flex justify-end">
