@@ -115,6 +115,7 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
           apellido:     regForm.apellido.trim(),
           email:        regForm.email.trim(),
           password:     regForm.password,
+          tenantNombre: regForm.tenantNombre.trim() || `${regForm.nombre.trim()} ${regForm.apellido.trim()}`,
         }),
       });
       const data = await res.json();

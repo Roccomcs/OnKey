@@ -1,6 +1,10 @@
 import { useState } from 'react';
-import { jwtDecode } from 'jwt-decode';
 import { API } from '../utils/helpers';
+
+const decodeJwt = (token) => {
+  const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+  return JSON.parse(atob(payload));
+};
 
 export function useGoogleAuth({ onLoginSuccess, onRegisterReady }) {
   const [error, setError] = useState('');
@@ -27,9 +31,12 @@ export function useGoogleAuth({ onLoginSuccess, onRegisterReady }) {
         // Si el usuario no existe, permitir registro
         if (res.status === 401 && data.code === 'USER_NOT_FOUND') {
           setError('');
-          // Decodificar token para autocompletar formulario
-          const decoded = jwtDecode(credentialResponse.credential);
-          onRegisterReady?.(decoded);
+          const decoded = decodeJwt(credentialResponse.credential);
+          onRegisterReady?.({
+            email: decoded.email || '',
+            nombre: decoded.given_name || '',
+            apellido: decoded.family_name || '',
+          });
           return;
         }
         throw new Error(data.error || 'Error al iniciar sesión con Google');
@@ -58,7 +65,7 @@ export function useGoogleAuth({ onLoginSuccess, onRegisterReady }) {
         throw new Error('No se recibió credencial de Google');
       }
 
-      const decoded = jwtDecode(credentialResponse.credential);
+      const decoded = decodeJwt(credentialResponse.credential);
       const { email, given_name, family_name } = decoded;
 
       // Retornar datos para autocompletar formulario
