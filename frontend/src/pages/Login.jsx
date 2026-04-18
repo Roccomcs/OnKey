@@ -3,6 +3,7 @@ import { Eye, EyeOff, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import { API } from '../utils/helpers';
+import { useGoogleAuth } from '../hooks/useGoogleAuth';
 import '../App.css';
 
 export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClick, initialView = 'login' }) {
@@ -16,7 +17,32 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
 
   const [regForm, setRegForm] = useState({
     nombre: '', apellido: '', email: '',
-    password: '',
+    password: '', tenantNombre: '', dni: '',
+  });
+
+  // Google OAuth hook
+  const {
+    handleGoogleLoginSuccess,
+    handleGoogleRegisterSuccess,
+    handleGoogleError,
+    error: googleError,
+    loading: googleLoading,
+    clearError: clearGoogleError,
+  } = useGoogleAuth({
+    onLoginSuccess: () => {
+      onLoginSuccess?.();
+    },
+    onRegisterReady: (googleData) => {
+      // Auto-llenar formulario de registro
+      setRegForm(prev => ({
+        ...prev,
+        nombre: googleData.nombre || '',
+        apellido: googleData.apellido || '',
+        email: googleData.email || '',
+        tenantNombre: `${googleData.nombre || ''} ${googleData.apellido || ''}`.trim(),
+      }));
+      switchView('register');
+    },
   });
 
   useEffect(() => {
@@ -31,7 +57,11 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
   }, []);
 
   // Limpiar error al cambiar de vista
-  const switchView = (v) => { setView(v); setError(''); };
+  const switchView = (v) => { 
+    setView(v); 
+    setError(''); 
+    clearGoogleError();
+  };
 
   // ── Login ──────────────────────────────────────────────────────────────────
   const handleLoginChange = (e) => {
@@ -98,61 +128,8 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
   };
 
   // ── Google OAuth ───────────────────────────────────────────────────────────
-  const handleGoogleLoginSuccess = async (credentialResponse) => {
-    try {
-      setError('');
-      setLoading(true);
-      
-      const res = await fetch(`${API}/auth/google-login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ credential: credentialResponse.credential }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al iniciar sesión con Google');
-
-      // Guardar token y usuario
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('usuario', JSON.stringify(data.usuario));
-      localStorage.setItem('tenant', JSON.stringify(data.tenant));
-
-      onLoginSuccess?.();
-    } catch (err) {
-      setError(err.message || 'Error al iniciar sesión con Google');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleRegisterSuccess = async (credentialResponse) => {
-    try {
-      setError('');
-      setLoading(true);
-      
-      const decoded = jwtDecode(credentialResponse.credential);
-      const { email, given_name, family_name } = decoded;
-      
-      // Auto-rellenar el formulario con datos de Google
-      setRegForm(prev => ({
-        ...prev,
-        nombre: given_name || '',
-        apellido: family_name || '',
-        email: email,
-      }));
-      
-      // Mostrar mensaje informativo
-      setError('');
-    } catch (err) {
-      setError(err.message || 'Error al procesar datos de Google');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleError = () => {
-    setError('Error al conectar con Google');
-  };
+  // Se maneja ahora en el hook useGoogleAuth
+  // Aquí solo se usan los handlers del hook
 
   // ── Clases reutilizables ───────────────────────────────────────────────────
   const inputCls = `w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition ${
@@ -234,10 +211,10 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
         {view === 'login' && (
           <>
             <form onSubmit={handleLoginSubmit} className="space-y-4">
-              {error && (
+              {(error || googleError) && (
                 <div className={`border rounded-lg text-sm px-4 py-3 ${
                   dark ? 'bg-red-900/30 border-red-700 text-red-300' : 'bg-red-50 border-red-200 text-red-700'
-                }`}>{error}</div>
+                }`}>{error || googleError}</div>
               )}
 
               <div>
@@ -288,7 +265,7 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
                   onError={handleGoogleError}
                   text="signin_with"
                   type="standard"
-                  disabled={loading}
+                  disabled={loading || googleLoading}
                 />
               </div>
             </form>
@@ -316,10 +293,10 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
             </h2>
 
             <form onSubmit={handleRegSubmit} className="space-y-4">
-              {error && (
+              {(error || googleError) && (
                 <div className={`border rounded-lg text-sm px-4 py-3 ${
                   dark ? 'bg-red-900/30 border-red-700 text-red-300' : 'bg-red-50 border-red-200 text-red-700'
-                }`}>{error}</div>
+                }`}>{error || googleError}</div>
               )}
 
               <div className="grid grid-cols-2 gap-3">
@@ -398,7 +375,7 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
                     onError={handleGoogleError}
                     text="signup_with"
                     type="standard"
-                    disabled={loading}
+                    disabled={loading || googleLoading}
                   />
                 </div>
               </div>

@@ -228,6 +228,15 @@ app.use(cors({
   },
   credentials: true
 }));
+
+// Add security headers for Google OAuth
+app.use((req, res, next) => {
+  res.header('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+  res.header('Cross-Origin-Embedder-Policy', 'require-corp');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  next();
+});
+
 app.use(express.json());
 
 // ─── ROUTERS ─────────────────────────────────────────────────
