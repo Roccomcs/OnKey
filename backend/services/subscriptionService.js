@@ -8,14 +8,14 @@ import { createPreapproval, getPreapproval, cancelPreapproval } from './mpServic
 
 export async function getAllPlans() {
   const [planes] = await pool.query(
-    'SELECT * FROM planes WHERE activo = TRUE ORDER BY precio_mensual ASC'
+    'SELECT * FROM planes ORDER BY precio_mensual ASC'
   );
   return planes;
 }
 
 export async function getPlanById(planId) {
   const [planes] = await pool.query(
-    'SELECT * FROM planes WHERE id = ? AND activo = TRUE LIMIT 1',
+    'SELECT * FROM planes WHERE id = ? LIMIT 1',
     [planId]
   );
   return planes.length > 0 ? planes[0] : null;
@@ -50,7 +50,7 @@ export async function getPlanLimits(usuarioId, tenantId) {
  */
 export async function assignFreePlan(usuarioId, tenantId) {
   const [planes] = await pool.query(
-    "SELECT id FROM planes WHERE nombre IN ('Starter', 'Gratis') AND activo = TRUE LIMIT 1"
+    "SELECT id FROM planes WHERE nombre IN ('Starter', 'Gratis') LIMIT 1"
   );
   if (!planes.length) throw new Error('Plan Starter/Gratis no configurado en la BD. Ejecutá la migración 002-add-suscripciones.sql');
 
