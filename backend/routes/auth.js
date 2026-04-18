@@ -117,16 +117,18 @@ router.post('/register', async (req, res) => {
     await assignFreePlan(usuario.id, tenant.id);
 
     // Enviar mail de verificación
+    let mailError = null;
     try {
       await sendVerificationEmail(email, nombre, usuario.verificationToken);
     } catch (mailErr) {
       console.error('[register] Error enviando mail:', mailErr.message);
-      // No falla el registro si el mail falla — el usuario puede pedir reenvío
+      mailError = mailErr.message;
     }
 
     res.status(201).json({
       mensaje: `¡Listo! Revisá tu correo ${email} para verificar tu cuenta.`,
       tenantNombre: tenant.nombre,
+      ...(mailError && { mailWarning: 'No pudimos enviar el email de verificación. Usá el botón "Reenviar" al iniciar sesión.' }),
     });
   } catch (err) {
     console.error('[register]', err.message);

@@ -143,6 +143,7 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Error al registrar');
+      if (data.mailWarning) setError(data.mailWarning);
       setView('registered');
     } catch (err) {
       setError(err.message || 'Error al registrar');
