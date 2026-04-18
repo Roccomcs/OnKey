@@ -63,7 +63,7 @@ router.post('/resend-verification', async (req, res) => {
     if (!email) return res.status(400).json({ error: 'Se requiere el email' });
 
     const [rows] = await pool.query(
-      'SELECT id, nombre, email_verificado, verification_token FROM usuarios WHERE email = ? LIMIT 1',
+      'SELECT id, nombre, email_verificado FROM usuarios WHERE email = ? LIMIT 1',
       [email.trim().toLowerCase()]
     );
 
@@ -76,7 +76,7 @@ router.post('/resend-verification', async (req, res) => {
     const token = randomUUID().replace(/-/g, '');
     const expira = new Date(Date.now() + 24 * 60 * 60 * 1000);
     await pool.query(
-      'UPDATE usuarios SET verification_token = ?, token_expira = ? WHERE id = ?',
+      'UPDATE usuarios SET token_verificacion = ?, token_expira = ? WHERE id = ?',
       [token, expira, u.id]
     );
 
@@ -113,10 +113,14 @@ router.post('/register', async (req, res) => {
     // Crear usuario admin del tenant
     const usuario = await createUser(tenant.id, email, password, nombre.trim(), apellido?.trim(), dni?.trim(), 'admin');
 
-    // Asignar plan Starter
-    await assignFreePlan(usuario.id, tenant.id);
+    // Asignar plan Starter (no-fatal si falla)
+    try {
+      await assignFreePlan(usuario.id, tenant.id);
+    } catch (planErr) {
+      console.error('[register] Error asignando plan:', planErr.message);
+    }
 
-    // Enviar mail de verificación
+    // Enviar mail de verificación (no-fatal si falla)
     let mailError = null;
     try {
       await sendVerificationEmail(email, nombre, usuario.verificationToken);
@@ -135,7 +139,7 @@ router.post('/register', async (req, res) => {
     if (err.message.includes('ya existe') || err.message.includes('registrado')) {
       return res.status(409).json({ error: err.message });
     }
-    res.status(500).json({ error: 'Error al crear la cuenta' });
+    res.status(500).json({ error: err.message || 'Error al crear la cuenta' });
   }
 });
 
