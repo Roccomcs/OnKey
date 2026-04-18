@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Eye, EyeOff, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
 import { GoogleLogin } from '@react-oauth/google';
-import { jwtDecode } from 'jwt-decode';
 import { API } from '../utils/helpers';
 import { useGoogleAuth } from '../hooks/useGoogleAuth';
 import '../App.css';
@@ -14,6 +13,9 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
   const [showPassword, setShowPassword] = useState(false);
 
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendDone, setResendDone]       = useState(false);
+  const needsVerification = error.includes('verificar');
 
   const [regForm, setRegForm] = useState({
     nombre: '', apellido: '', email: '',
@@ -85,6 +87,27 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
       setError(err.message || 'Error al iniciar sesión');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // ── Resend verification ────────────────────────────────────────────────────
+  const handleResendVerification = async () => {
+    if (!loginForm.email) return setError('Ingresá tu email primero');
+    setResendLoading(true);
+    try {
+      const res = await fetch(`${API}/auth/resend-verification`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: loginForm.email }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error al reenviar');
+      setResendDone(true);
+      setError('');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -212,10 +235,27 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
         {view === 'login' && (
           <>
             <form onSubmit={handleLoginSubmit} className="space-y-4">
+              {resendDone && (
+                <div className={`border rounded-lg text-sm px-4 py-3 ${
+                  dark ? 'bg-green-900/30 border-green-700 text-green-300' : 'bg-green-50 border-green-200 text-green-700'
+                }`}>Mail de verificación reenviado. Revisá tu bandeja de entrada.</div>
+              )}
               {(error || googleError) && (
                 <div className={`border rounded-lg text-sm px-4 py-3 ${
                   dark ? 'bg-red-900/30 border-red-700 text-red-300' : 'bg-red-50 border-red-200 text-red-700'
-                }`}>{error || googleError}</div>
+                }`}>
+                  {error || googleError}
+                  {needsVerification && (
+                    <button
+                      type="button"
+                      onClick={handleResendVerification}
+                      disabled={resendLoading}
+                      className="block mt-2 underline font-medium hover:opacity-80 disabled:opacity-50"
+                    >
+                      {resendLoading ? 'Enviando...' : 'Reenviar email de verificación'}
+                    </button>
+                  )}
+                </div>
               )}
 
               <div>
@@ -262,6 +302,7 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
 
               <div className="flex justify-center">
                 <GoogleLogin
+                  key="google-login"
                   onSuccess={handleGoogleLoginSuccess}
                   onError={handleGoogleError}
                   text="signin_with"
@@ -372,6 +413,7 @@ export default function Login({ auth, verifiedStatus, onLoginSuccess, onBackClic
                 </p>
                 <div className="flex justify-center">
                   <GoogleLogin
+                    key="google-register"
                     onSuccess={handleGoogleRegisterSuccess}
                     onError={handleGoogleError}
                     text="signup_with"

@@ -1,5 +1,6 @@
 import express from 'express';
 import { OAuth2Client } from 'google-auth-library';
+import { randomUUID } from 'crypto';
 import {
   authenticateUser, createUser, createTenant,
   findTenantByName, verifyEmailToken, sendVerificationEmail
@@ -52,6 +53,38 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: err.message, code: err.message.includes('verificar') ? 'EMAIL_NOT_VERIFIED' : undefined });
     }
     res.status(500).json({ error: 'Error al autenticar' });
+  }
+});
+
+// ── POST /api/auth/resend-verification ───────────────────────────────────────
+router.post('/resend-verification', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Se requiere el email' });
+
+    const [rows] = await pool.query(
+      'SELECT id, nombre, email_verificado, verification_token FROM usuarios WHERE email = ? LIMIT 1',
+      [email.trim().toLowerCase()]
+    );
+
+    if (!rows.length) return res.status(404).json({ error: 'No existe una cuenta con ese email' });
+
+    const u = rows[0];
+    if (u.email_verificado) return res.status(400).json({ error: 'Este email ya fue verificado' });
+
+    // Generar nuevo token
+    const token = randomUUID().replace(/-/g, '');
+    const expira = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    await pool.query(
+      'UPDATE usuarios SET verification_token = ?, token_expira = ? WHERE id = ?',
+      [token, expira, u.id]
+    );
+
+    await sendVerificationEmail(email.trim().toLowerCase(), u.nombre, token);
+    res.json({ mensaje: 'Email de verificación reenviado' });
+  } catch (err) {
+    console.error('[resend-verification]', err.message);
+    res.status(500).json({ error: 'Error al reenviar el email' });
   }
 });
 
@@ -181,7 +214,7 @@ router.post('/google-login', async (req, res) => {
     // Con Google OAuth No requerimos email verificado
 
     // Generar JWT
-    const jti = require('crypto').randomUUID();
+    const jti = randomUUID();
     const token = jwt.sign(
       {
         id: u.id,
@@ -263,7 +296,7 @@ router.post('/google-register', async (req, res) => {
     );
 
     // Generar JWT para login automático
-    const jti = require('crypto').randomUUID();
+    const jti = randomUUID();
     const token = jwt.sign(
       {
         id: usuario.id,
