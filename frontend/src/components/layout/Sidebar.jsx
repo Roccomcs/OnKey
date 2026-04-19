@@ -35,7 +35,7 @@ export function Sidebar({ active, setActive, alertCount, dark, toggleDark, user,
         {/* Logo Image - Solo cuando está abierto */}
         {sidebarOpen && (
           <motion.img 
-            src="/Gemini_Generated_Image_5pu4335pu4335pu4-removebg-preview.png"
+            src="/OnKey-blue-to-purple-icon.svg"
             alt="OnKey"
             className="h-16 w-auto flex-shrink-0 transition-all duration-300 order-1"
             whileHover={{ scale: 1.05 }}

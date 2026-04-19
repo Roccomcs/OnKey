@@ -10,7 +10,7 @@ export const Navigation = () => {
         <div className="flex justify-between items-center">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <img src="/Gemini_Generated_Image_5pu4335pu4335pu4-removebg-preview.png" alt="OnKey" className="h-12 w-auto" />
+            <img src="/OnKey-blue-to-purple-icon.svg" alt="OnKey" className="h-12 w-auto" />
             <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent hidden sm:inline">OnKey</span>
           </div>
 

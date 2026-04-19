@@ -50,7 +50,7 @@ const LandingPageModern = ({ onLoginClick, onSignupClick, dark, toggleDark }) =>
       >
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
           <motion.div className="font-semibold text-xl text-gray-900 dark:text-gray-100 dark:text-gray-100 flex items-center gap-2">
-            <img src="/Gemini_Generated_Image_5pu4335pu4335pu4-removebg-preview.png" alt="OnKey" className="h-10 w-auto" />
+            <img src="/OnKey-blue-to-purple-icon.svg" alt="OnKey" className="h-10 w-auto" />
             <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent hidden sm:inline">OnKey</span>
           </motion.div>
 
