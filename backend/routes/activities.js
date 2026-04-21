@@ -10,19 +10,18 @@ const router = express.Router();
 // ─── REGISTRAR ACTIVIDAD ──────────────────────────────────────────────────────
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const { id: userId, tenantId } = req.user;
     const { type, title, description, relatedId, relatedType } = req.body;
 
     if (!type || !title) {
       return res.status(400).json({ error: 'type y title son requeridos' });
     }
 
-    const query = `
-      INSERT INTO activities (userId, type, title, description, relatedId, relatedType)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `;
-
-    const [result] = await pool.query(query, [userId, type, title, description || null, relatedId || null, relatedType || null]);
+    const [result] = await pool.query(
+      `INSERT INTO activities (userId, tenant_id, type, title, description, relatedId, relatedType)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [userId, tenantId, type, title, description || null, relatedId || null, relatedType || null]
+    );
 
     res.json({ success: true, id: result.insertId });
   } catch (err) {
@@ -34,19 +33,17 @@ router.post('/', authMiddleware, async (req, res) => {
 // ─── OBTENER ACTIVIDADES DEL USUARIO ──────────────────────────────────────────
 router.get('/', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const { id: userId, tenantId } = req.user;
     const limit = parseInt(req.query.limit) || 50;
 
-    const query = `
-      SELECT 
-        id, type, title, description, relatedId, relatedType, createdAt
-      FROM activities
-      WHERE userId = ?
-      ORDER BY createdAt DESC
-      LIMIT ?
-    `;
-
-    const [activities] = await pool.query(query, [userId, limit]);
+    const [activities] = await pool.query(
+      `SELECT id, type, title, description, relatedId, relatedType, createdAt
+       FROM activities
+       WHERE userId = ? AND (tenant_id = ? OR tenant_id IS NULL)
+       ORDER BY createdAt DESC
+       LIMIT ?`,
+      [userId, tenantId, limit]
+    );
 
     res.json(activities);
   } catch (err) {

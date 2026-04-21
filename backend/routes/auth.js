@@ -1,9 +1,9 @@
 import express from 'express';
 import { OAuth2Client } from 'google-auth-library';
-import { randomUUID } from 'crypto';
+import { randomUUID, randomBytes } from 'crypto';
 import {
   authenticateUser, createUser, createTenant,
-  findTenantByName, verifyEmailToken, sendVerificationEmail
+  findTenantByName, verifyEmailToken, sendVerificationEmail, hashPassword,
 } from '../services/authService.js';
 import { assignFreePlan } from '../services/subscriptionService.js';
 import { authMiddleware } from '../middleware/auth.js';
@@ -94,24 +94,53 @@ router.post('/register', async (req, res) => {
   try {
     const { tenantNombre, nombre, apellido, dni, email, password } = req.body;
 
-    if (!tenantNombre || !nombre || !email || !password) {
+    if (!tenantNombre || !nombre || !email || !password)
       return res.status(400).json({ error: 'Faltan campos obligatorios' });
-    }
     if (!email.includes('@')) return res.status(400).json({ error: 'Email inválido' });
     if (password.length < 6) return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
 
-    // Verificar que no exista ya ese tenant o email global
+    // Verificar nombre de tenant único
     const existingTenant = await findTenantByName(tenantNombre);
     if (existingTenant) return res.status(409).json({ error: 'Ya existe una inmobiliaria con ese nombre' });
 
-    const [emailCheck] = await pool.query('SELECT id FROM usuarios WHERE email = ? LIMIT 1', [email]);
-    if (emailCheck.length) return res.status(409).json({ error: 'Ese email ya está registrado' });
+    // Verificar email único en usuarios Y en tenants (ambas tablas tienen UNIQUE en email)
+    const [emailInUsers] = await pool.query('SELECT id FROM usuarios WHERE email = ? LIMIT 1', [email]);
+    if (emailInUsers.length) return res.status(409).json({ error: 'Ese email ya está registrado' });
 
-    // Crear tenant
-    const tenant = await createTenant(tenantNombre.trim(), email, 'starter');
+    const [emailInTenants] = await pool.query('SELECT id FROM tenants WHERE email = ? LIMIT 1', [email]);
+    if (emailInTenants.length) return res.status(409).json({ error: 'Ese email ya está registrado' });
 
-    // Crear usuario admin del tenant
-    const usuario = await createUser(tenant.id, email, password, nombre.trim(), apellido?.trim(), dni?.trim(), 'admin');
+    // Crear tenant + usuario en una transacción para evitar orphan tenants
+    const conn = await pool.getConnection();
+    let tenant, usuario;
+    try {
+      await conn.beginTransaction();
+
+      const [tResult] = await conn.query(
+        'INSERT INTO tenants (nombre, email, plan, activo) VALUES (?, ?, ?, TRUE)',
+        [tenantNombre.trim(), email, 'starter']
+      );
+      tenant = { id: tResult.insertId, nombre: tenantNombre.trim() };
+
+      const passwordHash = await hashPassword(password);
+      const verificationToken = randomBytes(32).toString('hex');
+      const tokenExpira = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+      const [uResult] = await conn.query(
+        `INSERT INTO usuarios
+          (tenant_id, email, password_hash, nombre, apellido, dni, rol, activo, email_verificado, token_verificacion, token_expira)
+         VALUES (?, ?, ?, ?, ?, ?, 'admin', TRUE, FALSE, ?, ?)`,
+        [tenant.id, email, passwordHash, nombre.trim(), apellido?.trim() || null, dni?.trim() || null, verificationToken, tokenExpira]
+      );
+      usuario = { id: uResult.insertId, tenantId: tenant.id, email, nombre: nombre.trim(), verificationToken };
+
+      await conn.commit();
+    } catch (err) {
+      await conn.rollback();
+      throw err;
+    } finally {
+      conn.release();
+    }
 
     // Asignar plan Starter (no-fatal si falla)
     try {
@@ -123,7 +152,7 @@ router.post('/register', async (req, res) => {
     // Enviar mail de verificación (no-fatal si falla)
     let mailError = null;
     try {
-      await sendVerificationEmail(email, nombre, usuario.verificationToken);
+      await sendVerificationEmail(email, usuario.nombre, usuario.verificationToken);
     } catch (mailErr) {
       console.error('[register] Error enviando mail:', mailErr.message);
       mailError = mailErr.message;
@@ -136,10 +165,11 @@ router.post('/register', async (req, res) => {
     });
   } catch (err) {
     console.error('[register]', err.message);
-    if (err.message.includes('ya existe') || err.message.includes('registrado')) {
-      return res.status(409).json({ error: err.message });
+    // Detectar duplicados independientemente de mayúsculas o código SQL
+    if (err.code === 'ER_DUP_ENTRY' || /ya existe|registrado|duplicate/i.test(err.message)) {
+      return res.status(409).json({ error: 'Ese email o nombre de inmobiliaria ya está registrado' });
     }
-    res.status(500).json({ error: err.message || 'Error al crear la cuenta' });
+    res.status(500).json({ error: 'Error al crear la cuenta' });
   }
 });
 
@@ -219,19 +249,6 @@ router.post('/google-login', async (req, res) => {
     if (!u.activo) return res.status(403).json({ error: 'Usuario inactivo' });
     // Con Google OAuth No requerimos email verificado
 
-    // Generar JWT
-    const jti = randomUUID();
-    const token = jwt.sign(
-      {
-        id: u.id,
-        email: googleData.email,
-        tenant_id: u.tenant_id,
-        jti: jti,
-      },
-      process.env.JWT_SECRET || 'secret-key',
-      { expiresIn: '24h' }
-    );
-
     const [tenants] = await pool.query('SELECT id, nombre FROM tenants WHERE id = ? LIMIT 1', [u.tenant_id]);
     const tenant = tenants[0] || { id: u.tenant_id, nombre: 'Inmobiliaria' };
 
@@ -241,6 +258,21 @@ router.post('/google-login', async (req, res) => {
       [u.id]
     );
     const usuario = usuariosFull[0] || { id: u.id, email: googleData.email };
+
+    // Generar JWT con el mismo esquema que el login estándar (tenantId camelCase)
+    const jti = randomUUID();
+    const token = jwt.sign(
+      {
+        id: u.id,
+        tenantId: u.tenant_id,
+        email: googleData.email,
+        nombre: usuario.nombre || '',
+        rol: usuario.rol || 'admin',
+        jti,
+      },
+      process.env.JWT_SECRET || 'secret-key',
+      { expiresIn: '24h' }
+    );
 
     res.json({ token, usuario, tenant });
   } catch (err) {
@@ -301,14 +333,16 @@ router.post('/google-register', async (req, res) => {
       [usuario.id]
     );
 
-    // Generar JWT para login automático
+    // Generar JWT con el mismo esquema que el login estándar (tenantId camelCase)
     const jti = randomUUID();
     const token = jwt.sign(
       {
         id: usuario.id,
+        tenantId: tenant.id,
         email: googleData.email,
-        tenant_id: tenant.id,
-        jti: jti,
+        nombre: usuario.nombre || googleData.firstName || '',
+        rol: 'admin',
+        jti,
       },
       process.env.JWT_SECRET || 'secret-key',
       { expiresIn: '24h' }
@@ -322,7 +356,7 @@ router.post('/google-register', async (req, res) => {
     });
   } catch (err) {
     console.error('[google-register]', err.message);
-    if (err.message.includes('ya existe') || err.message.includes('registrado')) {
+    if (err.code === 'ER_DUP_ENTRY' || /ya existe|registrado|duplicate/i.test(err.message)) {
       return res.status(409).json({ error: err.message });
     }
     res.status(500).json({ error: 'Error al crear la cuenta con Google' });

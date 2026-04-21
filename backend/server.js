@@ -202,6 +202,19 @@ async function runMigrations() {
       console.log(`  ✅ Columna '${name}' agregada`);
     }
   }
+
+  // Agregar tenant_id a activities si no existe (multi-tenancy explícito)
+  if (!(await columnExists("activities", "tenant_id"))) {
+    await pool.query(
+      "ALTER TABLE activities ADD COLUMN tenant_id INT UNSIGNED NULL, ADD INDEX idx_activities_tenant (tenant_id)"
+    );
+    // Backfill: copiar el tenant_id desde el usuario correspondiente
+    await pool.query(
+      "UPDATE activities a JOIN usuarios u ON u.id = a.userId SET a.tenant_id = u.tenant_id WHERE a.tenant_id IS NULL"
+    );
+    console.log("  ✅ Columna 'tenant_id' agregada a activities y backfilled");
+  }
+
   console.log("✅ Migraciones aplicadas");
 }
 
