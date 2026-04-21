@@ -151,17 +151,29 @@ router.post('/register', async (req, res) => {
 
     // Enviar mail de verificación (no-fatal si falla)
     let mailError = null;
+    let devAutoVerified = false;
     try {
       await sendVerificationEmail(email, usuario.nombre, usuario.verificationToken);
     } catch (mailErr) {
       console.error('[register] Error enviando mail:', mailErr.message);
       mailError = mailErr.message;
+
+      // Bypass de desarrollo: si el SMTP falla fuera de producción, auto-verificar
+      // para no bloquear el testing del login
+      if (process.env.NODE_ENV !== 'production') {
+        await pool.query('UPDATE usuarios SET email_verificado = 1 WHERE id = ?', [usuario.id]);
+        devAutoVerified = true;
+        console.warn('[register] DEV MODE: email_verificado = 1 forzado (SMTP no disponible)');
+      }
     }
 
     res.status(201).json({
-      mensaje: `¡Listo! Revisá tu correo ${email} para verificar tu cuenta.`,
+      mensaje: devAutoVerified
+        ? `Cuenta creada. (Dev: email auto-verificado, podés ingresar ya)`
+        : `¡Listo! Revisá tu correo ${email} para verificar tu cuenta.`,
       tenantNombre: tenant.nombre,
-      ...(mailError && { mailWarning: 'No pudimos enviar el email de verificación. Usá el botón "Reenviar" al iniciar sesión.' }),
+      ...(mailError && !devAutoVerified && { mailWarning: 'No pudimos enviar el email de verificación. Usá el botón "Reenviar" al iniciar sesión.' }),
+      ...(devAutoVerified && { devNote: 'SMTP no disponible en dev — cuenta verificada automáticamente' }),
     });
   } catch (err) {
     console.error('[register]', err.message);
@@ -180,11 +192,10 @@ router.get('/verificar-email', async (req, res) => {
     if (!token) return res.status(400).json({ error: 'Token requerido' });
 
     await verifyEmailToken(token);
-    // Redirigir al login con mensaje
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const frontendUrl = (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/$/, '');
     res.redirect(`${frontendUrl}/login?verified=1`);
   } catch (err) {
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const frontendUrl = (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/$/, '');
     res.redirect(`${frontendUrl}/login?verified=error&msg=${encodeURIComponent(err.message)}`);
   }
 });

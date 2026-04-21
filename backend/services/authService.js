@@ -15,25 +15,40 @@ function getJWTSecret() {
 // ─── Email ────────────────────────────────────────────────────────────────────
 
 function getMailTransporter() {
+  const user = process.env.SMTP_USER;
+  // Remover espacios por si la App Password de Google se pegó con formato de display
+  const pass = (process.env.SMTP_PASS || '').replace(/\s/g, '');
+
+  if (!user || !pass) {
+    throw new Error('SMTP_USER o SMTP_PASS no configurados en .env');
+  }
+
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: Number(process.env.SMTP_PORT) || 587,
     secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-    connectionTimeout: 5000,
-    greetingTimeout: 5000,
-    socketTimeout: 10000,
+    auth: { user, pass },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
   });
 }
 
 export async function sendVerificationEmail(email, nombre, token) {
-  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+  // Quitar trailing slash para evitar doble-slash en el link
+  const frontendUrl = (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/$/, '');
   const link = `${frontendUrl}/verificar-email?token=${token}`;
 
   const transporter = getMailTransporter();
+
+  // Verificar conexión SMTP antes de intentar enviar
+  try {
+    await transporter.verify();
+  } catch (verifyErr) {
+    console.error('[sendVerificationEmail] Falló la verificación SMTP:', verifyErr.message);
+    throw new Error(`Error de conexión SMTP: ${verifyErr.message}`);
+  }
+
   await transporter.sendMail({
     from: `"OnKey" <${process.env.SMTP_USER}>`,
     to: email,
