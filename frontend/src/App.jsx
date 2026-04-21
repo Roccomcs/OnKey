@@ -11,6 +11,7 @@ import { useApi }        from "./hooks/useApi";
 import { useTheme }      from "./hooks/useTheme";
 import { useAlerts }     from "./hooks/useAlerts";
 import { useAuth }       from "./hooks/useAuth";
+import { apiCall }       from "./utils/helpers";
 import Login             from "./pages/Login";
 import Planes            from "./pages/planes";
 import LandingPageModern from "./pages/LandingPageModern";
@@ -67,6 +68,23 @@ export default function App() {
   const { data: subscription, loading: lSub } = useApi(auth.token ? "/subscriptions/mi-plan" : null, auth.token);
 
   const { badgeCount, dismiss, activeAlerts } = useAlerts(leases);
+
+  const [photosCache, setPhotosCache] = useState({});
+
+  useEffect(() => {
+    if (!properties || properties.length === 0 || !auth.token) return;
+    let cancelled = false;
+    Promise.all(
+      properties.map(p =>
+        apiCall(`/properties/${p.id}/photos`)
+          .then(data => [p.id, data])
+          .catch(() => [p.id, []])
+      )
+    ).then(entries => {
+      if (!cancelled) setPhotosCache(Object.fromEntries(entries));
+    });
+    return () => { cancelled = true; };
+  }, [properties, auth.token]);
 
   if (auth.loading) {
     return (
@@ -210,7 +228,7 @@ export default function App() {
           <div className="flex-1 overflow-auto flex flex-col">
             <div className="flex-1 px-8 py-2">
               {active === "dashboard"     && <Dashboard     {...shared} setActive={handleSetActive} activeAlerts={activeAlerts} dark={dark} />}
-              {active === "properties"    && <Properties    {...shared} initialFilter={propFilter} initialPropertyId={selectedPropertyId} />}
+              {active === "properties"    && <Properties    {...shared} initialFilter={propFilter} initialPropertyId={selectedPropertyId} photosCache={photosCache} setPhotosCache={setPhotosCache} />}
               {active === "contacts"      && <Contacts      {...shared} />}
               {active === "leases"        && <Leases        {...shared} setActive={handleSetActive} initialTab={leaseFilter} />}
               {active === "notifications" && <Notifications {...shared} activeAlerts={activeAlerts} dismiss={dismiss} setActive={handleSetActive} />}

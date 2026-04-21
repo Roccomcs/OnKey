@@ -35,8 +35,8 @@ const fmtInputPrice = (val) => {
 };
 
 // ── Hook: fotos de propiedad ──────────────────────────────────────────────────
-function usePropertyPhotos(propertyId) {
-  const [photos,  setPhotos]  = useState([]);
+function usePropertyPhotos(propertyId, initialPhotos) {
+  const [photos,  setPhotos]  = useState(initialPhotos || []);
   const [loading, setLoading] = useState(false);
 
   const load = async () => {
@@ -49,7 +49,13 @@ function usePropertyPhotos(propertyId) {
     finally { setLoading(false); }
   };
 
-  useEffect(() => { load(); }, [propertyId]);
+  useEffect(() => {
+    if (initialPhotos && initialPhotos.length > 0) {
+      setPhotos(initialPhotos);
+    } else {
+      load();
+    }
+  }, [propertyId]);
 
   const upload = async (files) => {
     const fd = new FormData();
@@ -254,9 +260,9 @@ function PropertyDocuments({ propertyId }) {
 }
 
 // ── PropertyDetailModal ───────────────────────────────────────────────────────
-function PropertyDetailModal({ property, owners, leases, tenants, onClose, onEdit, onDelete }) {
+function PropertyDetailModal({ property, owners, leases, tenants, onClose, onEdit, onDelete, initialPhotos }) {
   if (!property) return null;
-  const { photos } = usePropertyPhotos(property.id);
+  const { photos } = usePropertyPhotos(property.id, initialPhotos);
   const owner       = owners.find(o => o.id === property.ownerId);
   const activeLease = leases?.find(l => l.propertyId === property.id && l.status === "activo");
   const leaseTenant = activeLease ? tenants?.find(t => t.id === activeLease.tenantId) : null;
@@ -471,8 +477,8 @@ function PropertyDetailModal({ property, owners, leases, tenants, onClose, onEdi
 }
 
 // ── PropertyCard horizontal ───────────────────────────────────────────────────
-function PropertyCard({ p, owners, leases, tenants, onClick, onEdit, onDelete }) {
-  const { photos } = usePropertyPhotos(p.id);
+function PropertyCard({ p, owners, leases, tenants, onClick, onEdit, onDelete, initialPhotos }) {
+  const { photos } = usePropertyPhotos(p.id, initialPhotos);
   const owner       = owners.find(o => o.id === p.ownerId);
   const activeLease = leases?.find(l => l.propertyId === p.id && l.status === "activo");
   const tenant      = activeLease ? tenants?.find(t => t.id === activeLease.tenantId) : null;
@@ -568,7 +574,7 @@ function PropertyCard({ p, owners, leases, tenants, onClick, onEdit, onDelete })
 }
 
 // ── Componente principal ──────────────────────────────────────────────────────
-export function Properties({ properties, setProperties, owners, leases, tenants, initialFilter = "todos", initialPropertyId = null }) {
+export function Properties({ properties, setProperties, owners, leases, tenants, initialFilter = "todos", initialPropertyId = null, photosCache = {}, setPhotosCache }) {
   const [search,         setSearch]         = useState("");
   const [filter,         setFilter]         = useState(initialFilter);
   const [modal,          setModal]          = useState(false);
@@ -752,6 +758,7 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
             owners={owners}
             leases={leases}
             tenants={tenants}
+            initialPhotos={photosCache[p.id]}
             onClick={() => {
             const key = "recentlyViewedProperties";
             const prev = JSON.parse(localStorage.getItem(key) || "[]");
@@ -783,6 +790,7 @@ export function Properties({ properties, setProperties, owners, leases, tenants,
           owners={owners}
           leases={leases || []}
           tenants={tenants || []}
+          initialPhotos={photosCache[detailProperty.id]}
           onClose={() => setDetailProperty(null)}
           onEdit={(p) => { setDetailProperty(null); openEdit(p); }}
           onDelete={(id) => { setDetailProperty(null); del(id); }}
