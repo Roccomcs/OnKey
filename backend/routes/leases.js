@@ -3,9 +3,13 @@ import { pool, columnExists }    from "../db.js";
 import { mapLease } from "../mappers.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { subscriptionMiddleware, checkLimits } from "../middleware/subscription.js";
+import { pagination, paginatedResponse } from "../middleware/pagination.js";
+import { validateDate, validateDateRange, validateRent, validatePercentage } from "../validators.js";
 import { calcularProximaActualizacion } from "../services/rentCalc.js";
+import { createLogger } from "../middleware/logging.js";
 
 const router = Router();
+const logger = createLogger('leases');
 
 // Todas las rutas requieren autenticación y suscripción activa
 router.use(authMiddleware);
@@ -31,16 +35,30 @@ async function getIndiceBase(conn, tipo, fecha) {
 }
 
 // ─── GET /api/leases ──────────────────────────────────────────
-router.get("/", async (req, res) => {
+router.get("/", pagination(20), async (req, res) => {
   try {
     const [rows] = await pool.query(`
       SELECT * FROM contratos
       WHERE estado_contrato NOT IN ('borrador') AND tenant_id = ?
       ORDER BY fecha_fin ASC
-    `, [req.user.tenantId]);
-    res.json(rows.map(mapLease));
+      LIMIT ? OFFSET ?
+    `, [req.user.tenantId, req.pagination.limit, req.pagination.offset]);
+
+    // Contar total
+    const [[{ total }]] = await pool.query(
+      `SELECT COUNT(*) AS total FROM contratos 
+       WHERE estado_contrato NOT IN ('borrador') AND tenant_id = ?`,
+      [req.user.tenantId]
+    );
+
+    res.json(paginatedResponse(
+      rows.map(mapLease),
+      req.pagination.page,
+      req.pagination.pageSize,
+      total
+    ));
   } catch (err) {
-    console.error(err);
+    logger.error('Error al obtener contratos', { error: err.message });
     res.status(500).json({ error: "Error al obtener contratos" });
   }
 });
@@ -58,6 +76,27 @@ router.post("/", checkLimits('contratos'), async (req, res) => {
 
   if (!propertyId || !tenantId || !startDate || !endDate || !rent)
     return res.status(400).json({ error: "Faltan campos obligatorios" });
+
+  // ✅ Validar fechas
+  if (!validateDate(startDate)) {
+    return res.status(400).json({ error: "Fecha de inicio inválida (formato: YYYY-MM-DD)" });
+  }
+  if (!validateDate(endDate)) {
+    return res.status(400).json({ error: "Fecha de fin inválida (formato: YYYY-MM-DD)" });
+  }
+  if (!validateDateRange(startDate, endDate)) {
+    return res.status(400).json({ error: "La fecha de fin debe ser posterior a la fecha de inicio" });
+  }
+
+  // ✅ Validar monto de alquiler
+  if (!validateRent(rent)) {
+    return res.status(400).json({ error: "Monto de alquiler inválido (debe ser entre $0.01 y $999,999.99)" });
+  }
+
+  // ✅ Validar porcentaje de ajuste (si es FIJO)
+  if (tipoAjuste === "FIJO" && increase !== undefined && !validatePercentage(increase)) {
+    return res.status(400).json({ error: "Porcentaje de ajuste inválido (debe estar entre 0 y 100)" });
+  }
 
   const conn = await pool.getConnection();
   try {
@@ -165,7 +204,7 @@ router.post("/", checkLimits('contratos'), async (req, res) => {
     });
   } catch (err) {
     await conn.rollback();
-    console.error(err);
+    logger.error('Error al crear contrato', { error: err.message });
     res.status(500).json({ error: err.message || "Error al crear contrato" });
   } finally {
     conn.release();
@@ -187,6 +226,27 @@ router.put("/:id", async (req, res) => {
 
   if (!propertyId || !tenantId || !startDate || !endDate || !rent)
     return res.status(400).json({ error: "Faltan campos obligatorios" });
+
+  // ✅ Validar fechas
+  if (!validateDate(startDate)) {
+    return res.status(400).json({ error: "Fecha de inicio inválida (formato: YYYY-MM-DD)" });
+  }
+  if (!validateDate(endDate)) {
+    return res.status(400).json({ error: "Fecha de fin inválida (formato: YYYY-MM-DD)" });
+  }
+  if (!validateDateRange(startDate, endDate)) {
+    return res.status(400).json({ error: "La fecha de fin debe ser posterior a la fecha de inicio" });
+  }
+
+  // ✅ Validar monto de alquiler
+  if (!validateRent(rent)) {
+    return res.status(400).json({ error: "Monto de alquiler inválido (debe ser entre $0.01 y $999,999.99)" });
+  }
+
+  // ✅ Validar porcentaje de ajuste (si es FIJO)
+  if (tipoAjuste === "FIJO" && increase !== undefined && !validatePercentage(increase)) {
+    return res.status(400).json({ error: "Porcentaje de ajuste inválido (debe estar entre 0 y 100)" });
+  }
 
   const conn = await pool.getConnection();
   try {
@@ -271,7 +331,7 @@ router.put("/:id", async (req, res) => {
     res.json(mapLease(row));
   } catch (err) {
     await conn.rollback();
-    console.error(err);
+    logger.error('Error al actualizar contrato', { error: err.message });
     res.status(500).json({ error: err.message || "Error al actualizar contrato" });
   } finally {
     conn.release();
@@ -308,7 +368,7 @@ router.delete("/:id", async (req, res) => {
     res.json({ ok: true });
   } catch (err) {
     await conn.rollback();
-    console.error(err);
+    logger.error('Error al eliminar contrato', { error: err.message });
     res.status(500).json({ error: "Error al eliminar contrato" });
   } finally {
     conn.release();
@@ -348,7 +408,7 @@ router.patch("/:id/status", async (req, res) => {
     res.json({ ok: true });
   } catch (err) {
     await conn.rollback();
-    console.error(err);
+    logger.error('Error al actualizar estado del contrato', { error: err.message });
     res.status(500).json({ error: "Error al actualizar estado del contrato" });
   } finally {
     conn.release();
@@ -374,7 +434,7 @@ router.get("/indices/:tipo", async (req, res) => {
       valor: parseFloat(r.valor),
     })));
   } catch (err) {
-    console.error(err);
+    logger.error('Error al obtener índices', { error: err.message });
     res.status(500).json({ error: "Error al obtener índices" });
   }
 });

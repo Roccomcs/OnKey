@@ -3,27 +3,47 @@ import { pool } from "../db.js";
 import { mapOwner, splitName } from "../mappers.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { subscriptionMiddleware, checkLimits } from "../middleware/subscription.js";
+import { pagination, paginatedResponse } from "../middleware/pagination.js";
+import { validateEmail, validatePhone, validateDocument, normalizeEmail } from "../validators.js";
+import { createLogger } from "../middleware/logging.js";
 
 const router = Router();
+const logger = createLogger('owners');
 
 // Todas las rutas requieren autenticación y suscripción activa
 router.use(authMiddleware);
 router.use(subscriptionMiddleware);
 
 // GET /api/owners
-router.get("/", async (req, res) => {
+router.get("/", pagination(20), async (req, res) => {
   try {
+    // Obtener propietarios con paginación
     const [rows] = await pool.query(`
-      SELECT pe.*, GROUP_CONCAT(pr.id ORDER BY pr.id) AS properties
+      SELECT pe.*,
+        GROUP_CONCAT(pr.id ORDER BY pr.id) AS properties
       FROM personas pe
       LEFT JOIN propiedades pr ON pr.id_propietario = pe.id AND pr.activo = 1 AND pr.tenant_id = ?
       WHERE pe.activo = 1 AND pe.tipo_persona IN ('propietario', 'ambos') AND pe.tenant_id = ?
       GROUP BY pe.id
       ORDER BY pe.apellido, pe.nombre
-    `, [req.user.tenantId, req.user.tenantId]);
-    res.json(rows.map(mapOwner));
+      LIMIT ? OFFSET ?
+    `, [req.user.tenantId, req.user.tenantId, req.pagination.limit, req.pagination.offset]);
+
+    // Contar total
+    const [[{ total }]] = await pool.query(
+      `SELECT COUNT(*) AS total FROM personas 
+       WHERE activo = 1 AND tipo_persona IN ('propietario', 'ambos') AND tenant_id = ?`,
+      [req.user.tenantId]
+    );
+
+    res.json(paginatedResponse(
+      rows.map(mapOwner),
+      req.pagination.page,
+      req.pagination.pageSize,
+      total
+    ));
   } catch (err) {
-    console.error(err);
+    logger.error('Error al obtener propietarios', { error: err.message });
     res.status(500).json({ error: "Error al obtener propietarios" });
   }
 });
@@ -32,20 +52,31 @@ router.get("/", async (req, res) => {
 router.post("/", checkLimits('contactos'), async (req, res) => {
   const { name, email, phone, document } = req.body;
   if (!name || !email) return res.status(400).json({ error: "Faltan campos: name, email" });
-  if (!email.includes("@")) return res.status(400).json({ error: "Ingrese un mail válido" });
+  
+  // Validar email
+  if (!validateEmail(email)) return res.status(400).json({ error: "Email inválido" });
+  
+  // Validar teléfono si se proporciona
+  if (phone && !validatePhone(phone)) return res.status(400).json({ error: "Teléfono inválido" });
+  
+  // Validar documento si se proporciona
+  if (document && !validateDocument(document)) return res.status(400).json({ error: "Documento inválido (7-8 dígitos)" });
+  
   const { nombre, apellido } = splitName(name);
+  const normalizedEmail = normalizeEmail(email);
+  
   try {
     const [result] = await pool.query(
       `INSERT INTO personas (tenant_id, tipo_persona, nombre, apellido, documento_tipo, documento_nro, telefono, email, activo)
        VALUES (?, 'propietario', ?, ?, 'DNI', ?, ?, ?, 1)`,
-      [req.user.tenantId, nombre, apellido, document || null, phone || null, email]
+      [req.user.tenantId, nombre, apellido, document || null, phone || null, normalizedEmail]
     );
     const [[row]] = await pool.query("SELECT *, NULL AS properties FROM personas WHERE id = ?", [result.insertId]);
     res.status(201).json(mapOwner({ ...row, properties: null }));
   } catch (err) {
     if (err.code === "ER_DUP_ENTRY")
       return res.status(409).json({ error: "Ya existe una persona con ese email o documento" });
-    console.error(err);
+    logger.error('Error al crear propietario', { error: err.message });
     res.status(500).json({ error: "Error al crear propietario" });
   }
 });
@@ -70,7 +101,7 @@ router.put("/:id", async (req, res) => {
     );
     res.json(mapOwner(row));
   } catch (err) {
-    console.error(err);
+    logger.error('Error al actualizar propietario', { error: err.message });
     res.status(500).json({ error: "Error al actualizar propietario" });
   }
 });
@@ -128,7 +159,7 @@ router.delete("/:id", async (req, res) => {
     res.json({ ok: true });
   } catch (err) {
     await conn.rollback();
-    console.error(err);
+    logger.error('Error al eliminar propietario', { error: err.message });
     res.status(500).json({ error: "Error al eliminar propietario" });
   } finally {
     conn.release();

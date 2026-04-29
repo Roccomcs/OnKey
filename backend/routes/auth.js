@@ -7,34 +7,44 @@ import {
 } from '../services/authService.js';
 import { assignFreePlan } from '../services/subscriptionService.js';
 import { authMiddleware } from '../middleware/auth.js';
+import { setAuthCookie, clearAuthCookie } from '../middleware/httpOnlyCookies.js';
+import { loginLimiter, registerLimiter, emailResendLimiter } from '../middleware/rateLimiting.js';
+import { createLogger } from '../middleware/logging.js';
 import { pool } from '../db.js';
 import jwt from 'jsonwebtoken';
+import { validateEmail, validatePassword, normalizeEmail } from '../validators.js';
 
 const router = express.Router();
+const logger = createLogger('auth');
 
 // ── POST /api/auth/login ──────────────────────────────────────────────────────
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Se requieren email y contraseña' });
 
+    // Validar formato de email
+    if (!validateEmail(email)) {
+      return res.status(400).json({ error: 'Email inválido' });
+    }
+
     // 🔍 Buscar usuario por email (búsqueda global, no por tenant)
     const [usuarios] = await pool.query(
       'SELECT id, tenant_id, activo, email_verificado, nombre FROM usuarios WHERE email = ? ORDER BY activo DESC, id ASC LIMIT 1',
-      [email]
+      [normalizeEmail(email)]
     );
     if (!usuarios.length) {
-      console.warn(`[login] Usuario no encontrado: ${email}`);
+      logger.warn('Usuario no encontrado', { email: normalizeEmail(email) });
       return res.status(401).json({ error: 'Email o contraseña incorrectos' });
     }
 
     const u = usuarios[0];
     if (!u.activo) {
-      console.warn(`[login] Usuario inactivo: ${email}`);
+      logger.warn('Usuario inactivo', { userId: u.id, email: normalizeEmail(email) });
       return res.status(403).json({ error: 'Usuario inactivo' });
     }
     if (!u.email_verificado) {
-      console.warn(`[login] Email no verificado: ${email}`);
+      logger.warn('Email no verificado', { userId: u.id, email: normalizeEmail(email) });
       return res.status(403).json({ error: 'Debés verificar tu email antes de ingresar', code: 'EMAIL_NOT_VERIFIED' });
     }
 
@@ -45,10 +55,13 @@ router.post('/login', async (req, res) => {
     const [tenants] = await pool.query('SELECT id, nombre FROM tenants WHERE id = ? LIMIT 1', [u.tenant_id]);
     const tenant = tenants[0] || { id: u.tenant_id, nombre: 'Inmobiliaria' };
 
-    console.log(`✅ [login] Usuario autenticado: ${email} (tenant: ${u.tenant_id})`);
+    // ✅ SECURITY: Set JWT en HttpOnly cookie (XSS protection)
+    setAuthCookie(res, result.token);
+
+    logger.info('Usuario autenticado exitosamente', { userId: u.id, tenantId: u.tenant_id });
     res.json({ token: result.token, usuario: result.usuario, tenant });
   } catch (err) {
-    console.error('[login] Error:', err.message);
+    logger.error('Error en login', { email: normalizeEmail(email), error: err.message });
     if (err.message.includes('Email o contraseña') || err.message.includes('verificar')) {
       return res.status(401).json({ error: err.message, code: err.message.includes('verificar') ? 'EMAIL_NOT_VERIFIED' : undefined });
     }
@@ -57,7 +70,7 @@ router.post('/login', async (req, res) => {
 });
 
 // ── POST /api/auth/resend-verification ───────────────────────────────────────
-router.post('/resend-verification', async (req, res) => {
+router.post('/resend-verification', emailResendLimiter, async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Se requiere el email' });
@@ -83,32 +96,43 @@ router.post('/resend-verification', async (req, res) => {
     await sendVerificationEmail(email.trim().toLowerCase(), u.nombre, token);
     res.json({ mensaje: 'Email de verificación reenviado' });
   } catch (err) {
-    console.error('[resend-verification]', err.message);
+    logger.error('Error al reenviar verificación', { email: normalizeEmail(req.body.email || ''), error: err.message });
     res.status(500).json({ error: 'Error al reenviar el email' });
   }
 });
 
 // ── POST /api/auth/register ───────────────────────────────────────────────────
 // Crea un tenant propio + usuario admin + asigna plan Starter + manda mail
-router.post('/register', async (req, res) => {
+router.post('/register', registerLimiter, async (req, res) => {
   try {
     const { tenantNombre, nombre, apellido, dni, email, password } = req.body;
 
     if (!tenantNombre || !nombre || !email || !password)
       return res.status(400).json({ error: 'Faltan campos obligatorios' });
-    if (!email.includes('@')) return res.status(400).json({ error: 'Email inválido' });
-    if (password.length < 6) return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
+    
+    // Validar email
+    if (!validateEmail(email)) 
+      return res.status(400).json({ error: 'Email inválido' });
+    
+    // Validar contraseña (OWASP: 12+ chars, mayúscula, número, símbolo)
+    const pwValidation = validatePassword(password);
+    if (!pwValidation.valid) 
+      return res.status(400).json({ error: pwValidation.errors.join('; ') });
+
+    // Normalizar email
+    const normalizedEmail = normalizeEmail(email);
+
+    // ✅ SECURITY FIX: Verificar que email NO existe ya en usuarios
+    // Esto previene que un usuario existente registre otro tenant con el mismo email
+    const [emailInUsers] = await pool.query('SELECT id FROM usuarios WHERE email = ? LIMIT 1', [normalizedEmail]);
+    if (emailInUsers.length) return res.status(409).json({ error: 'Ese email ya está registrado' });
+
+    const [emailInTenants] = await pool.query('SELECT id FROM tenants WHERE email = ? LIMIT 1', [normalizedEmail]);
+    if (emailInTenants.length) return res.status(409).json({ error: 'Ese email ya está registrado' });
 
     // Verificar nombre de tenant único
     const existingTenant = await findTenantByName(tenantNombre);
     if (existingTenant) return res.status(409).json({ error: 'Ya existe una inmobiliaria con ese nombre' });
-
-    // Verificar email único en usuarios Y en tenants (ambas tablas tienen UNIQUE en email)
-    const [emailInUsers] = await pool.query('SELECT id FROM usuarios WHERE email = ? LIMIT 1', [email]);
-    if (emailInUsers.length) return res.status(409).json({ error: 'Ese email ya está registrado' });
-
-    const [emailInTenants] = await pool.query('SELECT id FROM tenants WHERE email = ? LIMIT 1', [email]);
-    if (emailInTenants.length) return res.status(409).json({ error: 'Ese email ya está registrado' });
 
     // Crear tenant + usuario en una transacción para evitar orphan tenants
     const conn = await pool.getConnection();
@@ -118,7 +142,7 @@ router.post('/register', async (req, res) => {
 
       const [tResult] = await conn.query(
         'INSERT INTO tenants (nombre, email, plan, activo) VALUES (?, ?, ?, TRUE)',
-        [tenantNombre.trim(), email, 'starter']
+        [tenantNombre.trim(), normalizedEmail, 'starter']
       );
       tenant = { id: tResult.insertId, nombre: tenantNombre.trim() };
 
@@ -130,9 +154,9 @@ router.post('/register', async (req, res) => {
         `INSERT INTO usuarios
           (tenant_id, email, password_hash, nombre, apellido, dni, rol, activo, email_verificado, token_verificacion, token_expira)
          VALUES (?, ?, ?, ?, ?, ?, 'admin', TRUE, FALSE, ?, ?)`,
-        [tenant.id, email, passwordHash, nombre.trim(), apellido?.trim() || null, dni?.trim() || null, verificationToken, tokenExpira]
+        [tenant.id, normalizedEmail, passwordHash, nombre.trim(), apellido?.trim() || null, dni?.trim() || null, verificationToken, tokenExpira]
       );
-      usuario = { id: uResult.insertId, tenantId: tenant.id, email, nombre: nombre.trim(), verificationToken };
+      usuario = { id: uResult.insertId, tenantId: tenant.id, email: normalizedEmail, nombre: nombre.trim(), verificationToken };
 
       await conn.commit();
     } catch (err) {
@@ -146,16 +170,16 @@ router.post('/register', async (req, res) => {
     try {
       await assignFreePlan(usuario.id, tenant.id);
     } catch (planErr) {
-      console.error('[register] Error asignando plan:', planErr.message);
+      logger.error('Error asignando plan Starter', { userId: usuario.id, tenantId: tenant.id, error: planErr.message });
     }
 
     // Enviar mail de verificación (no-fatal si falla)
     let mailError = null;
     let devAutoVerified = false;
     try {
-      await sendVerificationEmail(email, usuario.nombre, usuario.verificationToken);
+      await sendVerificationEmail(normalizedEmail, usuario.nombre, usuario.verificationToken);
     } catch (mailErr) {
-      console.error('[register] Error enviando mail:', mailErr.message);
+      logger.error('Error enviando email de verificación', { userId: usuario.id, email: normalizedEmail, error: mailErr.message });
       mailError = mailErr.message;
 
       // Bypass de desarrollo: si el SMTP falla fuera de producción, auto-verificar
@@ -163,7 +187,7 @@ router.post('/register', async (req, res) => {
       if (process.env.NODE_ENV !== 'production') {
         await pool.query('UPDATE usuarios SET email_verificado = 1 WHERE id = ?', [usuario.id]);
         devAutoVerified = true;
-        console.warn('[register] DEV MODE: email_verificado = 1 forzado (SMTP no disponible)');
+        logger.warn('DEV MODE: email auto-verificado (SMTP no disponible)', { userId: usuario.id });
       }
     }
 
@@ -176,7 +200,7 @@ router.post('/register', async (req, res) => {
       ...(devAutoVerified && { devNote: 'SMTP no disponible en dev — cuenta verificada automáticamente' }),
     });
   } catch (err) {
-    console.error('[register]', err.message);
+    logger.error('Error en registro', { email: normalizeEmail(req.body.email || ''), error: err.message });
     // Detectar duplicados independientemente de mayúsculas o código SQL
     if (err.code === 'ER_DUP_ENTRY' || /ya existe|registrado|duplicate/i.test(err.message)) {
       return res.status(409).json({ error: 'Ese email o nombre de inmobiliaria ya está registrado' });
@@ -235,7 +259,7 @@ async function verifyGoogleToken(token) {
 }
 
 // ── POST /api/auth/google-login ───────────────────────────────────────────────
-router.post('/google-login', async (req, res) => {
+router.post('/google-login', loginLimiter, async (req, res) => {
   try {
     const { credential } = req.body; // JWT token de Google
     if (!credential) return res.status(400).json({ error: 'Se requiere el token de Google' });
@@ -285,15 +309,18 @@ router.post('/google-login', async (req, res) => {
       { expiresIn: '24h' }
     );
 
+    // ✅ SECURITY: Set JWT en HttpOnly cookie (XSS protection)
+    setAuthCookie(res, token);
+
     res.json({ token, usuario, tenant });
   } catch (err) {
-    console.error('[google-login]', err.message);
+    logger.error('Error en Google login', { error: err.message });
     res.status(401).json({ error: err.message || 'Error al autenticar con Google' });
   }
 });
 
 // ── POST /api/auth/google-register ────────────────────────────────────────────
-router.post('/google-register', async (req, res) => {
+router.post('/google-register', registerLimiter, async (req, res) => {
   try {
     const { credential, tenantNombre } = req.body;
     if (!credential) return res.status(400).json({ error: 'Se requiere el token de Google' });
@@ -359,6 +386,9 @@ router.post('/google-register', async (req, res) => {
       { expiresIn: '24h' }
     );
 
+    // ✅ SECURITY: Set JWT en HttpOnly cookie (XSS protection)
+    setAuthCookie(res, token);
+
     res.status(201).json({
       mensaje: '¡Cuenta creada exitosamente con Google!',
       token,
@@ -366,7 +396,7 @@ router.post('/google-register', async (req, res) => {
       tenant,
     });
   } catch (err) {
-    console.error('[google-register]', err.message);
+    logger.error('Error en Google register', { error: err.message });
     if (err.code === 'ER_DUP_ENTRY' || /ya existe|registrado|duplicate/i.test(err.message)) {
       return res.status(409).json({ error: err.message });
     }
@@ -390,9 +420,69 @@ router.post('/logout', authMiddleware, async (req, res) => {
         [jti, req.user.id, expiresAt]
       );
     }
+
+    // ✅ SECURITY: Clear HttpOnly cookie
+    clearAuthCookie(res);
+
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: 'Error al cerrar sesión' });
+  }
+});
+
+// ── POST /api/auth/refresh ─────────────────────────────────────────────────────
+// Permite renovar JWT sin hacer login nuevamente
+// Usa refresh token cookie para obtener nuevo access token
+router.post('/refresh', async (req, res) => {
+  try {
+    // Obtener refresh token del cookie
+    const refreshToken = req.cookies?.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ error: 'Refresh token no encontrado' });
+    }
+
+    // Verificar refresh token (no necesita ser en blacklist, solo que sea válido)
+    let decoded;
+    try {
+      decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET || 'refresh-secret-key');
+    } catch (err) {
+      return res.status(401).json({ error: 'Refresh token inválido o expirado' });
+    }
+
+    // Obtener usuario actual
+    const [usuarios] = await pool.query(
+      'SELECT id, tenant_id, email, nombre, rol FROM usuarios WHERE id = ? AND activo = 1 LIMIT 1',
+      [decoded.id]
+    );
+    if (!usuarios.length) {
+      return res.status(401).json({ error: 'Usuario no encontrado' });
+    }
+
+    const u = usuarios[0];
+
+    // Generar nuevo JWT access token
+    const jti = randomUUID();
+    const accessToken = jwt.sign(
+      {
+        id: u.id,
+        tenantId: u.tenant_id,
+        email: u.email,
+        nombre: u.nombre,
+        rol: u.rol,
+        jti,
+      },
+      process.env.JWT_SECRET || 'secret-key',
+      { expiresIn: '7d' }
+    );
+
+    // Set nuevo JWT en HttpOnly cookie
+    setAuthCookie(res, accessToken);
+
+    logger.info('Refresh token utilizado', { userId: u.id, tenantId: u.tenant_id });
+    res.json({ token: accessToken });
+  } catch (err) {
+    logger.error('Error en refresh token', { error: err.message });
+    res.status(500).json({ error: 'Error al renovar token' });
   }
 });
 

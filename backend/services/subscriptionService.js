@@ -166,6 +166,30 @@ export async function activateSubscription(mpPreapprovalId) {
 
     const sub = rows[0];
 
+    // ✅ CRITICAL: Validar que el monto aprobado coincide con el plan
+    const [planRows] = await conn.query(
+      'SELECT precio_mensual FROM planes WHERE id = ? LIMIT 1',
+      [sub.plan_id]
+    );
+    if (!planRows.length) {
+      await conn.rollback();
+      throw new Error('Plan no encontrado');
+    }
+
+    const planPrice = planRows[0].precio_mensual;
+    const approvedAmount = preapproval.auto_recurring?.transaction_amount ?? 0;
+
+    // Permitir pequeña diferencia por redondeo (0.01)
+    if (Math.abs(approvedAmount - planPrice) > 0.01) {
+      await conn.rollback();
+      console.error(
+        `[webhook] ❌ MONTO INVÁLIDO: Plan=${planPrice}, Aprobado=${approvedAmount}, Preapproval=${mpPreapprovalId}`
+      );
+      throw new Error(
+        `Monto no coincide. Plan: $${planPrice}, Aprobado: $${approvedAmount}`
+      );
+    }
+
     // Cancelar suscripciones activas anteriores del mismo usuario/tenant
     await conn.query(
       `UPDATE suscripciones
@@ -189,7 +213,7 @@ export async function activateSubscription(mpPreapprovalId) {
     );
 
     await conn.commit();
-    return { sub, montoAprobado: preapproval.auto_recurring?.transaction_amount ?? null };
+    return { sub, montoAprobado: approvedAmount };
   } catch (err) {
     await conn.rollback();
     throw err;

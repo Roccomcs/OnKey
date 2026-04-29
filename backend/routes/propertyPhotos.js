@@ -5,17 +5,10 @@ import { Router }           from "express";
 import { pool }             from "../db.js";
 import { authMiddleware }   from "../middleware/auth.js";
 import { subscriptionMiddleware } from "../middleware/subscription.js";
-import multer               from "multer";
+import { createImageUploadMiddleware, sanitizeFilename } from "../middleware/fileUpload.js";
 
 const router  = Router();
-const upload  = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 8 * 1024 * 1024 }, // 8 MB por foto
-  fileFilter: (_, file, cb) => {
-    if (file.mimetype.startsWith("image/")) cb(null, true);
-    else cb(new Error("Solo se permiten imágenes"));
-  },
-});
+const upload  = createImageUploadMiddleware({ maxFiles: 20, maxFileSize: 8 * 1024 * 1024 });
 
 router.use(authMiddleware);
 router.use(subscriptionMiddleware);
@@ -47,7 +40,7 @@ router.get("/:id/photos", async (req, res) => {
 });
 
 // POST /api/properties/:id/photos  — subir una o varias fotos
-router.post("/:id/photos", upload.array("photos", 20), async (req, res) => {
+router.post("/:id/photos", upload, async (req, res) => {
   if (!req.files || req.files.length === 0)
     return res.status(400).json({ error: "No se recibieron archivos" });
 
@@ -62,14 +55,18 @@ router.post("/:id/photos", upload.array("photos", 20), async (req, res) => {
     for (let i = 0; i < req.files.length; i++) {
       const file  = req.files[i];
       const orden = maxOrden + i + 1;
+      
+      // Sanitizar filename
+      const safeName = sanitizeFilename(file.originalname);
+      
       const [result] = await pool.query(
         `INSERT INTO property_photos (tenant_id, propiedad_id, file_name, mime_type, file_size, file_data, orden)
          VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [req.user.tenantId, req.params.id, file.originalname, file.mimetype, file.size, file.buffer, orden]
+        [req.user.tenantId, req.params.id, safeName, file.mimetype, file.size, file.buffer, orden]
       );
       inserted.push({
         id:       result.insertId,
-        fileName: file.originalname,
+        fileName: safeName,
         mimeType: file.mimetype,
         fileSize: file.size,
         orden,

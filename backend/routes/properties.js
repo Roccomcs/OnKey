@@ -4,25 +4,45 @@ import { pool } from "../db.js";
 import { mapProperty, mapTipoDB } from "../mappers.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { subscriptionMiddleware, checkLimits } from "../middleware/subscription.js";
+import { pagination, paginatedResponse } from "../middleware/pagination.js";
+import { validatePrice } from "../validators.js";
+import { createLogger } from "../middleware/logging.js";
 
 const router = Router();
+const logger = createLogger('properties');
 
 router.use(authMiddleware);
 router.use(subscriptionMiddleware);
 
 // GET /api/properties
-router.get("/", async (req, res) => {
+router.get("/", pagination(20), async (req, res) => {
   try {
+    // Obtener propiedades con paginación
     const [rows] = await pool.query(`
       SELECT p.*,
-        (SELECT c.id FROM contratos c WHERE c.propiedad_id = p.id AND c.estado_contrato = 'activo' LIMIT 1) AS leaseId
+        c.id AS leaseId
       FROM propiedades p
+      LEFT JOIN contratos c ON c.propiedad_id = p.id 
+        AND c.estado_contrato = 'activo'
       WHERE p.activo = 1 AND p.tenant_id = ?
       ORDER BY p.id DESC
-    `, [req.user.tenantId]);
-    res.json(rows.map(mapProperty));
+      LIMIT ? OFFSET ?
+    `, [req.user.tenantId, req.pagination.limit, req.pagination.offset]);
+
+    // Contar total para paginación
+    const [[{ total }]] = await pool.query(
+      'SELECT COUNT(*) AS total FROM propiedades WHERE activo = 1 AND tenant_id = ?',
+      [req.user.tenantId]
+    );
+
+    res.json(paginatedResponse(
+      rows.map(mapProperty),
+      req.pagination.page,
+      req.pagination.pageSize,
+      total
+    ));
   } catch (err) {
-    console.error(err);
+    logger.error('Error al obtener propiedades', { error: err.message });
     res.status(500).json({ error: "Error al obtener propiedades" });
   }
 });
@@ -38,6 +58,22 @@ router.post("/", checkLimits('propiedades'), async (req, res) => {
 
   if (!address || !price || !ownerId)
     return res.status(400).json({ error: "Faltan campos: address, price, ownerId" });
+
+  // ✅ Validar precio
+  if (!validatePrice(price)) {
+    return res.status(400).json({ error: "Precio inválido (debe ser entre $0.01 y $999,999.99)" });
+  }
+
+  // ✅ Validar números positivos opcionales
+  if (m2 !== undefined && (!Number.isInteger(Number(m2)) || Number(m2) <= 0)) {
+    return res.status(400).json({ error: "m² debe ser un número positivo" });
+  }
+  if (habitaciones !== undefined && (!Number.isInteger(Number(habitaciones)) || Number(habitaciones) < 0)) {
+    return res.status(400).json({ error: "Habitaciones debe ser un número no negativo" });
+  }
+  if (banos !== undefined && (!Number.isInteger(Number(banos)) || Number(banos) < 0)) {
+    return res.status(400).json({ error: "Baños debe ser un número no negativo" });
+  }
 
   const parts   = address.split(",");
   const dir     = parts[0]?.trim() || address;
@@ -66,7 +102,7 @@ router.post("/", checkLimits('propiedades'), async (req, res) => {
     );
     res.status(201).json(mapProperty(row));
   } catch (err) {
-    console.error(err);
+    logger.error('Error al crear propiedad', { error: err.message });
     res.status(500).json({ error: "Error al crear propiedad" });
   }
 });
@@ -80,6 +116,22 @@ router.put("/:id", async (req, res) => {
     moneda,
     m2, habitaciones, banos, descripcion,
   } = req.body;
+
+  // ✅ Validar precio si se proporciona
+  if (price !== undefined && !validatePrice(price)) {
+    return res.status(400).json({ error: "Precio inválido (debe ser entre $0.01 y $999,999.99)" });
+  }
+
+  // ✅ Validar números positivos opcionales
+  if (m2 !== undefined && (!Number.isInteger(Number(m2)) || Number(m2) <= 0)) {
+    return res.status(400).json({ error: "m² debe ser un número positivo" });
+  }
+  if (habitaciones !== undefined && (!Number.isInteger(Number(habitaciones)) || Number(habitaciones) < 0)) {
+    return res.status(400).json({ error: "Habitaciones debe ser un número no negativo" });
+  }
+  if (banos !== undefined && (!Number.isInteger(Number(banos)) || Number(banos) < 0)) {
+    return res.status(400).json({ error: "Baños debe ser un número no negativo" });
+  }
 
   const parts   = (address || "").split(",");
   const dir     = parts[0]?.trim() || address;
@@ -112,7 +164,7 @@ router.put("/:id", async (req, res) => {
     );
     res.json(mapProperty(row));
   } catch (err) {
-    console.error(err);
+    logger.error('Error al actualizar propiedad', { error: err.message });
     res.status(500).json({ error: "Error al actualizar propiedad" });
   }
 });
@@ -150,7 +202,7 @@ router.delete("/:id", async (req, res) => {
     res.json({ ok: true });
   } catch (err) {
     await conn.rollback();
-    console.error(err);
+    logger.error('Error al eliminar propiedad', { error: err.message });
     res.status(500).json({ error: "Error al eliminar propiedad" });
   } finally {
     conn.release();

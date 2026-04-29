@@ -21,6 +21,13 @@ if (envResult.error) {
 
 import express from "express";
 import cors    from "cors";
+import helmet  from "helmet";
+import cookieParser from "cookie-parser";
+
+import { loginLimiter, registerLimiter, webhookLimiter, emailResendLimiter, generalLimiter } from "./middleware/rateLimiting.js";
+import { extractCookieAuth } from "./middleware/httpOnlyCookies.js";
+import { requestLogger } from "./middleware/logging.js";
+import { dataFilteringMiddleware } from "./middleware/dataFiltering.js";
 
 import propertiesRouter     from "./routes/properties.js";
 import propertyPhotosRouter from "./routes/propertyPhotos.js";   // ← NUEVO
@@ -221,6 +228,21 @@ async function runMigrations() {
 const app  = express();
 const PORT = process.env.PORT || 3001;
 
+// ─── SEGURIDAD: Headers de seguridad ──────────────────────
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+  hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+  frameguard: { action: 'deny' },
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+}));
+
 // CORS configuration - Allow multiple origins
 const allowedOrigins = [
   process.env.FRONTEND_URL || "http://localhost:5173",
@@ -228,7 +250,6 @@ const allowedOrigins = [
   "http://localhost:3000",
   "https://www.onkey.com.ar",
   "https://onkey.com.ar",
-  "https://on-key-beryl.vercel.app", // Legacy Vercel deployment
 ];
 
 app.use(cors({
@@ -248,6 +269,14 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+
+// ─── COOKIES ──────────────────────────────────────────────────
+app.use(cookieParser());
+app.use(extractCookieAuth); // Extrae JWT de cookie al header Authorization
+
+// ─── LOGGING & DATA FILTERING ─────────────────────────────────
+app.use(requestLogger()); // Loguea requests (solo ruta, método, status en prod)
+app.use(dataFilteringMiddleware()); // Filtra datos sensibles de respuestas
 
 // ─── ROUTERS ─────────────────────────────────────────────────
 app.use('/api/auth',          authRouter);

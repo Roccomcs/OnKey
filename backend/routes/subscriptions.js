@@ -2,6 +2,8 @@
 import express from 'express';
 import crypto from 'crypto';
 import { authMiddleware } from '../middleware/auth.js';
+import { webhookLimiter } from '../middleware/rateLimiting.js';
+import { createLogger } from '../middleware/logging.js';
 import {
   getAllPlans,
   getActiveSubscription,
@@ -13,6 +15,7 @@ import {
 } from '../services/subscriptionService.js';
 
 const router = express.Router();
+const logger = createLogger('subscriptions');
 
 // ─────────────────────────────────────────────
 // GET /api/subscriptions/planes
@@ -67,7 +70,7 @@ router.post('/upgrade', authMiddleware, async (req, res) => {
       mensaje: 'Redirigí al usuario a init_point para completar el pago',
     });
   } catch (err) {
-    console.error('[subscriptions/upgrade]', err.message);
+    logger.error('Error en upgrade', { userId: req.user.id, error: err.message });
     res.status(500).json({ error: err.message });
   }
 });
@@ -77,7 +80,7 @@ router.post('/upgrade', authMiddleware, async (req, res) => {
 // Webhook de MercadoPago — VERIFICACIÓN DE FIRMA REQUERIDA
 // MP envía notificaciones cuando el estado del pago cambia
 // ─────────────────────────────────────────────
-router.post('/webhook', async (req, res) => {
+router.post('/webhook', webhookLimiter, async (req, res) => {
   // C5: Verificar firma ANTES de responder — rechazar con 401 si es inválida
   const xSignature = req.headers['x-signature'];
   const xRequestId = req.headers['x-request-id'];
@@ -90,7 +93,7 @@ router.post('/webhook', async (req, res) => {
     const manifest = `id:${req.body?.data?.id};request-id:${xRequestId};ts:${ts};`;
     const expected = crypto.createHmac('sha256', mpWebhookSecret).update(manifest).digest('hex');
     if (expected !== v1) {
-      console.warn('[webhook] ⚠️  Firma inválida — rechazando');
+      logger.warn('Firma webhook inválida', { xRequestId });
       return res.status(401).json({ error: 'Firma inválida' });
     }
   }
@@ -100,7 +103,7 @@ router.post('/webhook', async (req, res) => {
 
   try {
     const { type, data } = req.body;
-    console.log('[webhook] ✅ Notificación MP verificada:', { type, data });
+    logger.info('Notificación MercadoPago recibida', { type, dataId: data?.id });
 
     // Solo procesar eventos de suscripciones
     if (type !== 'subscription_preapproval') return;
@@ -110,12 +113,12 @@ router.post('/webhook', async (req, res) => {
 
     // C6+C7: activateSubscription devuelve { sub, montoAprobado } desde MP
     const { sub, montoAprobado } = await activateSubscription(preapprovalId);
-    console.log(`[webhook] ✅ Suscripción activada para usuario ${sub.usuario_id}`);
+    logger.info('Suscripción activada desde webhook', { userId: sub.usuario_id, tenantId: sub.tenant_id });
 
     await recordPayment(sub.id, sub.usuario_id, sub.tenant_id, montoAprobado ?? 0, 'completado', preapprovalId);
   } catch (err) {
     // No lanzar error (ya respondimos 200) — solo loguear
-    console.error('[webhook] ❌', err.message);
+    logger.error('Error procesando webhook', { error: err.message });
   }
 });
 
