@@ -8,6 +8,7 @@ import {
 import { assignFreePlan } from '../services/subscriptionService.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { setAuthCookie, clearAuthCookie } from '../middleware/httpOnlyCookies.js';
+import { generateCSRFToken } from '../middleware/csrf.js';
 import { loginLimiter, registerLimiter, emailResendLimiter } from '../middleware/rateLimiting.js';
 import { createLogger } from '../middleware/logging.js';
 import { pool } from '../db.js';
@@ -57,9 +58,12 @@ router.post('/login', loginLimiter, async (req, res) => {
 
     // ✅ SECURITY: Set JWT en HttpOnly cookie (XSS protection)
     setAuthCookie(res, result.token);
+    
+    // ✅ SECURITY: Generar token CSRF para proteger escrituras
+    const csrfToken = generateCSRFToken(result.usuario.jti);
 
     logger.info('Usuario autenticado exitosamente', { userId: u.id, tenantId: u.tenant_id });
-    res.json({ token: result.token, usuario: result.usuario, tenant });
+    res.json({ token: result.token, usuario: result.usuario, tenant, csrfToken });
   } catch (err) {
     logger.error('Error en login', { email: normalizeEmail(email), error: err.message });
     if (err.message.includes('Email o contraseña') || err.message.includes('verificar')) {
@@ -311,8 +315,11 @@ router.post('/google-login', loginLimiter, async (req, res) => {
 
     // ✅ SECURITY: Set JWT en HttpOnly cookie (XSS protection)
     setAuthCookie(res, token);
+    
+    // ✅ SECURITY: Generar token CSRF para proteger escrituras
+    const csrfToken = generateCSRFToken(jti);
 
-    res.json({ token, usuario, tenant });
+    res.json({ token, usuario, tenant, csrfToken });
   } catch (err) {
     logger.error('Error en Google login', { error: err.message });
     res.status(401).json({ error: err.message || 'Error al autenticar con Google' });
@@ -388,12 +395,16 @@ router.post('/google-register', registerLimiter, async (req, res) => {
 
     // ✅ SECURITY: Set JWT en HttpOnly cookie (XSS protection)
     setAuthCookie(res, token);
+    
+    // ✅ SECURITY: Generar token CSRF para proteger escrituras
+    const csrfToken = generateCSRFToken(jti);
 
     res.status(201).json({
       mensaje: '¡Cuenta creada exitosamente con Google!',
       token,
       usuario: { id: usuario.id, email: usuario.email, nombre: usuario.nombre },
       tenant,
+      csrfToken,
     });
   } catch (err) {
     logger.error('Error en Google register', { error: err.message });

@@ -1,0 +1,35 @@
+# OnKey - Gestión de Propiedades
+# Robots exclusion rules
+
+# Allow all robots
+User-agent: *
+Allow: /
+
+# Disallow API endpoints
+Disallow: /api/
+
+# Disallow admin and private areas
+Disallow: /admin/
+Disallow: /dashboard
+Disallow: /login
+Disallow: /register
+
+# Allow search engines to index landing page and key pages
+Allow: /$
+Allow: /features
+Allow: /pricing
+Allow: /contact
+
+# Sitemap
+Sitemap: https://www.onkey.com.ar/sitemap.xml
+Sitemap: https://onkey.com.ar/sitemap.xml
+
+# Crawl delay (optional, for low-traffic sites)
+# Crawl-delay: 1
+
+# Bot-specific rules
+User-agent: AdsBot-Google
+Allow: /
+
+User-agent: Googlebot
+Allow: /

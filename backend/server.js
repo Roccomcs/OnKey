@@ -28,6 +28,7 @@ import { loginLimiter, registerLimiter, webhookLimiter, emailResendLimiter, gene
 import { extractCookieAuth } from "./middleware/httpOnlyCookies.js";
 import { requestLogger } from "./middleware/logging.js";
 import { dataFilteringMiddleware } from "./middleware/dataFiltering.js";
+import { csrfProtection } from "./middleware/csrf.js";
 
 import propertiesRouter     from "./routes/properties.js";
 import propertyPhotosRouter from "./routes/propertyPhotos.js";   // ← NUEVO
@@ -39,6 +40,7 @@ import indicesRouter        from "./routes/indices.js";
 import authRouter           from "./routes/auth.js";
 import subscriptionsRouter  from "./routes/subscriptions.js";
 import activitiesRouter     from "./routes/activities.js";
+import seoRouter            from "./routes/seo.js";
 
 import { pool, columnExists } from "./db.js";
 import "./cron.js";
@@ -278,6 +280,9 @@ app.use(extractCookieAuth); // Extrae JWT de cookie al header Authorization
 app.use(requestLogger()); // Loguea requests (solo ruta, método, status en prod)
 app.use(dataFilteringMiddleware()); // Filtra datos sensibles de respuestas
 
+// ─── CSRF PROTECTION ──────────────────────────────────────────
+app.use(csrfProtection); // Valida token CSRF en POST, PUT, DELETE
+
 // ─── ROUTERS ─────────────────────────────────────────────────
 app.use('/api/auth',          authRouter);
 app.use('/api/subscriptions', subscriptionsRouter);
@@ -289,6 +294,7 @@ app.use('/api/leases',        leasesRouter);
 app.use('/api/documents',     documentsRouter);
 app.use('/api/indices',       indicesRouter);
 app.use('/api/activities',    activitiesRouter);
+app.use('/',                  seoRouter);  // ← SEO: sitemap.xml, robots.txt
 
 // ─── HEALTH CHECK ────────────────────────────────────────────
 app.get("/api/health", (_req, res) => res.json({ status: "ok", ts: new Date() }));
