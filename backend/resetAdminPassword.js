@@ -41,13 +41,12 @@ if (!email) {
 }
 
 /**
- * Valida que la contraseña cumpla con OWASP SP 800-63B
+ * Valida que la contraseña cumpla con OWASP SP 800-63B simplificado
  */
 function validatePassword(pwd) {
   const errors = [];
-  if (pwd.length < 12) errors.push('Mínimo 12 caracteres');
+  if (pwd.length < 8) errors.push('Mínimo 8 caracteres');
   if (!/[A-Z]/.test(pwd)) errors.push('Requiere al menos 1 mayúscula');
-  if (!/[a-z]/.test(pwd)) errors.push('Requiere al menos 1 minúscula');
   if (!/[0-9]/.test(pwd)) errors.push('Requiere al menos 1 número');
   if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd)) errors.push('Requiere al menos 1 símbolo');
   return { valid: errors.length === 0, errors };
