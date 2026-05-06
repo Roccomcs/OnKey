@@ -6,10 +6,10 @@
 
 /**
  * RFC 5322 simplified regex para validación de email
- * Acepta: usuario@dominio.com
+ * Acepta: usuario@dominio.com, usuario@localhost, usuario@127.0.0.1
  * Rechaza: usuario@, @dominio.com, usuario@@dominio
  */
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@.]+(\.[^\s@]+)*$/;
 
 /**
  * Valida formato de email

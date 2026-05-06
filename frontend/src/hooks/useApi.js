@@ -47,7 +47,11 @@ export function useApi(endpoint, token = null) {
       }
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      setData(await res.json());
+      const json = await res.json();
+      
+      // Si la respuesta tiene estructura paginada { data, pagination }, extraer solo data
+      const finalData = json?.data !== undefined ? json.data : json;
+      setData(finalData);
     } catch (e) {
       setError(e.message);
       console.error(`[useApi] Error en ${endpoint}:`, e.message);

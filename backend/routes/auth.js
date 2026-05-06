@@ -49,8 +49,8 @@ router.post('/login', loginLimiter, async (req, res) => {
       return res.status(403).json({ error: 'Debés verificar tu email antes de ingresar', code: 'EMAIL_NOT_VERIFIED' });
     }
 
-    // ✅ Autenticar con contraseña
-    const result = await authenticateUser(email, password, u.tenant_id);
+    // ✅ Autenticar con contraseña (usar email normalizado)
+    const result = await authenticateUser(normalizeEmail(email), password, u.tenant_id);
 
     // 📊 Obtener tenant
     const [tenants] = await pool.query('SELECT id, nombre FROM tenants WHERE id = ? LIMIT 1', [u.tenant_id]);

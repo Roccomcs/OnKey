@@ -77,6 +77,9 @@ export function getCSRFToken(jti) {
  * - Query: _csrf
  * 
  * Se aplica a: POST, PUT, DELETE, PATCH
+ * 
+ * Excluye: Endpoints de autenticación (login, register, etc.) 
+ * porque aún no hay usuario autenticado
  */
 export function csrfProtection(req, res, next) {
   // Skip CSRF check para métodos seguros (GET, HEAD, OPTIONS)
@@ -84,8 +87,18 @@ export function csrfProtection(req, res, next) {
     return next();
   }
 
-  // Skip CSRF check para rutas que lo requieren (ej: webhook de Mercury)
-  if (req.path === '/api/subscriptions/webhook') {
+  // Skip CSRF check para endpoints de autenticación (sin usuario previo)
+  const unauthenticatedPaths = [
+    '/api/auth/login',
+    '/api/auth/register',
+    '/api/auth/google-login',
+    '/api/auth/google-register',
+    '/api/auth/resend-verification',
+    '/api/auth/verify-email',
+    '/api/subscriptions/webhook', // Webhook de Mercury
+  ];
+
+  if (unauthenticatedPaths.includes(req.path)) {
     return next();
   }
 

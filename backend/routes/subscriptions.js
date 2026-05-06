@@ -33,14 +33,13 @@ router.get('/planes', async (_req, res) => {
 // ─────────────────────────────────────────────
 // GET /api/subscriptions/mi-plan
 // Devuelve la suscripción activa del usuario actual
+// Si no hay, devuelve null (no error 404)
 // ─────────────────────────────────────────────
 router.get('/mi-plan', authMiddleware, async (req, res) => {
   try {
     const suscripcion = await getActiveSubscription(req.user.id, req.user.tenantId);
-    if (!suscripcion) {
-      return res.status(404).json({ error: 'Sin suscripción activa' });
-    }
-    res.json(suscripcion);
+    // Devuelve null si no hay suscripción (permitir app funcione sin suscripción)
+    res.json(suscripcion || null);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
