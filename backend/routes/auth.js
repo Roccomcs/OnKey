@@ -179,29 +179,36 @@ router.post('/register', registerLimiter, async (req, res) => {
 
     // Enviar mail de verificación (no-fatal si falla)
     let mailError = null;
-    let devAutoVerified = false;
-    try {
-      await sendVerificationEmail(normalizedEmail, usuario.nombre, usuario.verificationToken);
-    } catch (mailErr) {
-      logger.error('Error enviando email de verificación', { userId: usuario.id, email: normalizedEmail, error: mailErr.message });
-      mailError = mailErr.message;
+    let autoVerified = false;
+    
+    // Si SKIP_EMAIL_VERIFICATION está activado, verificar automáticamente
+    if (process.env.SKIP_EMAIL_VERIFICATION === 'true') {
+      await pool.query('UPDATE usuarios SET email_verificado = 1 WHERE id = ?', [usuario.id]);
+      autoVerified = true;
+      logger.warn('SKIP_EMAIL_VERIFICATION: cuenta auto-verificada', { userId: usuario.id });
+    } else {
+      try {
+        await sendVerificationEmail(normalizedEmail, usuario.nombre, usuario.verificationToken);
+      } catch (mailErr) {
+        logger.error('Error enviando email de verificación', { userId: usuario.id, email: normalizedEmail, error: mailErr.message });
+        mailError = mailErr.message;
 
-      // Bypass de desarrollo: si el SMTP falla fuera de producción, auto-verificar
-      // para no bloquear el testing del login
-      if (process.env.NODE_ENV !== 'production') {
-        await pool.query('UPDATE usuarios SET email_verificado = 1 WHERE id = ?', [usuario.id]);
-        devAutoVerified = true;
-        logger.warn('DEV MODE: email auto-verificado (SMTP no disponible)', { userId: usuario.id });
+        // Bypass de desarrollo: si el SMTP falla fuera de producción, auto-verificar
+        if (process.env.NODE_ENV !== 'production') {
+          await pool.query('UPDATE usuarios SET email_verificado = 1 WHERE id = ?', [usuario.id]);
+          autoVerified = true;
+          logger.warn('DEV MODE: email auto-verificado (SMTP no disponible)', { userId: usuario.id });
+        }
       }
     }
 
     res.status(201).json({
-      mensaje: devAutoVerified
-        ? `Cuenta creada. (Dev: email auto-verificado, podés ingresar ya)`
+      mensaje: autoVerified
+        ? `Cuenta creada. Podés ingresar ya`
         : `¡Listo! Revisá tu correo ${email} para verificar tu cuenta.`,
       tenantNombre: tenant.nombre,
-      ...(mailError && !devAutoVerified && { mailWarning: 'No pudimos enviar el email de verificación. Usá el botón "Reenviar" al iniciar sesión.' }),
-      ...(devAutoVerified && { devNote: 'SMTP no disponible en dev — cuenta verificada automáticamente' }),
+      ...(mailError && !autoVerified && { mailWarning: 'No pudimos enviar el email de verificación. Usá el botón "Reenviar" al iniciar sesión.' }),
+      ...(autoVerified && { devNote: 'Email auto-verificado (verificación saltada)' }),
     });
   } catch (err) {
     logger.error('Error en registro', { email: normalizeEmail(req.body.email || ''), error: err.message });
