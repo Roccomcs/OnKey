@@ -9,7 +9,7 @@ import { assignFreePlan } from '../services/subscriptionService.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { setAuthCookie, clearAuthCookie } from '../middleware/httpOnlyCookies.js';
 import { generateCSRFToken } from '../middleware/csrf.js';
-import { loginLimiter, registerLimiter, emailResendLimiter } from '../middleware/rateLimiting.js';
+import { loginLimiter, registerLimiter, emailResendLimiter, googleAuthLimiter } from '../middleware/rateLimiting.js';
 import { createLogger } from '../middleware/logging.js';
 import { pool } from '../db.js';
 import jwt from 'jsonwebtoken';
@@ -263,7 +263,7 @@ async function verifyGoogleToken(token) {
 }
 
 // ── POST /api/auth/google-login ───────────────────────────────────────────────
-router.post('/google-login', loginLimiter, async (req, res) => {
+router.post('/google-login', googleAuthLimiter, async (req, res) => {
   try {
     const { credential } = req.body; // JWT token de Google
     if (!credential) return res.status(400).json({ error: 'Se requiere el token de Google' });
@@ -327,7 +327,7 @@ router.post('/google-login', loginLimiter, async (req, res) => {
 });
 
 // ── POST /api/auth/google-register ────────────────────────────────────────────
-router.post('/google-register', registerLimiter, async (req, res) => {
+router.post('/google-register', googleAuthLimiter, async (req, res) => {
   try {
     const { credential, tenantNombre } = req.body;
     if (!credential) return res.status(400).json({ error: 'Se requiere el token de Google' });

@@ -16,6 +16,9 @@ export const loginLimiter = rateLimit({
   message: 'Demasiados intentos de login. Intenta de nuevo en 15 minutos.',
   standardHeaders: true, // Retorna info en header `RateLimit-*`
   legacyHeaders: false, // Deshabilita header `X-RateLimit-*`
+  handler: (req, res) => {
+    res.status(429).json({ error: 'Demasiados intentos de login. Intenta de nuevo en 15 minutos.' });
+  },
   skip: (req) => {
     // Skip para desarrollo
     return process.env.NODE_ENV === 'development';
@@ -32,6 +35,9 @@ export const registerLimiter = rateLimit({
   message: 'Demasiados registros desde tu IP. Intenta mañana.',
   standardHeaders: true,
   legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({ error: 'Demasiados registros desde tu IP. Intenta mañana.' });
+  },
   skip: (req) => process.env.NODE_ENV === 'development',
 });
 
@@ -46,6 +52,9 @@ export const webhookLimiter = rateLimit({
   message: 'Demasiados webhooks. Contacta a soporte.',
   standardHeaders: true,
   legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({ error: 'Demasiados webhooks. Contacta a soporte.' });
+  },
   skip: (req) => process.env.NODE_ENV === 'development',
 });
 
@@ -59,6 +68,9 @@ export const emailResendLimiter = rateLimit({
   message: 'Demasiados intentos de reenvío. Intenta mañana.',
   standardHeaders: true,
   legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({ error: 'Demasiados intentos de reenvío. Intenta mañana.' });
+  },
   skip: (req) => process.env.NODE_ENV === 'development',
 });
 
@@ -71,5 +83,22 @@ export const generalLimiter = rateLimit({
   max: 1000, // Generoso, pero previene DoS masivos
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => process.env.NODE_ENV === 'development',
+});
+
+/**
+ * Rate limiter para Google login (más permisivo que login tradicional)
+ * Max 20 intentos por IP cada 15 minutos
+ * (Google verifica identidad, menos riesgo de brute force)
+ */
+export const googleAuthLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: 'Demasiados intentos de Google login. Intenta de nuevo en 15 minutos.',
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({ error: 'Demasiados intentos de Google login. Intenta de nuevo en 15 minutos.' });
+  },
   skip: (req) => process.env.NODE_ENV === 'development',
 });
