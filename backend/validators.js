@@ -22,8 +22,8 @@ export function validateEmail(email) {
 }
 
 /**
- * Valida contraseña según estándares OWASP
- * Mínimo 12 caracteres con:
+ * Valida contraseña según estándares OWASP SP 800-63B simplificado
+ * Mínimo 8 caracteres con:
  * - Al menos 1 mayúscula
  * - Al menos 1 número
  * - Al menos 1 símbolo especial
@@ -38,8 +38,8 @@ export function validatePassword(password) {
     return { valid: false, errors: ['Contraseña requerida'] };
   }
 
-  if (password.length < 12) {
-    errors.push('Mínimo 12 caracteres');
+  if (password.length < 8) {
+    errors.push('Mínimo 8 caracteres');
   }
 
   if (!/[A-Z]/.test(password)) {
