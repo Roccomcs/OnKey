@@ -20,8 +20,8 @@ const logger = createLogger('auth');
 
 // ── POST /api/auth/login ──────────────────────────────────────────────────────
 router.post('/login', loginLimiter, async (req, res) => {
+  const { email, password } = req.body;
   try {
-    const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Se requieren email y contraseña' });
 
     // Validar formato de email
@@ -65,7 +65,7 @@ router.post('/login', loginLimiter, async (req, res) => {
     logger.info('Usuario autenticado exitosamente', { userId: u.id, tenantId: u.tenant_id });
     res.json({ token: result.token, usuario: result.usuario, tenant, csrfToken });
   } catch (err) {
-    logger.error('Error en login', { email: normalizeEmail(email), error: err.message });
+    logger.error('Error en login', { email: email ? normalizeEmail(email) : 'unknown', error: err.message });
     if (err.message.includes('Email o contraseña') || err.message.includes('verificar')) {
       return res.status(401).json({ error: err.message, code: err.message.includes('verificar') ? 'EMAIL_NOT_VERIFIED' : undefined });
     }

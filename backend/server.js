@@ -142,8 +142,8 @@ async function runMigrations() {
 
   // Crear plan Starter si no existe (required para new users)
   const ensureStarterPlan = `
-    INSERT IGNORE INTO planes (nombre, activo, precio_mensual, max_propiedades, max_contratos, max_contactos, max_usuarios)
-    VALUES ('Starter', 1, 0, 5, 5, 10, 1)
+    INSERT IGNORE INTO planes (nombre, activo, precio_mensual, max_propiedades, max_contratos, max_contactos)
+    VALUES ('Starter', 1, 0, 5, 5, 10)
   `;
 
   try {
@@ -229,6 +229,11 @@ async function runMigrations() {
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
+
+// ─── TRUST PROXY: Necesario para rate-limiting detrás de proxy (Railway, Vercel, etc)
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
 
 // ─── SEGURIDAD: Headers de seguridad ──────────────────────
 app.use(helmet({
